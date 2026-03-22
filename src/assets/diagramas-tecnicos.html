@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Diagramas Técnicos - TRIVIA WAR</title>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10.6.1/dist/mermaid.min.js"></script>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            color: white;
+            margin: 0;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        
+        h2 {
+            color: #01ba9a;
+            font-size: 1.8rem;
+            margin: 2rem 0 1rem 0;
+            text-shadow: 0 0 15px rgba(1, 186, 154, 0.5);
+            text-align: center;
+        }
+        
+        h3 {
+            color: #f6ad55;
+            font-size: 1.4rem;
+            margin: 1.5rem 0 1rem 0;
+            text-shadow: 0 0 10px rgba(246, 173, 85, 0.4);
+        }
+        
+        hr {
+            border: none;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #01ba9a, transparent);
+            margin: 2rem 0;
+        }
+        
+        .mermaid {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 2rem;
+            margin: 2rem 0;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+
+<h2>🎯 Arquitectura y Tecnología</h2>
+
+<div class="mermaid">
+flowchart TD
+    A{🎮 TRIVIA WAR<br/>Sistema Multijugador<br/>con IA Generativa}
+    B{⚙️ Angular + Node.js<br/>Stack Tecnológico<br/>Frontend + Backend}
+    C{🏗️ AWS Cloud Services<br/>Arquitectura Serverless<br/>Infraestructura Escalable}
+    
+    B1[🎨 Angular 20 + TypeScript<br/>Experiencia Usuario<br/>Gaming Neon + Responsive]
+    B2[⚡ Lambda + DynamoDB<br/>Motor del Juego<br/>Serverless + API REST]
+    B3[🤖 Gemini + Bedrock Claude<br/>Inteligencia Artificial<br/>IA Híbrida + Fallback]
+
+    C1[🌐 AWS Amplify<br/>Hosting Inteligente<br/>Deploy + CDN Global]
+    C2[🔐 AWS Cognito<br/>Autenticación Segura<br/>Usuarios + Sesiones]
+    C3[💾 AWS DynamoDB<br/>Base de Datos NoSQL<br/>Escalable + Ranking]
+    C4[💰 AWS Lambda + Bedrock<br/>Costo Operativo<br/>Pay-per-Use Serverless]
+
+    A --> B
+    A --> C
+    
+    B --> B1
+    B --> B2
+    B --> B3
+    
+    C --> C1
+    C --> C2
+    C --> C3
+    C --> C4
+
+    B1 ~~~ B2 ~~~ B3
+    C1 ~~~ C2 ~~~ C3 ~~~ C4
+    B ~~~ A ~~~ C
+</div>
+
+<h2>🎮 Flujo de Experiencia de Usuario</h2>
+
+<div class="mermaid">
+flowchart TD
+    A4{🎯 Modo de Juego<br/>Selección Central}
+    
+    A1[🎆 Splash]
+    A2[🔑 Login]
+    A3[🏠 Dashboard]
+    
+    A5[📝 Configurar<br/>Sala]
+    A6[🚪 Lobby<br/>Espera]
+    A7[⚔️ Arena<br/>Gaming]
+    
+    A9[🏋️ Entrenar<br/>Práctica]
+    A10[🎮 Juego<br/>Individual]
+    
+    A8[🏆 Resultados<br/>Finales]
+    A11[🏅 Ranking<br/>Global]
+    
+    AUTH[🔐 Cognito<br/>Auth Service]
+    API[⚡ Lambda<br/>API Functions]
+    
+    A1 --> A2 --> A3 --> A4
+    
+    A4 -->|Multijugador| A5
+    A4 -->|Individual| A9
+    
+    A5 --> A6 --> A7
+    A9 --> A10
+    
+    A7 --> A8
+    A10 --> A8
+    A8 --> A11
+    
+    A2 -.->|Auth| AUTH
+    A7 -.->|API| API
+    A10 -.->|API| API
+    A8 -.->|Stats| API
+    
+    A5 ~~~ A4 ~~~ A9
+    A6 ~~~ A8 ~~~ A10
+    AUTH ~~~ A3 ~~~ API
+    A7 ~~~ A11
+</div>
+
+<h2>🏠 Armado de Salas Modo Multijugador</h2>
+
+<div class="mermaid">
+flowchart TD
+    API{☁️ AWS LAMBDA<br/>Coordinador Central}
+    
+    J1[👑 HOST<br/>Jugador 1]
+    J2[👤 INVITADO<br/>Jugador 2] 
+    J3[👤 INVITADO<br/>Jugador 3]
+    J4[👤 INVITADO<br/>Jugador 4]
+    
+    DB[🗄️ DynamoDB<br/>Estado Sala]
+    IA1[🤖 GEMINI<br/>IA Primaria]
+    IA2[🧠 BEDROCK<br/>IA Backup]
+    
+    J1 <-->|HTTP Polling<br/>cada 5s| API
+    J2 <-->|HTTP Polling<br/>cada 5s| API
+    J3 <-->|HTTP Polling<br/>cada 5s| API
+    J4 <-->|HTTP Polling<br/>cada 5s| API
+    
+    API <-->|CRUD<br/>Operations| DB
+    API -->|Generate<br/>Questions| IA1
+    IA1 -.->|Fallback| IA2
+    
+    J1 ~~~ J2 ~~~ J3 ~~~ J4
+    DB ~~~ IA1 ~~~ IA2
+    J2 ~~~ API ~~~ J3
+</div>
+
+<h2>🤖 Sistema IA Híbrido</h2>
+
+<div class="mermaid">
+flowchart LR
+    REQ[📝 REQUEST IA<br/>Generar Preguntas<br/>Sistema Híbrido]
+    
+    C1[🤖 GEMINI 2.0 FLASH<br/>Servicio Primario<br/>GRATIS - 1000 req/min]
+    C2[🧠 BEDROCK CLAUDE<br/>Fallback Automático<br/>$0.0007/request]
+    
+    RES[✅ RESPONSE<br/>Preguntas Generadas<br/>JSON Validado]
+    
+    REQ --> C1
+    REQ --> C2
+    C1 --> RES
+    C2 --> RES
+    
+    C1 ~~~ C2
+</div>
+
+<script>
+    mermaid.initialize({ 
+        startOnLoad: true,
+        theme: 'dark',
+        themeVariables: {
+            primaryColor: '#01ba9a',
+            primaryTextColor: '#ffffff',
+            primaryBorderColor: '#00cee6',
+            lineColor: '#ffffff',
+            sectionBkgColor: '#2d3748',
+            altSectionBkgColor: '#1a202c',
+            gridColor: '#ffffff',
+            secondaryColor: '#f6ad55',
+            tertiaryColor: '#fc8181'
+        }
+    });
+</script>
+
+</body>
+</html>

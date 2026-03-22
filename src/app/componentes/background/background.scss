@@ -1,0 +1,580 @@
+// === COMPONENTE GAMING NEÓN BACKGROUND OPTIMIZADO ===
+
+.background-container {
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+  z-index: -1; /* Asegúrate de que el body/html tenga background: transparent */
+  pointer-events: none;
+}
+
+/* Ondas decorativas */
+.wave {
+  position: absolute;
+  opacity: 0.4;
+}
+
+.wave-left {
+  left: -10%;
+  top: 0;
+  width: 40%;
+  height: 100%;
+  background: radial-gradient(ellipse at center, rgba(138, 43, 226, 0.3) 0%, transparent 70%);
+  border-radius: 0 50% 50% 0;
+  animation: pulseWave 4s ease-in-out infinite;
+}
+
+.wave-right {
+  right: -10%;
+  top: 20%;
+  width: 45%;
+  height: 80%;
+  background: radial-gradient(ellipse at center, rgba(75, 0, 130, 0.4) 0%, transparent 70%);
+  border-radius: 50% 0 0 50%;
+  animation: pulseWave 5s ease-in-out infinite reverse;
+}
+
+/* Elementos flotantes estilo neón */
+.neon-element {
+  position: absolute;
+  filter: drop-shadow(0 0 10px currentColor);
+  animation: float 6s ease-in-out infinite;
+  will-change: transform;
+}
+
+.globe {
+  top: 60%;
+  right: 10%;
+  width: 80px;
+  height: 80px;
+  border: 3px solid #ff10f0;
+  border-radius: 50%;
+  box-shadow: 0 0 20px #ff10f0, inset 0 0 20px rgba(255, 16, 240, 0.3);
+  animation: float 4s ease-in-out infinite, rotate 20s linear infinite;
+}
+
+.globe::before,
+.globe::after {
+  content: '';
+  position: absolute;
+  border: 2px solid #ff10f0;
+}
+
+.globe::before {
+  width: 100%;
+  height: 60%;
+  top: 20%;
+  left: 0;
+  border-radius: 50%;
+}
+
+.globe::after {
+  width: 60%;
+  height: 100%;
+  left: 20%;
+  top: 0;
+  border-radius: 50%;
+}
+
+.gamepad {
+  top: 25%;
+  left: 12%;
+  width: 70px;
+  height: 50px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 20px 20px 30px 30px;
+  box-shadow: 0 0 30px rgba(102, 126, 234, 0.8);
+  animation: float 5s ease-in-out infinite;
+}
+
+.gamepad::before,
+.gamepad::after {
+  content: '';
+  position: absolute;
+  background: #00ffff;
+  box-shadow: 0 0 10px #00ffff;
+}
+
+.gamepad::before {
+  width: 8px;
+  height: 20px;
+  top: 15px;
+  left: 15px;
+  clip-path: polygon(30% 0%, 70% 0%, 70% 40%, 100% 40%, 100% 60%, 70% 60%, 70% 100%, 30% 100%, 30% 60%, 0% 60%, 0% 40%, 30% 40%);
+}
+
+.gamepad::after {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  top: 20px;
+  right: 20px;
+}
+
+/* Joysticks estilo Nintendo NES */
+.joystick {
+  position: absolute;
+  animation: float 6s ease-in-out infinite;
+}
+
+.joystick-body {
+  width: 90px;
+  height: 70px;
+  background: transparent;
+  border: 3px solid;
+  border-radius: 8px;
+  position: relative;
+  box-shadow: 0 0 20px currentColor;
+}
+
+.joystick-1 {
+  top: 35%;
+  left: 8%;
+}
+
+.joystick-1 .joystick-body {
+  border-color: #00ffff;
+}
+
+.joystick-2 {
+  bottom: 20%;
+  right: 12%;
+}
+
+.joystick-2 .joystick-body {
+  border-color: #ff10f0;
+}
+
+/* Cruz direccional (D-pad) */
+.dpad {
+  position: absolute;
+  width: 28px;
+  height: 28px;
+  top: 50%;
+  left: 20%;
+  transform: translate(-50%, -50%);
+}
+
+.dpad::before,
+.dpad::after {
+  content: '';
+  position: absolute;
+  background: currentColor;
+  box-shadow: 0 0 8px currentColor;
+}
+
+.dpad::before {
+  width: 28px;
+  height: 9px;
+  top: 50%;
+  left: 0;
+  transform: translateY(-50%);
+}
+
+.dpad::after {
+  width: 9px;
+  height: 28px;
+  left: 50%;
+  top: 0;
+  transform: translateX(-50%);
+}
+
+/* Botones A y B */
+.buttons {
+  position: absolute;
+  right: 18%;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.button {
+  width: 12px;
+  height: 12px;
+  border: 2px solid currentColor;
+  border-radius: 50%;
+  position: absolute;
+  box-shadow: 0 0 10px currentColor;
+}
+
+.button-a {
+  right: 0;
+  top: 8px;
+}
+
+.button-b {
+  right: 18px;
+  top: 0;
+}
+
+/* Orbitas */
+.orbit {
+  position: absolute;
+  border: 2px solid;
+  border-radius: 50%;
+}
+
+.orbit-1 {
+  top: 15%;
+  left: 5%;
+  width: 150px;
+  height: 150px;
+  border-color: rgba(0, 255, 255, 0.3);
+  box-shadow: 0 0 20px rgba(0, 255, 255, 0.5);
+}
+
+.orbit-1::after {
+  content: '';
+  position: absolute;
+  width: 15px;
+  height: 15px;
+  background: linear-gradient(135deg, #00ffff, #00ffff);
+  border-radius: 50%;
+  top: -7px;
+  left: 50%;
+  transform: translateX(-50%);
+  box-shadow: 0 0 20px #00ffff;
+  animation: orbitRotate1 15s linear infinite;
+}
+
+.orbit-2 {
+  bottom: 10%;
+  right: 8%;
+  width: 200px;
+  height: 200px;
+  border-color: rgba(255, 16, 240, 0.3);
+  box-shadow: 0 0 20px rgba(255, 16, 240, 0.5);
+}
+
+.orbit-2::after {
+  content: '';
+  position: absolute;
+  width: 18px;
+  height: 18px;
+  background: linear-gradient(135deg, #ff10f0, #c471ed);
+  border-radius: 50%;
+  bottom: -9px;
+  left: 50%;
+  transform: translateX(-50%);
+  box-shadow: 0 0 20px #ff10f0;
+  animation: orbitRotate2 20s linear infinite reverse;
+}
+
+.orbit-3 {
+  top: 5%;
+  right: 5%;
+  width: 170px;
+  height: 170px;
+  border-color: rgba(0, 255, 136, 0.3);
+  box-shadow: 0 0 20px rgba(0, 255, 136, 0.4);
+}
+
+.orbit-3::after {
+  content: '';
+  position: absolute;
+  width: 12px;
+  height: 12px;
+  background: linear-gradient(135deg, #00ff88, #00ffaa);
+  border-radius: 50%;
+  top: -6px;
+  left: 50%;
+  transform: translateX(-50%);
+  box-shadow: 0 0 15px #00ff88;
+  animation: orbitRotate3 18s linear infinite;
+}
+
+.orbit-4 {
+  bottom: 8%;
+  left: 6%;
+  width: 140px;
+  height: 140px;
+  border-color: rgba(255, 215, 0, 0.3);
+  box-shadow: 0 0 20px rgba(255, 215, 0, 0.4);
+}
+
+.orbit-4::after {
+  content: '';
+  position: absolute;
+  width: 14px;
+  height: 14px;
+  background: linear-gradient(135deg, #ffd700, #ffed4e);
+  border-radius: 50%;
+  top: 50%;
+  right: -7px;
+  transform: translateY(-50%);
+  box-shadow: 0 0 18px #ffd700;
+  animation: orbitRotate4 22s linear infinite reverse;
+}
+
+/* Partículas brillantes */
+.sparkle {
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  background: white;
+  border-radius: 50%;
+  box-shadow: 0 0 10px white;
+  animation: twinkle 2s ease-in-out infinite;
+}
+
+.sparkle-1 { top: 30%; right: 20%; animation-delay: 0s; }
+.sparkle-2 { top: 45%; right: 15%; animation-delay: 0.5s; }
+.sparkle-3 { top: 50%; right: 25%; animation-delay: 1s; }
+.sparkle-4 { top: 35%; left: 25%; animation-delay: 0.3s; }
+.sparkle-5 { top: 65%; left: 15%; animation-delay: 0.8s; }
+
+/* Letras y símbolos neón */
+.neon-text {
+  position: absolute;
+  font-family: 'Arial Black', sans-serif;
+  font-size: 4em;
+  font-weight: bold;
+  color: transparent;
+  -webkit-text-stroke: 2px;
+  text-shadow: 0 0 10px currentColor, 0 0 20px currentColor, 0 0 30px currentColor;
+  opacity: 0;
+  animation: slow-neon-fade 6s ease-in-out infinite;
+}
+
+.neon-m {
+  top: 20%;
+  left: 35%;
+  -webkit-text-stroke-color: #00ffff;
+  color: transparent;
+  animation-delay: 0s;
+}
+
+.neon-v {
+  top: 55%;
+  right: 30%;
+  -webkit-text-stroke-color: #ff10f0;
+  color: transparent;
+  animation-delay: 4s;
+}
+
+.neon-pp {
+  bottom: 25%;
+  left: 20%;
+  -webkit-text-stroke-color: #00ff88;
+  color: transparent;
+  animation-delay: 8s;
+}
+
+.question-mark {
+  position: absolute;
+  font-family: 'Arial Black', sans-serif;
+  font-size: 3em;
+  font-weight: bold;
+  color: transparent;
+  -webkit-text-stroke: 2px;
+  text-shadow: 0 0 10px currentColor, 0 0 20px currentColor;
+  opacity: 0;
+  animation: slow-neon-fade 6s ease-in-out infinite;
+}
+
+.question-1 {
+  top: 15%;
+  right: 35%;
+  -webkit-text-stroke-color: #ffd700;
+  animation-delay: 2s;
+}
+
+.question-2 {
+  top: 70%;
+  left: 40%;
+  -webkit-text-stroke-color: #ff6b6b;
+  animation-delay: 6s;
+}
+
+.question-3 {
+  top: 40%;
+  left: 15%;
+  -webkit-text-stroke-color: #a78bfa;
+  animation-delay: 10s;
+}
+
+.question-4 {
+  bottom: 15%;
+  right: 20%;
+  -webkit-text-stroke-color: #00ffff;
+  animation-delay: 3s;
+}
+
+// Elementos secundarios optimizados
+.neon-text.secondary,
+.question-mark.secondary {
+  opacity: 0.6;
+  font-size: 2.5em;
+  animation-duration: 8s;
+}
+
+// Posicionamiento dinámico para elementos secundarios
+.neon-text.secondary[data-pos*="8,5"] { top: 8%; right: 5%; }
+.neon-text.secondary[data-pos*="78,8"] { top: 78%; left: 8%; }
+.neon-text.secondary[data-pos*="32,35"] { top: 32%; right: 35%; }
+.neon-text.secondary[data-pos*="88,45"] { top: 88%; right: 45%; }
+.neon-text.secondary[data-pos*="5,25"] { top: 5%; left: 25%; }
+.neon-text.secondary[data-pos*="62,12"] { top: 62%; right: 12%; }
+
+.question-mark.secondary[data-pos*="12,35"] { top: 12%; left: 35%; }
+.question-mark.secondary[data-pos*="42,8"] { top: 42%; right: 8%; }
+.question-mark.secondary[data-pos*="68,45"] { top: 68%; left: 45%; }
+.question-mark.secondary[data-pos*="22,15"] { top: 22%; right: 15%; }
+
+// === ANIMACIONES ===
+@keyframes slow-neon-fade {
+  0% { 
+    opacity: 0; 
+    transform: scale(0.95);
+  }
+  10% {
+    opacity: 0.05;
+    transform: scale(0.97);
+  }
+  25% {
+    opacity: 0.15;
+    transform: scale(0.99);
+  }
+  50% { 
+    opacity: 0.4; 
+    transform: scale(1);
+  }
+  75% {
+    opacity: 0.15;
+    transform: scale(0.99);
+  }
+  90% {
+    opacity: 0.05;
+    transform: scale(0.97);
+  }
+  100% { 
+    opacity: 0; 
+    transform: scale(0.95);
+  }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  50% { transform: translateY(-20px) rotate(5deg); }
+}
+
+@keyframes rotate {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes orbitRotate1 {
+  from { 
+    transform: translateX(-50%) rotate(0deg) translateX(75px) rotate(0deg);
+  }
+  to { 
+    transform: translateX(-50%) rotate(360deg) translateX(75px) rotate(-360deg);
+  }
+}
+
+@keyframes orbitRotate2 {
+  from { 
+    transform: translateX(-50%) rotate(0deg) translateX(100px) rotate(0deg);
+  }
+  to { 
+    transform: translateX(-50%) rotate(360deg) translateX(100px) rotate(-360deg);
+  }
+}
+
+@keyframes orbitRotate3 {
+  from { 
+    transform: translateX(-50%) rotate(0deg) translateX(85px) rotate(0deg);
+  }
+  to { 
+    transform: translateX(-50%) rotate(360deg) translateX(85px) rotate(-360deg);
+  }
+}
+
+@keyframes orbitRotate4 {
+  from { 
+    transform: translateY(-50%) rotate(0deg) translateX(70px) rotate(0deg);
+  }
+  to { 
+    transform: translateY(-50%) rotate(360deg) translateX(70px) rotate(-360deg);
+  }
+}
+
+@keyframes pulseWave {
+  0%, 100% { opacity: 0.4; transform: scale(1); }
+  50% { opacity: 0.6; transform: scale(1.05); }
+}
+
+@keyframes twinkle {
+  0%, 100% { opacity: 0.3; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.5); }
+}
+
+/* Logo icono */
+.logo-icon {
+  position: absolute;
+  bottom: 8%;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: -1;
+}
+
+.logo-icon img {
+  width: 75px;
+  height: auto;
+  opacity: 0.7;
+  filter: drop-shadow(0 0 8px rgba(0, 255, 255, 0.5));
+  animation: float 4s ease-in-out infinite;
+}
+
+// === BURBUJAS FLOTANTES ===
+.bubbles-container {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+  overflow: hidden;
+  top: 0;
+  left: 0;
+}
+
+.bubble {
+  position: absolute;
+  background-color: rgba(255, 255, 255, 0.15);
+  border-radius: 50%;
+  bottom: -100px;
+  will-change: transform, opacity;
+  animation: bubble-animation var(--speed) ease-in infinite;
+  animation-delay: var(--delay);
+  opacity: var(--opacity);
+  transform: scale(var(--scale));
+}
+
+// Configuración de burbujas (50% más grandes)
+.bubble:nth-child(1) { left: 5%; --speed: 9s; --scale: 0.8; --opacity: 0.8; --delay: 0s; width: 63px; height: 63px; }
+.bubble:nth-child(2) { left: 20%; --speed: 20s; --scale: 1.1; --opacity: 0.6; --delay: 2s; width: 83px; height: 83px; }
+.bubble:nth-child(3) { left: 35%; --speed: 12s; --scale: 0.6; --opacity: 0.9; --delay: 1s; width: 105px; height: 105px; }
+.bubble:nth-child(4) { left: 50%; --speed: 27s; --scale: 1.0; --opacity: 0.5; --delay: 3s; width: 68px; height: 68px; }
+.bubble:nth-child(5) { left: 65%; --speed: 9s; --scale: 0.9; --opacity: 0.7; --delay: 0.5s; width: 90px; height: 90px; }
+.bubble:nth-child(6) { left: 80%; --speed: 5s; --scale: 0.7; --opacity: 0.6; --delay: 1.5s; width: 81px; height: 81px; }
+.bubble:nth-child(7) { left: 10%; --speed: 17s; --scale: 1.2; --opacity: 0.4; --delay: 4s; width: 75px; height: 75px; }
+.bubble:nth-child(8) { left: 25%; --speed: 33s; --scale: 0.8; --opacity: 0.9; --delay: 2.5s; width: 102px; height: 102px; }
+.bubble:nth-child(9) { left: 40%; --speed: 24s; --scale: 1.1; --opacity: 0.5; --delay: 1.7s; width: 60px; height: 60px; }
+.bubble:nth-child(10) { left: 55%; --speed: 38s; --scale: 0.9; --opacity: 0.85; --delay: 3.5s; width: 108px; height: 108px; }
+.bubble:nth-child(11) { left: 70%; --speed: 15s; --scale: 1.3; --opacity: 0.7; --delay: 1.3s; width: 69px; height: 69px; }
+.bubble:nth-child(12) { left: 85%; --speed: 30s; --scale: 0.7; --opacity: 0.95; --delay: 5s; width: 95px; height: 95px; }
+.bubble:nth-child(13) { left: 93%; --speed: 14s; --scale: 1.0; --opacity: 0.6; --delay: 1.8s; width: 75px; height: 75px; }
+.bubble:nth-child(14) { left: 75%; --speed: 9s; --scale: 0.8; --opacity: 0.8; --delay: 0.8s; width: 87px; height: 87px; }
+
+@keyframes bubble-animation {
+  0% {
+    transform: translateY(0) scale(var(--scale));
+    opacity: var(--opacity);
+  }
+  50% {
+    opacity: calc(var(--opacity) * 0.8);
+  }
+  100% {
+    transform: translateY(-120vh) scale(calc(var(--scale) * 1.1));
+    opacity: 0;
+  }
+}

@@ -1,0 +1,172 @@
+<div class="login-container">
+  
+  <div class="login-card">
+    <h1 class="login-title">TRIVIA WAR</h1>
+    <p class="login-subtitle">Juego de trivia<br>Desafío grupal</p>
+    
+    @if (showSuccess()) {
+      <div class="success-message">
+        <div class="success-icon">✨</div>
+        <p class="success-title">Usuario Registrado Correctamente</p>
+        <small class="success-text">Tu cuenta ha sido verificada exitosamente</small>
+        <div class="success-loader"></div>
+        <small class="redirect-text">Redirigiendo al login...</small>
+      </div>
+    } @else if (showConfirmation()) {
+      <div class="confirmation-form">
+        <h2 class="confirmation-title">✉️ Confirma tu cuenta</h2>
+        <p class="confirmation-text">Hemos enviado un código a <strong>{{ pendingEmail() }}</strong></p>
+        
+        @if (errorMessage()) {
+          <div class="error-message">{{ errorMessage() }}</div>
+        }
+        
+        <div class="form-group">
+          <input 
+            type="text"
+            placeholder="Código de confirmación"
+            class="form-input" 
+            [value]="confirmationCode()"
+            (input)="onConfirmationCodeChange($event.target.value)"
+            [disabled]="isLoading()"
+            required>
+        </div>
+        
+        <button 
+          type="button" 
+          class="login-button"
+          (click)="confirmSignUp()"
+          [disabled]="isLoading() || !confirmationCode()"
+          [class.loading]="isLoading()">
+          @if (isLoading()) {
+            <span class="loading-spinner"></span>
+            Confirmando...
+          } @else {
+            Confirmar Cuenta
+          }
+        </button>
+        
+        <div class="resend-section">
+          <a href="#" class="resend-link" (click)="resendCode(); $event.preventDefault()">
+            ¿No recibiste el código? Reenviar
+          </a>
+        </div>
+      </div>
+    } @else {
+      <form class="login-form" (ngSubmit)="onSubmit()">
+        @if (errorMessage()) {
+          <div class="error-message">{{ errorMessage() }}</div>
+        }
+      
+        @if (isSignUpMode()) {
+          <div class="form-group">
+            <input 
+              type="text"
+              placeholder="Nombre de jugador"
+              class="form-input" 
+              [value]="name()"
+              (input)="onNameChange($event.target.value)"
+              [disabled]="isLoading()"
+              required>
+          </div>
+        }
+
+        <div class="form-group">
+          <input 
+            type="email"
+            placeholder="Email"
+            class="form-input" 
+            [value]="email()"
+            (input)="onEmailChange($event.target.value)"
+            [disabled]="isLoading()"
+            required>
+        </div>
+        
+        <div class="form-group">
+          <input 
+            [type]="showPassword() ? 'text' : 'password'"
+            placeholder="Contraseña" 
+            class="form-input password" 
+            [value]="password()"
+            (input)="onPasswordChange($event.target.value)"
+            [disabled]="isLoading()"
+            required>
+            <button type="button" class="toggle-btn" (click)="togglePassword()">
+              <i class="material-symbols-outlined">
+                @if(showPassword()){
+                  visibility_off
+                } @else{
+                  visibility
+                }</i>
+            </button>
+        </div>
+
+        @if (isSignUpMode()) {
+          <div class="form-group">
+            <input 
+              [type]="showPassword() ? 'text' : 'password'"
+              placeholder="Confirmar contraseña" 
+              class="form-input" 
+              [class.error]="!passwordsMatch()"
+              [value]="confirmPassword()"
+              (input)="onConfirmPasswordChange($event.target.value)"
+              [disabled]="isLoading()"
+              required>
+              <button type="button" class="toggle-btn" (click)="togglePassword()">
+                <i class="material-symbols-outlined">
+                  @if(showPassword()){
+                    visibility_off
+                  } @else{
+                    visibility
+                  }</i>
+              </button>
+          </div>
+          @if (!passwordsMatch() && confirmPassword()) {
+            <div class="password-error">Las contraseñas no coinciden</div>
+          }
+        }
+        
+        <button 
+          type="submit" 
+          class="login-button"
+          [disabled]="isLoading() || !email() || !password() || (isSignUpMode() && (!name() || !confirmPassword() || !passwordsMatch()))"
+          [class.loading]="isLoading()">
+          @if (isLoading()) {
+            <span class="loading-spinner"></span>
+            @if (isSignUpMode()) {
+              Registrando...
+            } @else {
+              Ingresando...
+            }
+          } @else {
+            @if (isSignUpMode()) {
+              Crear Cuenta
+            } @else {
+              Ingresar
+            }
+          }
+        </button>
+      </form>
+      
+      <div class="toggle-mode">
+        <a href="#" class="toggle-link" (click)="toggleMode(); $event.preventDefault()">
+          @if (isSignUpMode()) {
+            ¿Ya tienes cuenta? Inicia sesión
+          } @else {
+            ¿No tienes cuenta? Regístrate
+          }
+        </a>
+      </div>
+
+      @if (isSignUpMode()) {
+        <div class="password-requirements">
+          <small>🎮 Requisitos: Mínimo 6 caracteres y 1 número</small>
+        </div>
+      }
+      
+      <div class="login-hint">
+        <small>Autenticación con Firebase</small>
+      </div>
+    }
+  </div>
+</div>

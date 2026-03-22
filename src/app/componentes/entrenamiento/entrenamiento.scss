@@ -1,0 +1,250 @@
+@use '../../theme/variables.scss' as *;
+
+.training-container {
+  @extend %page-container;
+}
+
+.training-content {
+  padding: 1rem 2rem;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.training-title {
+  text-align: center;
+  margin-bottom: 1.5rem;
+  
+  h1 {
+    font-family: $font-victor-mono;
+    color: $primary-pink;
+    text-shadow: 0 0 10px rgba(255, 80, 140, 0.5);
+    font-size: 1.4rem;
+    margin: 0;
+  }
+}
+
+.training-main {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.config-section {
+  @extend %content-panel;
+  padding: 2rem;
+
+  .training-info {
+    margin-bottom: 2rem;
+
+    h2 {
+      font-family: $font-victor-mono;
+      color: $primary-violet;
+      margin-bottom: 0.5rem;
+    }
+
+    p {
+      opacity: 0.8;
+      font-size: 1.1rem;
+      color: $dark-text;
+    }
+  }
+}
+
+.input-group {
+  margin-bottom: 2rem;
+
+  label {
+    display: block;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+    color: $primary-aqua;
+    font-size: 1.1rem;
+  }
+
+  .help-text {
+    font-size: 0.9rem;
+    opacity: 0.8;
+    margin-bottom: 0.75rem;
+    color: $primary-yellow;
+    font-style: italic;
+  }
+
+  .tematica-input {
+    @extend %tematica-input;
+    padding: 1rem;
+    border-radius: 10px;
+    font-size: 1.1rem;
+    
+    &:focus {
+      border-color: $primary-pink;
+      box-shadow: 0 0 15px rgba(255, 80, 140, 0.3);
+    }
+    
+    &.error {
+      border-color: $primary-pink;
+      box-shadow: 0 0 15px rgba(255, 80, 140, 0.5);
+    }
+  }
+  
+  .validation-message {
+    background: rgba(255, 80, 140, 0.2);
+    color: $primary-pink;
+    padding: 0.5rem;
+    border-radius: 5px;
+    font-size: 0.85rem;
+    margin-top: 0.5rem;
+    border: 1px solid rgba(255, 80, 140, 0.3);
+  }
+  
+  .word-counter {
+    text-align: right;
+    font-size: 0.8rem;
+    margin-top: 0.25rem;
+    opacity: 0.7;
+    font-family: $font-victor-mono;
+    color: $dark-text;
+  }
+}
+
+.suggestions {
+  @extend %suggestions-container;
+  border-radius: 10px;
+  
+  .suggestion-tag {
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-size: 0.9rem;
+  }
+}
+
+.difficulty-options {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+}
+
+.difficulty-btn {
+  @extend %difficulty-btn;
+  padding: 1.5rem 1rem;
+  border-radius: 15px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+
+  .difficulty-desc {
+    font-size: 0.85rem;
+    opacity: 0.8;
+  }
+
+  &:hover {
+    transform: translateY(-3px);
+  }
+
+  &.active {
+    background: $primary-pink;
+    border-color: $primary-pink;
+    box-shadow: 0 0 20px rgba(255, 80, 140, 0.4);
+  }
+}
+
+.ai-status-section {
+  margin-top: 2.5rem;
+  padding-top: 2rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  
+  h3 {
+    font-family: $font-victor-mono;
+    font-size: 1rem;
+    color: $primary-aqua;
+    margin-bottom: 1.5rem;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+  }
+}
+
+.ai-engines-list {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+}
+
+.ai-engine-card {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 1rem;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  transition: all 0.3s ease;
+  
+  &:hover {
+    background: rgba(255, 255, 255, 0.1);
+    transform: translateY(-2px);
+    border-color: rgba(255, 255, 255, 0.3);
+  }
+  
+  .engine-icon {
+    font-size: 1.5rem;
+  }
+  
+  .engine-info {
+    display: flex;
+    flex-direction: column;
+    
+    .engine-name {
+      font-weight: 700;
+      font-size: 0.9rem;
+      color: #fff;
+    }
+    
+    .engine-status {
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+  }
+}
+
+.action-section {
+  text-align: center;
+  margin-top: 2rem;
+}
+
+.start-training-btn {
+  padding: 1.2rem 3rem;
+  background: linear-gradient(45deg, $primary-pink, $primary-yellow);
+  border: none;
+  border-radius: 30px;
+  color: white;
+  font-family: $font-red-hat;
+  font-weight: 700;
+  font-size: 1.2rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+
+  &:hover:not(:disabled) {
+    transform: scale(1.05);
+    box-shadow: 0 8px 25px rgba(255, 80, 140, 0.4);
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+
+
+
+
+@media (max-width: 768px) {
+  .training-main {
+    grid-template-columns: 1fr;
+    padding: 1rem;
+  }
+
+  .difficulty-options {
+    grid-template-columns: 1fr;
+  }
+}

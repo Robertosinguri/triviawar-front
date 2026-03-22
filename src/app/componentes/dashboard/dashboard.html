@@ -1,0 +1,58 @@
+
+<div class="dashboard-container">
+  <app-navbar>
+    <main class="dashboard-main">
+      <div class="game-options">
+        <div class="option-card create-room">
+          <h2>Crear Sala</h2>
+          <p>Inicia una partida multijugador</p>
+          <button class="primary-btn" (click)="crearSala()">Crear Sala</button>
+        </div>
+
+        <div class="option-card join-room">
+          <h2>Unirse a Sala</h2>
+          <p>Únete a una partida existente</p>
+          <input type="text" placeholder="Ej: ABC123" [(ngModel)]="codigoSala" (input)="validarCodigoSala()"
+            [class.error]="!codigoSalaValido" class="room-input" maxlength="6">
+
+          @if (!codigoSalaValido) {
+          <div class="validation-message">
+            ⚠️ El código debe tener 6 caracteres (letras y números)
+          </div>
+          }
+
+          <button class="secondary-btn" [disabled]="!codigoSalaValido || !codigoSala.trim()"
+            (click)="unirseASala()">Unirse</button>
+        </div>
+
+        <div class="option-card training-room">
+          <h2>Entrenamiento</h2>
+          <p>Practica solo y mejora tu ranking</p>
+          <button class="training-btn" (click)="iniciarEntrenamiento()">Entrenar</button>
+        </div>
+      </div>
+
+      <!-- Ranking Minimalista -->
+      <div class="mini-ranking">
+        <h3>🏆 Top 3 Jugadores</h3>
+        <ol class="mini-ranking-list">
+          @for (jugador of rankingMinimalista; track jugador.nombre) {
+          <li>
+            <span class="ranking-pos">#{{jugador.posicion}}</span>
+            <span class="ranking-name">{{jugador.nombre}}</span>
+            <span class="ranking-score">{{jugador.puntajeTotal}} pts</span>
+          </li>
+          }
+
+          @if (rankingMinimalista !== null && rankingMinimalista.length === 0) {
+          <li class="no-data">
+            Aún no hay datos de ranking.
+          </li>
+          }
+        </ol>
+        <a routerLink="/ranking" class="ver-mas">Ver ranking completo...</a>
+      </div>
+
+    </main>
+  </app-navbar>
+</div>

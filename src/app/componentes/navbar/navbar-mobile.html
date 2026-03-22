@@ -1,0 +1,109 @@
+<header class="mobile-header">
+  <div class="mobile-top">
+    <div class="profile-avatar" (click)="toggleStats()">
+      <div class="avatar-circle">
+        @if (hasAvatar()) {
+        <img [src]="getUserAvatar()" alt="Avatar" class="avatar-img">
+        } @else {
+        <span class="avatar-placeholder">👤</span>
+        }
+      </div>
+    </div>
+
+    <h1>TRIVIA WAR</h1>
+
+    <div class="user-initial">
+      {{getUserName().charAt(0).toUpperCase()}}
+    </div>
+  </div>
+
+  <nav class="mobile-nav">
+    <a routerLink="/dashboard" routerLinkActive="active" class="nav-link">Dashboard</a>
+    <a routerLink="/ranking" routerLinkActive="active" class="nav-link">Ranking</a>
+    <a routerLink="/about" routerLinkActive="active" class="nav-link">About</a>
+  </nav>
+</header>
+
+<div class="navbar-content">
+  <div class="profile-dropdown" [class.open]="showStats">
+    <div class="stats-panel">
+      <div class="user-info-section">
+        <div class="user-name-display">
+          <span class="player-name">{{getUserName()}}</span>
+        </div>
+        <div class="user-email">
+          <span class="email-text">{{getUserEmail()}}</span>
+        </div>
+      </div>
+
+      <div class="avatar-section">
+        <div class="current-avatar">
+          @if (hasAvatar()) {
+          <img [src]="getUserAvatar()" alt="Avatar actual" class="current-avatar-img">
+          } @else {
+          <div class="no-avatar">Sin avatar</div>
+          }
+        </div>
+        <button class="change-avatar-btn" (click)="abrirSelectorAvatar()">
+          {{hasAvatar() ? 'Cambiar Avatar' : 'Seleccionar Avatar'}}
+        </button>
+      </div>
+
+      <div class="stats-info">
+        <h4>📊 Estadísticas</h4>
+
+        <div class="stat-item">
+          <span class="stat-label">Partidas jugadas:</span>
+          <span class="stat-value">{{estadisticas?.partidasJugadas || 0}}</span>
+        </div>
+
+        <div class="stat-item">
+          <span class="stat-label">Mejor puntaje:</span>
+          <span class="stat-value highlight">{{estadisticas?.mejorPuntaje || 0}}/5</span>
+        </div>
+
+        <div class="stat-item">
+          <span class="stat-label">Promedio:</span>
+          <span class="stat-value">{{estadisticas?.promedio || 0}}/5</span>
+        </div>
+
+        <div class="stat-item">
+          <span class="stat-label">Puntos totales:</span>
+          <span class="stat-value highlight">{{estadisticas?.puntajeTotal || 0}}</span>
+        </div>
+
+        <div class="stat-item">
+          <span class="stat-label">Posición ranking:</span>
+          <span class="stat-value ranking">#{{estadisticas?.posicionRanking || '-'}}</span>
+        </div>
+      </div>
+
+      <div class="logout-section">
+        <button class="sidebar-logout-btn" (click)="logout()">
+          <span class="logout-text">Cerrar Sesión</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <ng-content></ng-content>
+</div>
+
+<!-- Selector de Avatar Modal -->
+@if (showAvatarSelector) {
+<div class="avatar-modal" (click)="cerrarSelectorAvatar()">
+  <div class="avatar-modal-content" (click)="$event.stopPropagation()">
+    <div class="avatar-modal-header">
+      <h3>Seleccionar Avatar</h3>
+      <button class="close-btn" (click)="cerrarSelectorAvatar()">&times;</button>
+    </div>
+    <div class="avatar-grid">
+      @for (avatar of availableAvatars; track avatar) {
+      <div class="avatar-option" (click)="seleccionarAvatar(avatar)">
+        <img [src]="'/avatares/' + avatar" [alt]="avatar" class="avatar-preview">
+      </div>
+      }
+    </div>
+  </div>
+</div>
+}

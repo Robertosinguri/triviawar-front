@@ -1,0 +1,113 @@
+
+<div class="ranking-container">
+  <app-navbar>
+    <div class="ranking-content">
+      <div class="ranking-stats">
+        <div class="stat-card">
+          <span class="stat-number">{{ranking?.length || 0}}</span>
+          <span class="stat-label">Jugadores Activos</span>
+        </div>
+      </div>
+
+      <!-- Tabla Desktop -->
+      <div class="ranking-table-container">
+        <table class="ranking-table">
+          <thead>
+            <tr>
+              <th>Pos.</th>
+              <th>Jugador</th>
+              <th>Puntaje Total</th>
+              <th>Partidas</th>
+              <th>Promedio</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (jugador of rankingPaginado; track jugador.posicion) {
+            <tr [attr.data-position]="jugador.posicion">
+              <td class="posicion">#{{jugador.posicion}}</td>
+              <td class="nombre" [attr.data-name]="jugador.nombre" [attr.data-email]="jugador.userId">{{jugador.nombre}}
+              </td>
+              <td class="puntaje">{{jugador.puntajeTotal}} pts</td>
+              <td>{{jugador.partidasJugadas}}</td>
+              <td>{{jugador.promedio}}/5</td>
+            </tr>
+            } @empty {
+            @if (ranking !== null) {
+            <tr class="no-data-row">
+              <td colspan="5">
+                <div class="no-data-content">
+                  <span class="no-data-icon">🏆</span>
+                  <p>Aún no hay datos para mostrar el ranking.</p>
+                  <p>¡Sé el primero en jugar una partida!</p>
+                </div>
+              </td>
+            </tr>
+            }
+            }
+          </tbody>
+        </table>
+
+        <!-- Paginación Desktop -->
+        @if (ranking && ranking.length > 10) {
+        <div class="desktop-pagination">
+          <div class="pagination-info">
+            Página {{paginaActual}} de {{totalPaginas}} - Mostrando {{rankingPaginado.length}} de {{ranking.length}}
+            jugadores
+          </div>
+          <div class="pagination-controls">
+            <button class="pagination-btn" [disabled]="paginaActual === 1" (click)="cambiarPagina(paginaActual - 1)">
+              ← Anterior
+            </button>
+            <button class="pagination-btn" [disabled]="paginaActual === totalPaginas"
+              (click)="cambiarPagina(paginaActual + 1)">
+              Siguiente →
+            </button>
+          </div>
+        </div>
+        }
+      </div>
+
+      <!-- Lista Móvil -->
+      <div class="mobile-ranking">
+        <ol class="mobile-ranking-list">
+          @for (jugador of rankingPaginado; track jugador.posicion) {
+          <li [attr.data-position]="jugador.posicion">
+            <div class="mobile-ranking-header">
+              <div class="mobile-ranking-left">
+                <span class="mobile-ranking-pos">#{{jugador.posicion}}</span>
+                <div class="mobile-ranking-name">{{jugador.nombre.split('(')[0].trim()}}</div>
+              </div>
+              <span class="mobile-ranking-score">{{jugador.puntajeTotal}} pts</span>
+            </div>
+            <div class="mobile-ranking-email">{{jugador.userId}}</div>
+          </li>
+          } @empty {
+          @if (ranking !== null) {
+          <li class="no-data">
+            Aún no hay datos de ranking.
+          </li>
+          }
+          }
+        </ol>
+
+        <!-- Paginación Móvil -->
+        @if (ranking && ranking.length > 10) {
+        <div class="mobile-pagination">
+          <div class="pagination-info">
+            Página {{paginaActual}} de {{totalPaginas}} ({{ranking.length}} jugadores)
+          </div>
+          <div class="pagination-controls">
+            <button class="pagination-btn" [disabled]="paginaActual === 1" (click)="cambiarPagina(paginaActual - 1)">
+              ← Anterior
+            </button>
+            <button class="pagination-btn" [disabled]="paginaActual === totalPaginas"
+              (click)="cambiarPagina(paginaActual + 1)">
+              Siguiente →
+            </button>
+          </div>
+        </div>
+        }
+      </div>
+    </div>
+  </app-navbar>
+</div>

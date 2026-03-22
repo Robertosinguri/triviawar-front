@@ -1,0 +1,122 @@
+<div class="arena-container">
+  <header class="arena-header">
+    <div class="arena-info">
+      <h1>{{modo === 'entrenamiento' ? 'Entrenamiento' : 'Arena'}} {{nombreJugador}}</h1>
+      <div class="batalla-info">
+        <span class="sala-code">Sala: {{roomCode}}</span>
+        <span class="batalla-temas">{{getTematicasTexto()}}</span>
+        <span class="dificultad dif-{{dificultad}}">{{dificultad}}</span>
+      </div>
+    </div>
+
+    <div class="arena-stats">
+      <div class="pregunta-counter">
+        <span>{{preguntaActual + 1}}/{{totalPreguntas}}</span>
+      </div>
+      <div class="puntaje">
+        <span>Puntos: {{puntaje}}</span>
+      </div>
+      @if (aiIndicator) {
+      <div class="ai-indicator">
+        <span class="ai-icon">{{aiIndicator}}</span>
+        <span class="ai-text">Powered by {{aiUsada}}</span>
+      </div>
+      }
+      <div class="timer" [class.warning]="tiempoRestante <= 5">
+        <span>⏱️ {{tiempoRestante}}s</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- Estado de carga -->
+  @if (estadoJuego === 'cargando') {
+  <div class="loading-state">
+    <div class="loading-content">
+      <div class="spinner-arena"></div>
+      <h2>Preparando la Arena...</h2>
+      <p>Mezclando preguntas de todos los jugadores</p>
+      <div class="tematicas-loading">
+        @for (tematica of tematicas; track tematica) {
+        <span class="tematica-chip">
+          {{tematica}}
+        </span>
+        }
+      </div>
+    </div>
+  </div>
+  }
+
+  <!-- Arena activa -->
+  @if (estadoJuego === 'jugando') {
+  <main class="arena-main">
+    <div class="battle-section">
+      <div class="progress-bar">
+        <div class="progress-fill" [style.width.%]="progreso"></div>
+      </div>
+
+      <div class="question-card">
+        <!-- Indicador de temática -->
+        @if (preguntaActualObj) {
+        <div class="question-source">
+          <span class="source-badge">{{preguntaActualObj.tematica}}</span>
+          @if (preguntaActualObj.aportadoPor) {
+          <span class="contributed-by">
+            Aportada por {{preguntaActualObj.aportadoPor}}
+          </span>
+          }
+        </div>
+        }
+
+        <h2 class="question-text">{{preguntaActual + 1}}. {{preguntaActualObj?.pregunta}}</h2>
+
+        <div class="options-grid">
+          @for (opcion of preguntaActualObj?.opciones; track $index) {
+          <button class="option-btn arena-option" [class.selected]="respuestaSeleccionada === $index"
+            [class.correct]="mostrarRespuesta && $index === preguntaActualObj?.respuestaCorrecta"
+            [class.incorrect]="mostrarRespuesta && respuestaSeleccionada === $index && $index !== preguntaActualObj?.respuestaCorrecta"
+            [disabled]="mostrarRespuesta" (click)="seleccionarRespuesta($index)">
+            <span class="option-letter">{{getLetraOpcion($index)}}</span>
+            <span class="option-text">{{opcion}}</span>
+          </button>
+          }
+        </div>
+
+        @if (!mostrarRespuesta) {
+        <div class="question-actions">
+          <button class="confirm-btn arena-confirm" [disabled]="respuestaSeleccionada === null"
+            (click)="confirmarRespuesta()">
+            ⚡ Confirmar Respuesta
+          </button>
+        </div>
+        }
+
+        @if (mostrarRespuesta) {
+        <div class="answer-feedback">
+          <div class="feedback-content arena-feedback" [class.correct]="respuestaCorrecta"
+            [class.incorrect]="!respuestaCorrecta">
+            <h3>{{respuestaCorrecta ? '¡Correcto! 🎯' : 'Incorrecto ❌'}}</h3>
+            @if (!respuestaCorrecta && preguntaActualObj) {
+            <p>
+              La respuesta correcta era:
+              <strong>{{preguntaActualObj.opciones[preguntaActualObj.respuestaCorrecta]}}</strong>
+            </p>
+            }
+          </div>
+
+          <button class="next-btn arena-next" (click)="siguientePregunta()">
+            {{esUltimaPregunta() ? '🏆 Ver Resultados' : '➡️ Siguiente Pregunta'}}
+          </button>
+        </div>
+        }
+      </div>
+    </div>
+  </main>
+  }
+
+  <!-- Botón de salida -->
+  <div class="arena-controls">
+    <button class="exit-btn" (click)="salirArena()">
+      🚪 Salir de la Arena
+    </button>
+  </div>
+</div>

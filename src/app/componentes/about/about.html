@@ -1,0 +1,63 @@
+<div class="config-container">
+    <app-navbar>
+        <main class="about-main">
+            <section class="tab-content">
+
+                <article class="about-card">
+                    <div class="text-card">
+                        <h2 id="yellow">El Origen: Innovación Estudiantil 🎓</h2>
+                        <p>
+                            Trivia War surgió como respuesta a los métodos tradicionales de estudio...
+                        </p>
+                        <p>
+                            El proyecto evolucionó cuando exploramos las capacidades de la inteligencia artificial
+                            generativa...
+                        </p>
+                    </div>
+                </article>
+
+                <article class="about-card">
+                    <div class="text-card">
+                        <h2 id="violet">La Evolución: Batalla Campal 🔥</h2>
+                        <p>
+                            Tras darnos cuenta de que la competencia era lo divertido...
+                        </p>
+                        <p>
+                            Hoy, Trivia War es la respuesta: un juego multijugador online...
+                        </p>
+                    </div>
+                </article>
+
+                <article class="about-card">
+                    <div class="text-card">
+                        <h2 id="sky">El Futuro: ¡Que Empiece la Guerra! ⚔️</h2>
+                        <p>
+                            Nuestra visión a futuro es que Trivia War sea el caos organizado de conocimiento...
+                        </p>
+                        <p>
+                            El objetivo final es simple: que la diversión y la estrategia sean más importantes que
+                            cualquier libro de texto...
+                        </p>
+                    </div>
+                </article>
+
+                <!-- Footer MVPP -->
+                <footer class="mvpp-footer">
+                    <img src="/avatares/mvpp.png" alt="MVPP Team" class="mvpp-logo" (click)="openImageModal()">
+                    <p class="mvpp-text">Desarrollado por el equipo MVPP</p>
+                </footer>
+
+            </section>
+
+            <!-- Modal -->
+            @if (showImageModal) {
+            <div class="image-modal" (click)="closeImageModal()">
+                <div class="modal-content" (click)="$event.stopPropagation()">
+                    <img src="/avatares/mvpp.png" alt="MVPP Team" class="modal-image">
+                    <button class="close-btn" (click)="closeImageModal()">&times;</button>
+                </div>
+            </div>}
+
+        </main>
+    </app-navbar>
+</div>

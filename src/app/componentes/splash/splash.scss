@@ -1,0 +1,188 @@
+@use "../../theme/variables.scss" as *;
+
+.splash-content {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+  z-index: 1;
+}
+
+.splash-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: rgba(41, 46, 57, 0.125);
+  backdrop-filter: blur(6px);
+  border-radius: 25px;
+  width: 75%;
+  max-width: 420px;
+  padding: 25px 18px;
+  box-shadow: 
+    0 0 15px rgba(46, 52, 64, 0.2),
+    0 8px 25px rgba(0, 0, 0, 0.3),
+    inset 0 1px 0 rgba(248, 248, 242, 0.03);
+  border: 2px solid #292e39;
+  position: relative;
+  z-index: 3;
+  
+  &::before {
+    content: '';
+    position: absolute;
+    inset: -2px;
+    background: #2e3440;
+    border-radius: 27px;
+    z-index: -1;
+    opacity: 0.4;
+    animation: custom-glow 5s ease-in-out infinite;
+    filter: blur(1px);
+  }
+}
+
+.title-line1, .title-line2 {
+  font-size: clamp(2.5em, 8vw, 3.5em);
+  font-family: $font-monoton;
+  color: #00ffff;
+  text-shadow: 
+    0 0 4px rgba(0, 255, 255, 0.8),
+    0 0 8px rgba(0, 255, 255, 0.5),
+    0 0 12px rgba(0, 255, 255, 0.3),
+    0 2px 10px rgba(0, 0, 0, 0.3);
+  opacity: 0;
+  line-height: 1.1;
+  margin: 2px 0;
+}
+
+.title-line1 {
+  animation: slow-fade-in 1.5s ease-out 0.3s forwards;
+}
+
+.title-line2 {
+  animation: slow-fade-in 1.5s ease-out 0.6s forwards;
+}
+
+.subtitle {
+  font-size: clamp(1em, 4vw, 1.2em);
+  background: linear-gradient(45deg, $primary-pink, $primary-aqua, $primary-yellow);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent; 
+  background-size: 200% 200%;
+  animation: 
+    slow-fade-in 1s ease-out 1.2s both,
+    rainbow-shift 4s ease-in-out infinite;
+  margin-bottom: 25px;
+  font-weight: 500;
+  text-align: center;
+  padding: 0 10px;
+  font-family: $font-victor-mono;
+}
+
+.loader {
+  width: 200px;
+  height: 8px;
+  position: relative;
+  margin-top: 25px;
+  opacity: 0;
+  animation: 
+    fade-in 0.8s ease-out 1s forwards,
+    container-pulse 2s ease-in-out 2s infinite;
+
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: rgba(40, 42, 54, 0.8);
+    border-radius: 4px;
+    padding: 2px;
+    mask:
+      linear-gradient(#fff 0 0) content-box,
+      linear-gradient(#fff 0 0);
+    mask-composite: exclude;
+    -webkit-mask-composite: xor;
+  }
+  
+  &::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, $primary-yellow, $primary-aqua, $primary-pink); 
+    border-radius: 4px;
+    animation: progress-load 4s ease-in-out 2s forwards;
+  }
+}
+
+// === ANIMACIONES ===
+@keyframes rainbow-shift {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+
+@keyframes slow-fade-in {
+  0% { 
+    opacity: 0; 
+    transform: translateY(20px); 
+  }
+  100% { 
+    opacity: 1; 
+    transform: translateY(0); 
+  }
+}
+
+@keyframes fade-in {
+  0% { opacity: 0; }
+  100% { opacity: 1; }
+}
+
+@keyframes progress-load {
+  0% { width: 0%; }
+  100% { width: 100%; }
+}
+
+@keyframes container-pulse {
+  0%, 100% { 
+    box-shadow: 0 0 5px rgba(255, 255, 255, 0.2); 
+  }
+  50% { 
+    box-shadow: 0 0 15px rgba(255, 255, 255, 0.4); 
+  }
+}
+
+@keyframes custom-glow {
+  0%, 100% { 
+    opacity: 0.4;
+    transform: scale(1);
+    filter: blur(1px) brightness(0.95);
+  }
+  50% { 
+    opacity: 0.6;
+    transform: scale(1.003);
+    filter: blur(1px) brightness(1.05);
+  }
+}
+
+// === RESPONSIVE ===
+@include mobile-only {
+  .splash-content {
+    @include safe-area-padding;
+    padding: 1rem;
+  }
+  
+  .splash-card {
+    width: 90%;
+    padding: 2rem 1.5rem;
+  }
+  
+  .title-line1, .title-line2 {
+    font-size: 2.2rem;
+  }
+  
+  .loader {
+    width: 180px;
+  }
+}

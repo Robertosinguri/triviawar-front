@@ -1,0 +1,438 @@
+@use '../../theme/variables.scss' as *;
+
+.resultados-container {
+  @extend %page-container;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  overflow-y: auto;
+  max-height: 100vh;
+  padding: 1rem;
+}
+
+.resultados-header {
+  @extend %page-header;
+  text-align: center;
+  flex-shrink: 0;
+
+  h1 {
+    font-family: $font-victor-mono;
+    font-size: 2rem;
+    margin-bottom: 1rem;
+    background: linear-gradient(45deg, $primary-aqua, $primary-yellow);
+    -webkit-background-clip: text;
+    background-clip: text; // Standard property
+    -webkit-text-fill-color: transparent;
+  }
+
+  .game-info {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+
+    span {
+      padding: 0.5rem 1rem;
+      border-radius: 20px;
+      font-size: 0.9rem;
+      font-weight: 500;
+    }
+
+    .room-code {
+      background: rgba(1, 186, 154, 0.2);
+      border: 1px solid $primary-aqua;
+      color: $primary-aqua;
+    }
+
+    .tema {
+      background: rgba(255, 184, 0, 0.2);
+      border: 1px solid $primary-yellow;
+      color: $primary-yellow;
+    }
+
+    .dificultad {
+      &.dif-baby {
+        background: rgba(76, 175, 80, 0.2);
+        border: 1px solid #4caf50;
+        color: #4caf50;
+      }
+
+      &.dif-conocedor {
+        background: rgba(255, 193, 7, 0.2);
+        border: 1px solid #ffc107;
+        color: #ffc107;
+      }
+
+      &.dif-killer {
+        background: rgba(244, 67, 54, 0.2);
+        border: 1px solid #f44336;
+        color: #f44336;
+      }
+    }
+  }
+}
+
+.resultados-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr 1fr;
+  gap: 1rem;
+  height: calc(100vh - 220px);
+  min-height: 600px;
+
+  &.modo-entrenamiento {
+    grid-template-rows: 1fr; // Solo una fila
+    align-content: center;
+    min-height: auto;
+    height: auto;
+    max-width: 1000px;
+    margin: 0 auto;
+    flex: 1;
+
+    .cuadrante {
+      max-height: none; // Permitir que crezcan un poco más
+      height: 400px;
+    }
+  }
+}
+
+.cuadrante {
+  @extend %content-panel;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  min-height: 280px;
+  max-height: 320px;
+
+  h3 {
+    font-family: $font-victor-mono;
+    font-size: 1rem;
+    margin-bottom: 0.6rem;
+    text-align: center;
+    flex-shrink: 0;
+  }
+}
+
+// Cuadrante 1: Ganador
+.ganador-cuadrante {
+  h3 {
+    color: $primary-yellow;
+  }
+
+  .ganador-card {
+    text-align: center;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+
+    .corona {
+      font-size: 2.5rem;
+      margin-bottom: 0.5rem;
+    }
+
+    h4 {
+      font-family: $font-red-hat;
+      color: $primary-yellow;
+      margin-bottom: 0.5rem;
+      font-size: 1.2rem;
+    }
+
+    .ganador-email {
+      font-size: 0.8rem;
+      color: $dark-text;
+      opacity: 0.8;
+      margin-bottom: 0.8rem;
+      font-style: italic;
+    }
+
+    .ganador-stats {
+      display: flex;
+      justify-content: space-around;
+
+      .stat {
+        text-align: center;
+
+        .valor {
+          display: block;
+          font-family: $font-victor-mono;
+          font-size: 1.2rem;
+          font-weight: bold;
+          color: $primary-yellow;
+        }
+
+        .label {
+          font-size: 0.8rem;
+          color: $dark-text;
+        }
+      }
+    }
+  }
+}
+
+// Cuadrante 2: Ranking Partida
+.ranking-cuadrante {
+  h3 {
+    color: $primary-aqua;
+  }
+
+  .ranking-list {
+    flex: 1;
+    overflow-y: auto;
+
+    .jugador-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.5rem;
+      margin-bottom: 0.5rem;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 8px;
+      font-size: 0.9rem;
+
+      &.mi-resultado {
+        background: rgba(1, 186, 154, 0.2);
+        border: 1px solid $primary-aqua;
+      }
+
+      .posicion {
+        font-size: 1.2rem;
+        width: 30px;
+        flex-shrink: 0;
+      }
+
+      .jugador-info {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        padding-left: 0.5rem;
+
+        .nombre {
+          font-weight: 500;
+          line-height: 1.2;
+        }
+
+        .email {
+          font-size: 0.75rem;
+          color: $dark-text;
+          opacity: 0.7;
+          font-style: italic;
+        }
+      }
+
+      .puntaje {
+        font-family: $font-victor-mono;
+        color: $primary-aqua;
+        font-weight: bold;
+        flex-shrink: 0;
+      }
+    }
+  }
+}
+
+// Cuadrante 3: Mi Rendimiento
+.rendimiento-cuadrante {
+  h3 {
+    color: $primary-pink;
+  }
+
+  .mi-email {
+    font-size: 0.8rem;
+    color: $dark-text;
+    opacity: 0.8;
+    text-align: center;
+    margin-bottom: 0.6rem;
+    font-style: italic;
+    flex-shrink: 0;
+  }
+
+  .mi-resultado-card {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+
+    .posicion-info {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      margin-bottom: 1rem;
+
+      .medalla {
+        font-size: 2rem;
+      }
+
+      .posicion-texto {
+        font-family: $font-red-hat;
+        color: $primary-pink;
+        font-weight: bold;
+      }
+    }
+
+    .resultado-stats {
+      display: flex;
+      flex-direction: column;
+      gap: 0.8rem;
+
+      .stat-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+
+        .numero {
+          font-family: $font-victor-mono;
+          font-size: 1.1rem;
+          font-weight: bold;
+          color: $primary-pink;
+        }
+
+        .descripcion {
+          font-size: 0.9rem;
+          color: $dark-text;
+        }
+      }
+    }
+  }
+}
+
+// Cuadrante 4: Ranking Global
+.ranking-global-cuadrante {
+  h3 {
+    color: $primary-violet;
+  }
+
+  .ranking-global-list {
+    flex: 1;
+    overflow-y: auto;
+
+    .jugador-global {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.5rem;
+      margin-bottom: 0.5rem;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 8px;
+      font-size: 0.9rem;
+
+      &.mi-posicion {
+        background: rgba(129, 79, 196, 0.2);
+        border: 1px solid $primary-violet;
+
+        .posicion-global,
+        .nombre-global,
+        .puntos-global {
+          color: $primary-violet;
+          font-weight: bold;
+        }
+      }
+
+      .posicion-global {
+        font-family: $font-victor-mono;
+        width: 40px;
+        font-weight: bold;
+      }
+
+      .nombre-global {
+        flex: 1;
+        text-align: left;
+        padding-left: 0.5rem;
+      }
+
+      .puntos-global {
+        font-family: $font-victor-mono;
+        color: $primary-violet;
+        font-size: 0.8rem;
+      }
+    }
+  }
+}
+
+.acciones-section {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  flex-shrink: 0;
+  padding-top: 1rem;
+
+  button {
+    padding: 1rem 2rem;
+    border: none;
+    border-radius: 25px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+
+    &.btn-primary {
+      background: linear-gradient(45deg, $primary-aqua, $primary-yellow);
+      color: $dark-bg;
+
+      &:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 20px rgba(1, 186, 154, 0.3);
+      }
+    }
+
+    &.btn-secondary {
+      background: transparent;
+      border: 2px solid $primary-aqua;
+      color: $primary-aqua;
+
+      &:hover {
+        background: $primary-aqua;
+        color: $dark-bg;
+      }
+    }
+  }
+}
+
+@keyframes shine {
+  0% {
+    transform: translateX(-100%) translateY(-100%) rotate(45deg);
+  }
+
+  100% {
+    transform: translateX(100%) translateY(100%) rotate(45deg);
+  }
+}
+
+@media (max-width: 768px) {
+  .resultados-container {
+    padding: 0.5rem;
+  }
+
+  .resultados-grid {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto auto auto auto;
+    gap: 0.8rem;
+    height: auto;
+    min-height: auto;
+  }
+
+  .cuadrante {
+    min-height: 220px;
+    max-height: 280px;
+    padding: 0.8rem;
+  }
+
+  .acciones-section {
+    flex-direction: column;
+    gap: 0.8rem;
+
+    button {
+      padding: 0.8rem 1.5rem;
+    }
+  }
+}
+
+.loading-message {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  color: $dark-text;
+  font-style: italic;
+  opacity: 0.7;
+}

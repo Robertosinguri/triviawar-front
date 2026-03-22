@@ -1,0 +1,79 @@
+@use '../../theme/variables.scss' as *;
+
+.lobby-container {
+  @extend %page-container;
+}
+
+.lobby-header {
+  @extend %page-header;
+  
+  h1 {
+    color: $primary-yellow;
+  }
+  
+  .back-btn {
+    @extend %back-btn;
+  }
+}
+
+.lobby-main {
+  padding: 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+// Sección de código de sala con estilo consistente
+.room-code-section {
+  @extend %content-panel;
+  text-align: center;
+  margin: 0 auto 2rem;
+  max-width: 600px;
+  
+  h2 {
+    color: $primary-aqua;
+    margin-bottom: 1.25rem;
+    font-size: 1.5rem;
+  }
+  
+  .share-text {
+    color: $dark-text;
+    margin-bottom: 1.25rem;
+    opacity: 0.9;
+  }
+  
+  .code-display {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1rem;
+    
+    .room-code {
+      background: rgba(0, 0, 0, 0.4);
+      padding: 1.25rem 1.875rem;
+      border-radius: 10px;
+      border: 3px solid $primary-yellow;
+      font-family: monospace;
+      font-size: 2.5rem;
+      color: $primary-yellow;
+      font-weight: 700;
+      letter-spacing: 5px;
+    }
+  }
+  
+  .validity-text {
+    color: $primary-yellow;
+    font-size: 0.9rem;
+    margin: 0;
+    opacity: 0.8;
+  }
+}
+
+// Solo estilos para el botón copiar
+.copy-btn-destacado {
+  &.copied {
+    background: rgba(34, 197, 94, 0.2) !important;
+    border-color: #22c55e !important;
+    color: #22c55e !important;
+  }
+}

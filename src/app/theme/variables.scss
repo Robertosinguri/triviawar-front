@@ -1,0 +1,279 @@
+// ===========================================
+// FUENTES OPTIMIZADAS
+// ===========================================
+@import url('https://fonts.googleapis.com/css2?family=Monoton&family=Victor+Mono:wght@400;700&family=Red+Hat+Display:wght@300;500;700&display=swap');
+
+// ===========================================
+// VARIABLES PRINCIPALES
+// ===========================================
+// Fuentes
+$font-monoton: "Monoton", cursive;
+$font-red-hat: "Red Hat Display", sans-serif;
+$font-victor-mono: "Victor Mono", monospace;
+
+// Colores principales (solo los utilizados)
+$primary-purple: #814fc4;
+$primary-violet: #b601ff;
+$primary-pink: #ff508c;
+$primary-aqua: #01ba9a;
+$primary-yellow: #e6bd00;
+$primary-sky: #00cfe6;
+
+// Gradiente principal
+$background-gradient: linear-gradient(0deg, $primary-purple 0%, $primary-violet 100%);
+
+// Colores de tema oscuro
+$dark-bg: #282a36;
+$dark-surface: #44475a;
+$dark-text: #f8f8f2;
+$dark-accent: #6272a4;
+
+// ===========================================
+// BREAKPOINTS RESPONSIVE INTELIGENTES
+// ===========================================
+$mobile-small: 320px;   // iPhone SE, Galaxy S5
+$mobile-medium: 375px;  // iPhone 6/7/8
+$mobile-large: 414px;   // iPhone 6/7/8 Plus
+$tablet-small: 768px;   // iPad Mini
+$tablet-large: 1024px;  // iPad Pro
+$desktop: 1200px;       // Desktop
+
+// Mixins responsive optimizados
+@mixin mobile-only {
+  @media (max-width: #{$tablet-small - 1px}) {
+    @content;
+  }
+}
+
+@mixin tablet-only {
+  @media (min-width: $tablet-small) and (max-width: #{$desktop - 1px}) {
+    @content;
+  }
+}
+
+@mixin desktop-only {
+  @media (min-width: $desktop) {
+    @content;
+  }
+}
+
+@mixin mobile-responsive {
+  @include mobile-only {
+    padding: 1rem;
+    margin: 0.5rem;
+    
+    h1 {
+      font-size: 1.5rem;
+    }
+  }
+}
+
+@mixin touch-friendly {
+  min-height: 44px;
+  min-width: 44px;
+  padding: 0.75rem 1rem;
+  
+  @include mobile-only {
+    min-height: 56px;
+    padding: 1rem 1.5rem;
+    font-size: 1rem;
+    margin: 0.5rem 0;
+  }
+}
+
+@mixin mobile-grid {
+  @include mobile-only {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+    padding: 1rem;
+  }
+}
+
+@mixin safe-area-padding {
+  padding-left: max(1rem, env(safe-area-inset-left));
+  padding-right: max(1rem, env(safe-area-inset-right));
+  padding-top: max(1rem, env(safe-area-inset-top));
+  padding-bottom: max(1rem, env(safe-area-inset-bottom));
+}
+
+@mixin mobile-container {
+  @include mobile-only {
+    @include safe-area-padding;
+    width: 100%;
+    max-width: 100vw;
+    overflow-x: hidden;
+  }
+}
+
+// ===========================================
+// CLASES COMPARTIDAS
+// ===========================================
+
+// Layout base para páginas con responsive
+%page-container {
+  position: relative;
+  height: 100vh;
+  height: 100dvh; // Dynamic viewport height para móviles
+  overflow-y: auto;
+  background: transparent;
+  color: $dark-text;
+  font-family: $font-red-hat;
+  
+  @include mobile-only {
+    height: 100vh;
+    height: 100dvh;
+    overflow-x: hidden;
+  }
+}
+
+// Header compartido con responsive
+%page-header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 2rem;
+  background: rgba(0, 0, 0, 0.450);
+  backdrop-filter: blur(10px);
+  
+  @include mobile-container;
+
+  h1 {
+    font-family: $font-monoton;
+    font-size: 1.8rem;
+    text-shadow: 0 0 10px rgba(230, 189, 0, 0.5);
+    
+    @include mobile-only {
+      font-size: 1.3rem;
+    }
+  }
+}
+
+// Botón de volver compartido
+%back-btn {
+  padding: 0.5rem 1rem;
+  background: transparent;
+  border: 1px solid $primary-aqua;
+  color: $primary-aqua;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+
+  &:hover {
+    background: $primary-aqua;
+    color: white;
+  }
+}
+
+// Panel de contenido compartido
+%content-panel {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 15px;
+  padding: 1.5rem;
+}
+
+// Input de temática compartido
+%tematica-input {
+  width: 100%;
+  padding: 0.75rem;
+  background: rgba(0, 0, 0, 0.3);
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-radius: 8px;
+  color: white;
+  font-family: $font-red-hat;
+  transition: all 0.3s ease;
+
+  &:focus {
+    outline: none;
+    box-shadow: 0 0 10px rgba(1, 186, 154, 0.3);
+  }
+
+  &::placeholder {
+    color: rgba(255, 255, 255, 0.6);
+  }
+}
+
+// Sugerencias compartidas
+%suggestions-container {
+  margin-top: 1rem;
+  padding: 1rem;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+
+  .suggestions-label {
+    display: block;
+    font-size: 0.9rem;
+    color: $primary-aqua;
+    margin-bottom: 0.75rem;
+    font-weight: 500;
+  }
+
+  .suggestion-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .suggestion-tag {
+    padding: 0.4rem 0.8rem;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 15px;
+    color: white;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-family: $font-red-hat;
+
+    &:hover {
+      background: $primary-aqua;
+      border-color: $primary-aqua;
+      transform: translateY(-2px);
+    }
+  }
+}
+
+// Botones de dificultad compartidos
+%difficulty-btn {
+  padding: 0.75rem 1.5rem;
+  background: rgba(255, 255, 255, 0.1);
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-radius: 25px;
+  color: white;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-family: $font-red-hat;
+  text-align: center;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.2);
+  }
+
+  &.active {
+    background: $primary-violet;
+    border-color: $primary-violet;
+    box-shadow: 0 0 15px rgba(182, 1, 255, 0.4);
+  }
+}
+
+// ===========================================
+// 3. RESET BÁSICO GLOBAL
+// ===========================================
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden; /* Evita CUALQUIER scroll en el body/html */
+}
