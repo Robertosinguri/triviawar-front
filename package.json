@@ -1,6 +1,7 @@
 {
   "name": "triviawar-front",
   "version": "1.0.0",
+  "private": true,
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
@@ -8,7 +9,6 @@
     "watch": "ng build --watch --configuration development",
     "lint": "ng lint"
   },
-  "private": true,
   "dependencies": {
     "@angular/animations": "^20.0.0",
     "@angular/common": "^20.0.0",
@@ -21,7 +21,7 @@
     "@angular/platform-server": "^20.0.0",
     "@angular/router": "^20.0.0",
     "firebase": "^12.8.0",
-    "ngx-socket-io": "4.9.0",
+    "ngx-socket-io": "^4.10.0",
     "rxjs": "~7.8.0",
     "socket.io-client": "^4.8.1",
     "tslib": "^2.6.2",
@@ -33,5 +33,13 @@
     "@angular/compiler-cli": "^20.0.0",
     "@types/node": "^20.17.19",
     "typescript": "~5.9.3"
+  },
+  "overrides": {
+    "picomatch": "^4.0.4",
+    "@angular/build": {
+      "vite": {
+        "picomatch": "^4.0.4"
+      }
+    }
   }
 }
