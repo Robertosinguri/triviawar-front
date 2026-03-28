@@ -19,6 +19,12 @@ jobs:
         with:
           node-version: '20'
 
+      - name: Generar archivo environment.prod.ts
+        run: |
+          mkdir -p src/environments
+          echo "${{ secrets.FRONT_ENV_PROD }}" > src/environments/environment.prod.ts
+          echo "${{ secrets.FRONT_ENV_PROD }}" > src/environments/environment.ts
+
       - name: Instalar y Compilar Angular
         run: npm ci && npm run build
 
