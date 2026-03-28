@@ -3,6 +3,7 @@ import { Auth, signInWithEmailAndPassword, createUserWithEmailAndPassword, updat
 import { BehaviorSubject, Observable, from } from 'rxjs';
 import { map, catchError } from 'rxjs/operators';
 import { HttpClient } from '@angular/common/http';
+import { environment } from '../../../environments/environment';
 
 export interface AuthUser {
     username: string;
@@ -30,7 +31,7 @@ export interface SignUpData {
 export class FirebaseAuthService {
     private auth = inject(Auth);
     private http = inject(HttpClient);
-    private readonly API_URL = 'http://localhost:3000/api/auth';
+    private readonly API_URL = `${environment.apiUrl}/auth`;
 
     // Signals para compatibilidad con código existente
     private readonly isAuthenticated = signal(false);
