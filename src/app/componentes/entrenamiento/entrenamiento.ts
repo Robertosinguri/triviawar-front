@@ -35,9 +35,10 @@ export class EntrenamientoComponent {
   ];
 
   motoresIA = [
-    { nombre: 'Gemini 2.5', icono: '🤖', estado: 'Principal', color: '#4285F4' },
-    { nombre: 'Cohere', icono: '🧡', estado: 'Optimizado', color: '#FB8C00' },
-    { nombre: 'Llama 3.1', icono: '🦙', estado: 'Respaldo', color: '#00BCD4' }
+    { nombre: 'Groq (Llama 3)', icono: '⚡', estado: 'Plan A (Principal)', color: '#01BA9A' },
+    { nombre: 'Cohere', icono: '🧡', estado: 'Plan B (Estable)', color: '#FB8C00' },
+    { nombre: 'HF Llama', icono: '🦙', estado: 'Plan C (Respaldo)', color: '#00BCD4' },
+    { nombre: 'OpenRouter', icono: '🧠', estado: 'Plan D (Emergencia)', color: '#FF508C' }
   ];
 
   constructor(

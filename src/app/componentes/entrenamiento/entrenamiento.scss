@@ -238,13 +238,17 @@
 
 
 
-@media (max-width: 768px) {
+@media (max-width: 900px) {
   .training-main {
     grid-template-columns: 1fr;
     padding: 1rem;
   }
 
   .difficulty-options {
+    grid-template-columns: 1fr;
+  }
+  
+  .ai-engines-list {
     grid-template-columns: 1fr;
   }
 }
