@@ -28,6 +28,7 @@ export interface ResultadoJuego {
 export interface JugadorRanking {
     posicion: number;
     userId: string;
+    email?: string;
     nombre: string;
     puntajeTotal: number;
     partidasJugadas: number;

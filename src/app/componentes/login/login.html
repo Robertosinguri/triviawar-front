@@ -8,54 +8,67 @@
       <div class="success-message">
         <div class="success-icon">✨</div>
         <p class="success-title">Usuario Registrado Correctamente</p>
-        <small class="success-text">Tu cuenta ha sido verificada exitosamente</small>
+        <small class="success-text">¡Bienvenido a Trivia War!</small>
         <div class="success-loader"></div>
-        <small class="redirect-text">Redirigiendo al login...</small>
+        <small class="redirect-text">Entrando al juego...</small>
+      </div>
+    } @else if (showResetSuccess()) {
+      <div class="success-message">
+        <div class="success-icon">✉️</div>
+        <p class="success-title">Email Enviado</p>
+        <small class="success-text">Revisa tu bandeja de entrada para resetear tu clave.</small>
+        <div class="success-loader"></div>
+        <small class="redirect-text">Volviendo al login...</small>
       </div>
     } @else if (showConfirmation()) {
-      <div class="confirmation-form">
-        <h2 class="confirmation-title">✉️ Confirma tu cuenta</h2>
-        <p class="confirmation-text">Hemos enviado un código a <strong>{{ pendingEmail() }}</strong></p>
+      <div class="confirmation-form verification-card">
+        <div class="neon-envelope">
+          <i class="material-symbols-outlined pulsing">mail</i>
+          <div class="glow-ring"></div>
+        </div>
         
-        @if (errorMessage()) {
-          <div class="error-message">{{ errorMessage() }}</div>
-        }
+        <h2 class="confirmation-title neon-text-cyan">✉️ ¡Casi listo!</h2>
+        <p class="confirmation-text">
+          Hemos enviado un enlace de verificación a:<br>
+          <strong class="neon-text-magenta">{{ pendingEmail() }}</strong>
+        </p>
         
-        <div class="form-group">
-          <input 
-            type="text"
-            placeholder="Código de confirmación"
-            class="form-input" 
-            [value]="confirmationCode()"
-            (input)="onConfirmationCodeChange($event.target.value)"
-            [disabled]="isLoading()"
-            required>
+        <div class="verification-steps">
+          <p>1. Revisa tu bandeja de entrada (y spam)</p>
+          <p>2. Haz clic en el enlace de verificación</p>
+          <p>3. Regresa aquí para ingresar</p>
         </div>
         
         <button 
           type="button" 
-          class="login-button"
-          (click)="confirmSignUp()"
-          [disabled]="isLoading() || !confirmationCode()"
-          [class.loading]="isLoading()">
-          @if (isLoading()) {
-            <span class="loading-spinner"></span>
-            Confirmando...
-          } @else {
-            Confirmar Cuenta
-          }
+          class="login-button neon-btn-cyan"
+          (click)="showConfirmation.set(false)"
+          [disabled]="isLoading()">
+          Volver al Inicio
         </button>
         
         <div class="resend-section">
-          <a href="#" class="resend-link" (click)="resendCode(); $event.preventDefault()">
-            ¿No recibiste el código? Reenviar
+          <p class="resend-text">¿No recibiste nada?</p>
+          <a href="#" class="resend-link neon-link" (click)="resendCode(); $event.preventDefault()">
+             @if (isLoading()) {
+               Reenviando...
+             } @else {
+               Reenviar enlace
+             }
           </a>
         </div>
       </div>
     } @else {
+
       <form class="login-form" (ngSubmit)="onSubmit()">
         @if (errorMessage()) {
           <div class="error-message">{{ errorMessage() }}</div>
+        }
+
+        @if (isForgotPasswordMode()) {
+          <div class="form-hint">
+             Ingresa tu email para recuperar tu contraseña
+          </div>
         }
       
         @if (isSignUpMode()) {
@@ -82,34 +95,14 @@
             required>
         </div>
         
-        <div class="form-group">
-          <input 
-            [type]="showPassword() ? 'text' : 'password'"
-            placeholder="Contraseña" 
-            class="form-input password" 
-            [value]="password()"
-            (input)="onPasswordChange($event.target.value)"
-            [disabled]="isLoading()"
-            required>
-            <button type="button" class="toggle-btn" (click)="togglePassword()">
-              <i class="material-symbols-outlined">
-                @if(showPassword()){
-                  visibility_off
-                } @else{
-                  visibility
-                }</i>
-            </button>
-        </div>
-
-        @if (isSignUpMode()) {
+        @if (!isForgotPasswordMode()) {
           <div class="form-group">
             <input 
               [type]="showPassword() ? 'text' : 'password'"
-              placeholder="Confirmar contraseña" 
-              class="form-input" 
-              [class.error]="!passwordsMatch()"
-              [value]="confirmPassword()"
-              (input)="onConfirmPasswordChange($event.target.value)"
+              placeholder="Contraseña" 
+              class="form-input password" 
+              [value]="password()"
+              (input)="onPasswordChange($event.target.value)"
               [disabled]="isLoading()"
               required>
               <button type="button" class="toggle-btn" (click)="togglePassword()">
@@ -121,25 +114,43 @@
                   }</i>
               </button>
           </div>
-          @if (!passwordsMatch() && confirmPassword()) {
-            <div class="password-error">Las contraseñas no coinciden</div>
+
+          @if (isSignUpMode()) {
+            <div class="form-group">
+              <input 
+                [type]="showPassword() ? 'text' : 'password'"
+                placeholder="Confirmar contraseña" 
+                class="form-input" 
+                [class.error]="!passwordsMatch()"
+                [value]="confirmPassword()"
+                (input)="onConfirmPasswordChange($event.target.value)"
+                [disabled]="isLoading()"
+                required>
+            </div>
+            @if (!passwordsMatch() && confirmPassword()) {
+              <div class="password-error">Las contraseñas no coinciden</div>
+            }
           }
         }
         
         <button 
           type="submit" 
           class="login-button"
-          [disabled]="isLoading() || !email() || !password() || (isSignUpMode() && (!name() || !confirmPassword() || !passwordsMatch()))"
+          [disabled]="isLoading() || !email() || (!isForgotPasswordMode() && !password()) || (isSignUpMode() && (!name() || !confirmPassword() || !passwordsMatch()))"
           [class.loading]="isLoading()">
           @if (isLoading()) {
             <span class="loading-spinner"></span>
-            @if (isSignUpMode()) {
+            @if (isForgotPasswordMode()) {
+              Enviando...
+            } @else if (isSignUpMode()) {
               Registrando...
             } @else {
               Ingresando...
             }
           } @else {
-            @if (isSignUpMode()) {
+            @if (isForgotPasswordMode()) {
+              Enviar Link
+            } @else if (isSignUpMode()) {
               Crear Cuenta
             } @else {
               Ingresar
@@ -148,14 +159,26 @@
         </button>
       </form>
       
-      <div class="toggle-mode">
-        <a href="#" class="toggle-link" (click)="toggleMode(); $event.preventDefault()">
-          @if (isSignUpMode()) {
-            ¿Ya tienes cuenta? Inicia sesión
-          } @else {
-            ¿No tienes cuenta? Regístrate
-          }
-        </a>
+      <div class="auth-links">
+        <div class="toggle-mode">
+          <a href="#" class="toggle-link" (click)="toggleMode(); $event.preventDefault()">
+            @if (isSignUpMode()) {
+              ¿Ya tienes cuenta? Inicia sesión
+            } @else if (isForgotPasswordMode()) {
+              Volver al Login
+            } @else {
+              ¿No tienes cuenta? Regístrate
+            }
+          </a>
+        </div>
+
+        @if (!isSignUpMode() && !isForgotPasswordMode()) {
+          <div class="forgot-password">
+            <a href="#" class="toggle-link sub-link" (click)="toggleForgotPassword(); $event.preventDefault()">
+              ¿Olvidaste tu contraseña?
+            </a>
+          </div>
+        }
       </div>
 
       @if (isSignUpMode()) {
@@ -168,5 +191,6 @@
         <small>Autenticación con Firebase</small>
       </div>
     }
+
   </div>
 </div>

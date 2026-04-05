@@ -25,7 +25,7 @@
             @for (jugador of rankingPaginado; track jugador.posicion) {
             <tr [attr.data-position]="jugador.posicion">
               <td class="posicion">#{{jugador.posicion}}</td>
-              <td class="nombre" [attr.data-name]="jugador.nombre" [attr.data-email]="jugador.userId">{{jugador.nombre}}
+              <td class="nombre" [attr.data-name]="jugador.nombre" [attr.data-email]="jugador.email">{{jugador.nombre}}
               </td>
               <td class="puntaje">{{jugador.puntajeTotal}} pts</td>
               <td>{{jugador.partidasJugadas}}</td>
@@ -79,7 +79,7 @@
               </div>
               <span class="mobile-ranking-score">{{jugador.puntajeTotal}} pts</span>
             </div>
-            <div class="mobile-ranking-email">{{jugador.userId}}</div>
+            <div class="mobile-ranking-email">{{jugador.email || jugador.userId}}</div>
           </li>
           } @empty {
           @if (ranking !== null) {

@@ -187,10 +187,46 @@ export class FirebaseAuthService {
         return true;
     }
 
-    async resendConfirmationCode(username: string): Promise<boolean> {
-        console.warn('Firebase: Reenvío de código no implementado');
-        return true;
+    async resendConfirmationCode(email: string, password?: string): Promise<boolean> {
+        this.isLoading.set(true);
+        this.error.set(null);
+        try {
+            const response: any = await this.http.post(`${this.API_URL}/resend-verification`, {
+                email,
+                password // El backend lo usa para loguear y obtener token
+            }).toPromise();
+
+            return response.success;
+        } catch (e: any) {
+            this.error.set(e.error?.message || 'Error al reenviar verificación');
+            return false;
+        } finally {
+            this.isLoading.set(false);
+        }
     }
+
+    async forgotPassword(email: string): Promise<boolean> {
+        this.isLoading.set(true);
+        this.error.set(null);
+        try {
+            console.log('🧪 Solicitando recuperación para:', email);
+            const response: any = await this.http.post(`${this.API_URL}/forgot-password`, {
+                email
+            }).toPromise();
+
+            return response.success;
+        } catch (e: any) {
+            console.error('❌ Error en forgotPassword:', e);
+            const serverError = e.error?.message || 'Error al solicitar recuperación';
+            this.error.set(serverError);
+            return false;
+        } finally {
+            this.isLoading.set(false);
+        }
+    }
+
+
+
 
     usuarioActual() {
         return this.currentUser();
