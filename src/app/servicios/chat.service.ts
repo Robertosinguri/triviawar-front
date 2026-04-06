@@ -1,169 +1,185 @@
 import { Injectable, inject } from '@angular/core';
-import { Observable, Subscription } from 'rxjs';
 import { SocketService } from './websocket/socket.service';
+import { Observable } from 'rxjs';
 
 export interface ChatMessage {
-    id: string;
-    text: string;
-    username: string;
-    timestamp: Date;
-    roomId?: string | null;
-    isSystem?: boolean;
+  id: string;
+  text: string;
+  username: string;
+  timestamp: Date;
+  roomId?: string | null;
+  isSystem?: boolean;
+}
+
+export interface GroupUpdateMessage {
+  id: string;
+  type: 'group_updated' | 'group_info';
+  username: string;
+  members: string[];
+  timestamp: Date;
 }
 
 @Injectable({
-    providedIn: 'root'
+  providedIn: 'root'
 })
 export class ChatService {
-    private socketService = inject(SocketService);
-    private isSocketConnected = false;
-    private connectionSubscriptions = new Subscription();
+  private socketService = inject(SocketService);
 
-    // Conectar socket
-    connect() {
-        this.socketService.connect();
-        // Limpiar suscripciones previas
-        this.connectionSubscriptions.unsubscribe();
-        this.connectionSubscriptions = new Subscription();
+  // Conectar al socket de chat
+  connect() {
+    this.socketService.connect();
+  }
+
+  // Verificar si está conectado
+  isConnected(): boolean {
+    return this.socketService.socket?.connected || false;
+  }
+
+  // Obtener ID del socket
+  getSocketId(): string | undefined {
+    return this.socketService.socket?.id;
+  }
+
+  // Eventos de conexión
+  onConnect(): Observable<void> {
+    return this.socketService.socket.fromEvent<void>('connect');
+  }
+
+  onDisconnect(): Observable<void> {
+    return this.socketService.socket.fromEvent<void>('disconnect');
+  }
+
+  onError(): Observable<any> {
+    return this.socketService.socket.fromEvent<any>('connect_error');
+  }
+
+  // Unirse al chat (global o sala)
+  joinChat(username: string, roomId?: string | null) {
+    if (this.isConnected()) {
+      console.log(`📤 Enviando chat:join - usuario: ${username}, sala: ${roomId || 'global'}`);
+      this.socketService.socket.emit('chat:join', { username, roomId: roomId || null });
+    } else {
+      console.warn('⚠️ Socket no conectado, intentando conectar...');
+      this.connect();
+      // Esperar a que se conecte y luego enviar
+      const connectSub = this.onConnect().subscribe(() => {
+        console.log(`📤 (Retry) Enviando chat:join - usuario: ${username}, sala: ${roomId || 'global'}`);
+        this.socketService.socket.emit('chat:join', { username, roomId: roomId || null });
+        connectSub.unsubscribe();
+      });
+    }
+  }
+
+  // Enviar mensaje
+  sendMessage(text: string, username: string, roomId?: string | null) {
+    if (this.isConnected()) {
+      console.log(`📤 Enviando mensaje: "${text}", usuario: ${username}, sala: ${roomId || 'global'}`);
+      this.socketService.socket.emit('chat:send_message', {
+        text,
+        username,
+        roomId: roomId || null
+      });
+    } else {
+      console.warn('⚠️ Socket no conectado, intentando conectar...');
+      this.connect();
+      const connectSub = this.onConnect().subscribe(() => {
+        console.log(`📤 (Retry) Enviando mensaje: "${text}", usuario: ${username}, sala: ${roomId || 'global'}`);
+        this.socketService.socket.emit('chat:send_message', {
+          text,
+          username,
+          roomId: roomId || null
+        });
+        connectSub.unsubscribe();
+      });
+    }
+  }
+
+  // Enviar mensaje privado (1-a-1 o 1-a-muchos) con grupos bidireccionales
+  sendPrivateMessage(targetUsername: string | string[], text: string, fromUsername: string) {
+    if (this.isConnected()) {
+      // Convertir a string separado por comas si es array
+      const targetUsers = Array.isArray(targetUsername) 
+        ? targetUsername.join(',') 
+        : targetUsername;
+      
+      console.log(`📤 Enviando mensaje PRIVADO a ${targetUsers}: "${text}" (con grupos bidireccionales)`);
+      this.socketService.socket.emit('chat:private_message', {
+        text,
+        targetUsername: targetUsers,
+        fromUsername
+      });
+    } else {
+      console.warn('⚠️ Socket no conectado, intentando conectar...');
+      this.connect();
+      const connectSub = this.onConnect().subscribe(() => {
+        const targetUsers = Array.isArray(targetUsername) 
+          ? targetUsername.join(',') 
+          : targetUsername;
         
-        // Escuchar eventos de conexión para actualizar estado
-        this.connectionSubscriptions.add(
-            this.socketService.socket.fromEvent<void>('connect').subscribe(() => {
-                this.isSocketConnected = true;
-                console.log('✅ ChatService: Socket conectado');
-            })
-        );
-        
-        this.connectionSubscriptions.add(
-            this.socketService.socket.fromEvent<void>('disconnect').subscribe(() => {
-                this.isSocketConnected = false;
-                console.log('❌ ChatService: Socket desconectado');
-            })
-        );
+        console.log(`📤 (Retry) Enviando mensaje PRIVADO a ${targetUsers}: "${text}"`);
+        this.socketService.socket.emit('chat:private_message', {
+          text,
+          targetUsername: targetUsers,
+          fromUsername
+        });
+        connectSub.unsubscribe();
+      });
     }
+  }
 
-    // Verificar si el socket está conectado
-    isConnected(): boolean {
-        return this.isSocketConnected;
+  // Obtener miembros del grupo privado desde el backend
+  getPrivateGroup(username: string) {
+    if (this.isConnected()) {
+      console.log(`📤 Solicitando grupo privado para: ${username}`);
+      this.socketService.socket.emit('chat:get_private_group', { username });
     }
+  }
 
-    // Obtener ID del socket
-    getSocketId(): string | undefined {
-        try {
-            // Intentar acceder al ID del socket de diferentes maneras
-            const socket: any = this.socketService.socket;
-            return socket?.ioSocket?.id || socket?.id || 'unknown';
-        } catch (error) {
-            return 'error';
-        }
+  // Unirse a sala de chat específica
+  joinChatRoom(roomId: string) {
+    if (this.isConnected()) {
+      console.log(`📤 Uniéndose a sala de chat: ${roomId}`);
+      this.socketService.socket.emit('chat:join_room', { roomId });
     }
+  }
 
-    // Escuchar eventos de conexión
-    onConnect(): Observable<void> {
-        return this.socketService.socket.fromEvent<void>('connect');
+  // Salir de sala de chat específica
+  leaveChatRoom(roomId: string) {
+    if (this.isConnected()) {
+      console.log(`📤 Saliendo de sala de chat: ${roomId}`);
+      this.socketService.socket.emit('chat:leave_room', { roomId });
     }
+  }
 
-    // Escuchar eventos de desconexión
-    onDisconnect(): Observable<void> {
-        return this.socketService.socket.fromEvent<void>('disconnect');
-    }
+  // --- ESCUCHAR EVENTOS ---
 
-    // Escuchar errores de conexión
-    onError(): Observable<any> {
-        return this.socketService.socket.fromEvent<any>('error');
-    }
+  // Recibir mensajes (globales o de sala)
+  onMessage(): Observable<ChatMessage> {
+    return this.socketService.socket.fromEvent<ChatMessage>('chat:message');
+  }
 
-    // Unirse al flujo de mensajes del chat (notificar entrada)
-    joinChat(username: string, roomId?: string | null) {
-        if (this.isConnected()) {
-            console.log(`📤 Enviando chat:join - usuario: ${username}, sala: ${roomId || 'global'}`);
-            this.socketService.socket.emit('chat:join', { username, roomId: roomId || null });
-        } else {
-            console.warn('⚠️ Socket no conectado, intentando conectar...');
-            this.connect();
-            // Esperar a que se conecte y luego enviar
-            const connectSub = this.onConnect().subscribe(() => {
-                console.log(`📤 (Retry) Enviando chat:join - usuario: ${username}, sala: ${roomId || 'global'}`);
-                this.socketService.socket.emit('chat:join', { username, roomId: roomId || null });
-                connectSub.unsubscribe();
-            });
-        }
-    }
+  // Recibir historial de mensajes
+  onHistory(): Observable<ChatMessage[]> {
+    return this.socketService.socket.fromEvent<ChatMessage[]>('chat:history');
+  }
 
-    // Enviar mensaje
-    sendMessage(text: string, username: string, roomId?: string | null) {
-        if (this.isConnected()) {
-            console.log(`📤 Enviando mensaje: "${text}", usuario: ${username}, sala: ${roomId || 'global'}`);
-            this.socketService.socket.emit('chat:send_message', {
-                text,
-                username,
-                roomId: roomId || null
-            });
-        } else {
-            console.error('❌ Socket no conectado, no se puede enviar mensaje');
-        }
-    }
+  // Recibir mensajes privados (con información de grupos bidireccionales)
+  onPrivateMessage(): Observable<any> {
+    return this.socketService.socket.fromEvent<any>('chat:private_message');
+  }
 
-    // Unirse a sala de chat
-    joinChatRoom(roomId: string) {
-        if (this.isConnected()) {
-            console.log(`📤 Uniéndose a sala de chat: ${roomId}`);
-            this.socketService.socket.emit('chat:join_room', roomId);
-        } else {
-            console.warn('⚠️ Socket no conectado, intentando conectar...');
-            this.connect();
-            const connectSub = this.onConnect().subscribe(() => {
-                console.log(`📤 (Retry) Uniéndose a sala de chat: ${roomId}`);
-                this.socketService.socket.emit('chat:join_room', roomId);
-                connectSub.unsubscribe();
-            });
-        }
-    }
+  // Recibir actualizaciones de grupo
+  onGroupUpdate(): Observable<GroupUpdateMessage> {
+    return this.socketService.socket.fromEvent<GroupUpdateMessage>('chat:group_update');
+  }
 
-    // Salir de sala de chat
-    leaveChatRoom(roomId: string) {
-        if (this.isConnected()) {
-            console.log(`📤 Saliendo de sala de chat: ${roomId}`);
-            this.socketService.socket.emit('chat:leave_room', roomId);
-        }
-    }
+  // Recibir información de grupo
+  onGroupInfo(): Observable<GroupUpdateMessage> {
+    return this.socketService.socket.fromEvent<GroupUpdateMessage>('chat:group_info');
+  }
 
-    // Recibir mensajes (Global o Sala)
-    onMessage(): Observable<ChatMessage> {
-        return this.socketService.socket.fromEvent<ChatMessage>('chat:message');
-    }
-
-    // Recibir historial (Solo Global)
-    onHistory(): Observable<ChatMessage[]> {
-        return this.socketService.socket.fromEvent<ChatMessage[]>('chat:history');
-    }
-
-    // Limpiar recursos
-    ngOnDestroy() {
-        this.connectionSubscriptions.unsubscribe();
-    }
-
-    // --- NUEVAS FUNCIONALIDADES PARA SUB-CHATS ---
-
-    // Recibir lista de usuarios conectados
-    onUsersList(): Observable<string[]> {
-        return this.socketService.socket.fromEvent<string[]>('chat:users_list');
-    }
-
-    // Recibir mensajes privados
-    onPrivateMessage(): Observable<any> {
-        return this.socketService.socket.fromEvent<any>('chat:private_message');
-    }
-
-    // Enviar mensaje privado (Sub-chat)
-    sendPrivateMessage(targetUsername: string, text: string, fromUsername: string) {
-        if (this.isConnected()) {
-            console.log(`📤 Enviando mensaje PRIVADO a ${targetUsername}: "${text}"`);
-            this.socketService.socket.emit('chat:private_message', {
-                text,
-                targetUsername,
-                fromUsername
-            });
-        }
-    }
+  // Recibir lista de usuarios conectados
+  onUsersList(): Observable<string[]> {
+    return this.socketService.socket.fromEvent<string[]>('chat:users_list');
+  }
 }
