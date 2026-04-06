@@ -66,8 +66,19 @@
               </div>
             </div>
 
+            <div class="action-section">
+              <button class="start-training-btn" [disabled]="!esConfiguracionValida() || cargando"
+                (click)="iniciarEntrenamiento()">
+                @if (!cargando) {
+                <span>🚀 Comenzar Entrenamiento</span>
+                } @else {
+                <span>🤖 IA Pensando preguntas...</span>
+                }
+              </button>
+            </div>
+
             <div class="ai-status-section">
-              <h3>Sistemas de IA Activos</h3>
+              <h3>POWERED BY</h3>
               <div class="ai-engines-list">
                 @for (motor of motoresIA; track motor.nombre) {
                 <div class="ai-engine-card">
@@ -79,17 +90,6 @@
                 </div>
                 }
               </div>
-            </div>
-
-            <div class="action-section">
-              <button class="start-training-btn" [disabled]="!esConfiguracionValida() || cargando"
-                (click)="iniciarEntrenamiento()">
-                @if (!cargando) {
-                <span>🚀 Comenzar Entrenamiento</span>
-                } @else {
-                <span>🤖 IA Pensando preguntas...</span>
-                }
-              </button>
             </div>
           </div>
         </div>
