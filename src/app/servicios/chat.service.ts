@@ -42,15 +42,15 @@ export class ChatService {
 
   // Eventos de conexión
   onConnect(): Observable<void> {
-    return this.socketService.socket.fromEvent<void>('connect');
+    return this.socketService.socket.fromEvent('connect');
   }
 
   onDisconnect(): Observable<void> {
-    return this.socketService.socket.fromEvent<void>('disconnect');
+    return this.socketService.socket.fromEvent('disconnect');
   }
 
   onError(): Observable<any> {
-    return this.socketService.socket.fromEvent<any>('connect_error');
+    return this.socketService.socket.fromEvent('connect_error');
   }
 
   // Unirse al chat (global o sala)
@@ -155,31 +155,31 @@ export class ChatService {
 
   // Recibir mensajes (globales o de sala)
   onMessage(): Observable<ChatMessage> {
-    return this.socketService.socket.fromEvent<ChatMessage>('chat:message');
+    return this.socketService.socket.fromEvent('chat:message');
   }
 
   // Recibir historial de mensajes
   onHistory(): Observable<ChatMessage[]> {
-    return this.socketService.socket.fromEvent<ChatMessage[]>('chat:history');
+    return this.socketService.socket.fromEvent('chat:history');
   }
 
   // Recibir mensajes privados (con información de grupos bidireccionales)
   onPrivateMessage(): Observable<any> {
-    return this.socketService.socket.fromEvent<any>('chat:private_message');
+    return this.socketService.socket.fromEvent('chat:private_message');
   }
 
   // Recibir actualizaciones de grupo
   onGroupUpdate(): Observable<GroupUpdateMessage> {
-    return this.socketService.socket.fromEvent<GroupUpdateMessage>('chat:group_update');
+    return this.socketService.socket.fromEvent('chat:group_update');
   }
 
   // Recibir información de grupo
   onGroupInfo(): Observable<GroupUpdateMessage> {
-    return this.socketService.socket.fromEvent<GroupUpdateMessage>('chat:group_info');
+    return this.socketService.socket.fromEvent('chat:group_info');
   }
 
   // Recibir lista de usuarios conectados
   onUsersList(): Observable<string[]> {
-    return this.socketService.socket.fromEvent<string[]>('chat:users_list');
+    return this.socketService.socket.fromEvent('chat:users_list');
   }
 }
