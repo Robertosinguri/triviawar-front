@@ -1,88 +1,94 @@
 
 <div class="lobby-container">
-  <header class="lobby-header">
-    <h1>Sala: {{codigoSala || 'CARGANDO...'}}</h1>
-    <button class="back-btn" (click)="salirSala()">← Volver</button>
-  </header>
+  <div class="lobby-layout">
+    <main class="lobby-main">
+      <header class="lobby-header">
+        <h1>Sala: {{codigoSala || 'CARGANDO...'}}</h1>
+        <button class="back-btn" (click)="salirSala()">← Volver</button>
+      </header>
 
-  <main class="lobby-main">
-    <!-- Código de Sala -->
-    <div class="room-code-section">
-      <h2>✅ Sala Creada</h2>
-      <p class="share-text">Comparte este código con tus amigos:</p>
+      <!-- Código de Sala -->
+      <div class="room-code-section">
+        <h2>✅ Sala Creada</h2>
+        <p class="share-text">Comparte este código con tus amigos:</p>
 
-      <div class="code-display">
-        <div class="room-code">
-          {{codigoSala || 'NO-CODE'}}
+        <div class="code-display">
+          <div class="room-code">
+            {{codigoSala || 'NO-CODE'}}
+          </div>
+          <button (click)="copiarCodigo()" [class.copied]="copiado" class="copy-btn-destacado"
+            style="background: transparent; color: #E6BD00; border: 1px solid #E6BD00; padding: 8px 12px; border-radius: 5px; cursor: pointer; font-weight: 500; font-size: 0.9rem; transition: all 0.3s ease;">
+            {{copiado ? '✓' : 'Copiar'}}
+          </button>
         </div>
-        <button (click)="copiarCodigo()" [class.copied]="copiado" class="copy-btn-destacado"
-          style="background: transparent; color: #E6BD00; border: 1px solid #E6BD00; padding: 8px 12px; border-radius: 5px; cursor: pointer; font-weight: 500; font-size: 0.9rem; transition: all 0.3s ease;">
-          {{copiado ? '✓' : 'Copiar'}}
+
+        <p class="validity-text">
+          Este código es válido hasta que termine la partida
+        </p>
+      </div>
+
+      <!-- Lista de Jugadores -->
+      <div
+        style="background: rgba(255,255,255,0.1); border-radius: 10px; padding: 20px; margin: 0 auto 2rem; max-width: 600px;">
+        <h3 style="color: #01BA9A; margin-bottom: 15px;">👥 Jugadores ({{jugadores.length}}/{{maxJugadores}})</h3>
+
+        @for (jugador of jugadores; track jugador.nombre) {
+        <div
+          style="background: rgba(255,255,255,0.1); padding: 15px; border-radius: 8px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center;">
+          <div>
+            <strong style="color: white;">{{jugador.nombre}}</strong>
+            @if (jugador.esHost) {
+            <span style="color: #E6BD00; margin-left: 10px;">👑 Host</span>
+            }
+          </div>
+          <div>
+            @if (jugador.configurado) {
+            <span style="color: #01BA9A;">✅ Listo</span>
+            } @else {
+            <span style="color: #E6BD00;">⏳ Configurando...</span>
+            }
+          </div>
+        </div>
+        }
+
+        <!-- Slots vacíos -->
+        @for (slot of getSlotsVacios(); track $index) {
+        <div
+          style="background: rgba(255,255,255,0.05); padding: 15px; border-radius: 8px; margin-bottom: 10px; border: 2px dashed rgba(255,255,255,0.3); text-align: center;">
+          <span style="color: rgba(255,255,255,0.5); font-style: italic;">Esperando jugador...</span>
+        </div>
+        }
+      </div>
+
+      <!-- Botón de Iniciar Partida (solo para host) -->
+      @if (esHost && todosListos()) {
+      <div style="text-align: center; margin-bottom: 2rem;">
+        <button (click)="iniciarPartida()" [disabled]="iniciandoPartida"
+          [style.background]="iniciandoPartida ? 'rgba(1, 186, 154, 0.5)' : 'linear-gradient(45deg, #01BA9A, #00a085)'"
+          [style.cursor]="iniciandoPartida ? 'not-allowed' : 'pointer'"
+          style="color: white; border: none; padding: 20px 40px; border-radius: 25px; font-size: 1.3rem; font-weight: 700; box-shadow: 0 5px 15px rgba(1, 186, 154, 0.4); transition: all 0.3s ease;">
+          {{iniciandoPartida ? '⏳ Iniciando...' : '🚀 Iniciar Partida'}}
         </button>
       </div>
+      }
 
-      <p class="validity-text">
-        Este código es válido hasta que termine la partida
-      </p>
-    </div>
-
-    <!-- Lista de Jugadores -->
-    <div
-      style="background: rgba(255,255,255,0.1); border-radius: 10px; padding: 20px; margin: 0 auto 2rem; max-width: 600px;">
-      <h3 style="color: #01BA9A; margin-bottom: 15px;">👥 Jugadores ({{jugadores.length}}/{{maxJugadores}})</h3>
-
-      @for (jugador of jugadores; track jugador.nombre) {
-      <div
-        style="background: rgba(255,255,255,0.1); padding: 15px; border-radius: 8px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center;">
-        <div>
-          <strong style="color: white;">{{jugador.nombre}}</strong>
-          @if (jugador.esHost) {
-          <span style="color: #E6BD00; margin-left: 10px;">👑 Host</span>
-          }
-        </div>
-        <div>
-          @if (jugador.configurado) {
-          <span style="color: #01BA9A;">✅ Listo</span>
-          } @else {
-          <span style="color: #E6BD00;">⏳ Configurando...</span>
-          }
-        </div>
+      <!-- Estado del Juego -->
+      <div style="text-align: center;">
+        @if (!todosListos()) {
+        <p style="color: #E6BD00; font-size: 1.1rem; margin: 0;">
+          ⏳ Esperando que se unan más jugadores...
+        </p>
+        }
+        @if (todosListos() && !esHost) {
+        <p style="color: #01BA9A; font-size: 1.1rem; margin: 0;">
+          ✅ Todos listos! Esperando que el host inicie la partida...
+        </p>
+        }
       </div>
-      }
+    </main>
 
-      <!-- Slots vacíos -->
-      @for (slot of getSlotsVacios(); track $index) {
-      <div
-        style="background: rgba(255,255,255,0.05); padding: 15px; border-radius: 8px; margin-bottom: 10px; border: 2px dashed rgba(255,255,255,0.3); text-align: center;">
-        <span style="color: rgba(255,255,255,0.5); font-style: italic;">Esperando jugador...</span>
-      </div>
-      }
-    </div>
-
-    <!-- Botón de Iniciar Partida (solo para host) -->
-    @if (esHost && todosListos()) {
-    <div style="text-align: center; margin-bottom: 2rem;">
-      <button (click)="iniciarPartida()" [disabled]="iniciandoPartida"
-        [style.background]="iniciandoPartida ? 'rgba(1, 186, 154, 0.5)' : 'linear-gradient(45deg, #01BA9A, #00a085)'"
-        [style.cursor]="iniciandoPartida ? 'not-allowed' : 'pointer'"
-        style="color: white; border: none; padding: 20px 40px; border-radius: 25px; font-size: 1.3rem; font-weight: 700; box-shadow: 0 5px 15px rgba(1, 186, 154, 0.4); transition: all 0.3s ease;">
-        {{iniciandoPartida ? '⏳ Iniciando...' : '🚀 Iniciar Partida'}}
-      </button>
-    </div>
-    }
-
-    <!-- Estado del Juego -->
-    <div style="text-align: center;">
-      @if (!todosListos()) {
-      <p style="color: #E6BD00; font-size: 1.1rem; margin: 0;">
-        ⏳ Esperando que se unan más jugadores...
-      </p>
-      }
-      @if (todosListos() && !esHost) {
-      <p style="color: #01BA9A; font-size: 1.1rem; margin: 0;">
-        ✅ Todos listos! Esperando que el host inicie la partida...
-      </p>
-      }
-    </div>
-  </main>
-</div>
+    <aside class="lobby-sidebar">
+      <app-chat mode="room" [roomId]="codigoSala"></app-chat>
+    </aside>
+  </div>
+</div>

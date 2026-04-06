@@ -7,10 +7,12 @@ import { FirebaseAuthService } from '../../servicios/auth/firebase-auth.service'
 import { SocketService } from '../../servicios/websocket/socket.service';
 import { Subscription } from 'rxjs';
 
+import { ChatComponent } from '../chat/chat';
+
 @Component({
   selector: 'app-lobby',
   standalone: true,
-  imports: [FormsModule, CommonModule],
+  imports: [FormsModule, CommonModule, ChatComponent],
   templateUrl: './lobby.html',
   styleUrls: ['./lobby.scss']
 })

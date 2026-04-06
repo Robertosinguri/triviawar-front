@@ -1,0 +1,98 @@
+<div class="chat-container" [class.global-mode]="mode === 'global'" [class.room-mode]="mode === 'room'">
+  <!-- Cabecera con Pestañas -->
+  <div class="chat-header">
+    <div class="tabs-control">
+      <button class="tab-btn" [class.active]="activeTab() === 'global'" (click)="switchTab('global')">
+        <span class="status-dot" [class.online]="isConnected()"></span>
+        {{ mode === 'global' ? 'Conectados' : 'Sala' }}
+      </button>
+      <button class="tab-btn" [class.active]="activeTab() === 'private'" (click)="switchTab('private')">
+        Sub-chats
+        @if (privateMessages().length > 0) {
+          <span class="notification-badge">{{ privateMessages().length }}</span>
+        }
+      </button>
+    </div>
+  </div>
+
+  <div class="messages-viewport" #scrollMe>
+    <!-- Renderizado dinámico según la pestaña activa -->
+    @if (activeTab() === 'global') {
+      @for (msg of messages(); track msg.id) {
+        @if (msg.isSystem) {
+          <div class="system-message">
+            <span class="system-text">{{ msg.text }}</span>
+          </div>
+        } @else {
+          <div class="message-item" [class.own-message]="msg.username === username()">
+            <div class="message-meta">
+              <span class="status-dot-mini online"></span>
+              <span class="sender">{{ msg.username }}</span>
+              <span class="time">{{ formatTime(msg.timestamp) }}</span>
+            </div>
+            <div class="message-bubble">{{ msg.text }}</div>
+          </div>
+        }
+      }
+    } @else {
+      <!-- Pestaña de Sub-chats (Privados) -->
+      @for (msg of privateMessages(); track msg.id) {
+        <div class="message-item private" [class.own-message]="msg.username === username()">
+          <div class="message-meta">
+            <span class="sender">
+              {{ msg.username === username() ? 'Para: @' + msg.target : '@' + msg.username }}
+            </span>
+            <span class="time">{{ formatTime(msg.timestamp) }}</span>
+          </div>
+          <div class="message-bubble private">{{ msg.text }}</div>
+        </div>
+      }
+    }
+
+    @if (!hasMessages()) {
+      <div class="empty-state">
+        <p>{{ activeTab() === 'global' ? 'No hay mensajes globales.' : 'No tienes sub-chats activos. Usa @usuario para iniciar uno.' }} 👋</p>
+      </div>
+    }
+  </div>
+
+  <div class="chat-input-area">
+    <!-- Sugerencias de Usuarios para @ menciones -->
+    @if (showUserSuggestions() && filteredUsers().length > 0) {
+      <div class="user-suggestions-popup">
+        @for (user of filteredUsers(); track user) {
+          <button (click)="selectMention(user)" class="suggestion-item">
+            <span class="status-dot-mini online"></span>
+            @{{ user }}
+          </button>
+        }
+      </div>
+    }
+
+    <!-- Panel de Emojis -->
+    @if (showEmojiPicker()) {
+      <div class="emoji-picker-popup">
+        @for (emoji of commonEmojis; track emoji) {
+          <button (click)="addEmoji(emoji)" class="emoji-item">{{ emoji }}</button>
+        }
+      </div>
+    }
+
+    <button class="emoji-trigger" (click)="toggleEmojiPicker($event)">
+      <span class="emoji-icon">😊</span>
+    </button>
+
+    <input 
+      type="text" 
+      [ngModel]="newMessage()" 
+      (ngModelChange)="newMessage.set($event)"
+      (input)="onInputChange($event)"
+      (keyup.enter)="sendMessage()" 
+      placeholder="Escribe un mensaje o @usuario..."
+      maxlength="200"
+    >
+    <button (click)="sendMessage()" [disabled]="!newMessage().trim()" class="send-btn">
+      <span class="send-icon">🚀</span>
+    </button>
+  </div>
+</div>

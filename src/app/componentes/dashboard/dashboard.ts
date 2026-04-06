@@ -4,11 +4,12 @@ import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { NavbarComponent } from '../navbar/navbar';
 import { EstadisticasService, JugadorRanking } from '../../servicios/estadisticas/estadisticas.service';
+import { ChatComponent } from '../chat/chat';
 
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [FormsModule, CommonModule, RouterModule, NavbarComponent],
+  imports: [FormsModule, CommonModule, RouterModule, NavbarComponent, ChatComponent],
   templateUrl: './dashboard.html',
   styleUrls: ['./dashboard.scss']
 })

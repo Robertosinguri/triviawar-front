@@ -1,150 +1,136 @@
+
 <div class="resultados-container">
-  <header class="resultados-header">
-    <div class="header-title-group">
-      <h1>
-        <span class="full-title">{{esEntrenamiento ? '📉 Resumen de Entrenamiento' : '🏆 Resultados Finales'}}</span>
-        <span class="mobile-title">{{esEntrenamiento ? 'Resumen' : 'Resultados'}}</span>
-      </h1>
-    </div>
+  <div class="resultados-layout">
+    <main class="resultados-main">
+      <header class="resultados-header">
+        <div class="header-title-group">
+          <h1>
+            <span class="full-title">{{esEntrenamiento ? '📉 Resumen de Entrenamiento' : '🏆 Resultados Finales'}}</span>
+            <span class="mobile-title">{{esEntrenamiento ? 'Resumen' : 'Resultados'}}</span>
+          </h1>
+        </div>
 
-    <div class="header-info-group">
-      <div class="game-info">
-        @if (roomCode && !esEntrenamiento) {
-        <span class="room-code">Sala {{roomCode}}</span>
-        }
-        <span class="tema">{{tematica}}</span>
-        <span class="dificultad dif-{{dificultad}}">{{dificultad}}</span>
-      </div>
-    </div>
-  </header>
-
-  <div class="resultados-grid" [class.modo-entrenamiento]="esEntrenamiento">
-    <!-- Cuadrante 1: Ganador (Arriba Izquierda) -->
-    @if (!esEntrenamiento) {
-    <div class="cuadrante ganador-cuadrante">
-      <h3>👑 Ganador</h3>
-      <div class="ganador-card">
-        <div class="corona">🥇</div>
-        <h4>{{ganador?.username || 'Cargando...'}}</h4>
-        <!-- <div class="ganador-email">{{ganador?.userId}}</div> -->
-        <div class="ganador-stats">
-          <div class="stat">
-            <span class="valor">{{ganador?.puntaje || 0}}/5</span>
-            <span class="label">correctas</span>
-          </div>
-          <div class="stat">
-            <span class="valor">{{ganador?.porcentaje || 0}}%</span>
-            <span class="label">aciertos</span>
+        <div class="header-info-group">
+          <div class="game-info">
+            @if (roomCode && !esEntrenamiento) {
+            <span class="room-code">Sala {{roomCode}}</span>
+            }
+            <span class="tema">{{tematica}}</span>
+            <span class="dificultad dif-{{dificultad}}">{{dificultad}}</span>
           </div>
         </div>
-      </div>
-    </div>
+      </header>
 
-    <!-- Cuadrante 2: Ranking Partida (Arriba Derecha) -->
-    <div class="cuadrante ranking-cuadrante">
-      <h3>📊 Ranking Partida</h3>
-      <div class="ranking-list">
-        @for (resultado of resultados; track resultado.userId) {
-        <div class="jugador-item" [class.mi-resultado]="resultado.userId === miUserId">
-
-          <span class="posicion">{{getMedalla(resultado.posicion)}}</span>
-          <div class="jugador-info">
-            <span class="nombre">{{resultado.username}}</span>
-            <!-- <span class="email">{{resultado.userId}}</span> -->
-          </div>
-          <span class="puntaje">{{resultado.puntaje}}/5</span>
-        </div>
-        } @empty {
-        <div class="loading-message">
-          Cargando ranking...
-        </div>
-        }
-      </div>
-    </div>
-    }
-
-    <!-- Cuadrante 3: Mi Rendimiento (Abajo Izquierda) -->
-    <div class="cuadrante rendimiento-cuadrante">
-      <h3>📈 Rendimiento de {{nombreUsuarioActual}}</h3>
-      <!-- <div class="mi-email">{{miUserId}}</div> -->
-      <div class="mi-resultado-card">
+      <div class="resultados-grid" [class.modo-entrenamiento]="esEntrenamiento">
+        <!-- Cuadrante 1: Ganador (Arriba Izquierda) -->
         @if (!esEntrenamiento) {
-        <div class="posicion-info">
-          <span class="medalla">{{getMedalla(miResultado?.posicion || 1)}}</span>
-          <span class="posicion-texto">Posición #{{miResultado?.posicion || '-'}}</span>
+        <div class="cuadrante ganador-cuadrante">
+          <h3>👑 Ganador</h3>
+          <div class="ganador-card">
+            <div class="corona">🥇</div>
+            <h4>{{ganador?.username || 'Cargando...'}}</h4>
+            <div class="ganador-stats">
+              <div class="stat">
+                <span class="valor">{{ganador?.puntaje || 0}}/5</span>
+                <span class="label">correctas</span>
+              </div>
+              <div class="stat">
+                <span class="valor">{{ganador?.porcentaje || 0}}%</span>
+                <span class="label">aciertos</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Cuadrante 2: Ranking Partida -->
+        <div class="cuadrante ranking-cuadrante">
+          <h3>📊 Ranking Partida</h3>
+          <div class="ranking-list">
+            @for (resultado of resultados; track resultado.userId) {
+            <div class="jugador-item" [class.mi-resultado]="resultado.userId === miUserId">
+              <span class="posicion">{{getMedalla(resultado.posicion)}}</span>
+              <div class="jugador-info">
+                <span class="nombre">{{resultado.username}}</span>
+              </div>
+              <span class="puntaje">{{resultado.puntaje}}/5</span>
+            </div>
+            }
+          </div>
         </div>
         }
-        <div class="resultado-stats">
-          <div class="stat-item">
-            <span class="numero">{{miResultado?.puntaje || 0}}/5</span>
-            <span class="descripcion">Correctas</span>
+
+        <!-- Cuadrante 3: Mi Rendimiento -->
+        <div class="cuadrante rendimiento-cuadrante">
+          <h3>📈 Rendimiento de {{nombreUsuarioActual}}</h3>
+          <div class="mi-resultado-card">
+            @if (!esEntrenamiento) {
+            <div class="posicion-info">
+              <span class="medalla">{{getMedalla(miResultado?.posicion || 1)}}</span>
+              <span class="posicion-texto">Posición #{{miResultado?.posicion || '-'}}</span>
+            </div>
+            }
+            <div class="resultado-stats">
+              <div class="stat-item">
+                <span class="numero">{{miResultado?.puntaje || 0}}/5</span>
+                <span class="descripcion">Correctas</span>
+              </div>
+              <div class="stat-item">
+                <span class="numero">{{miResultado?.porcentaje || 0}}%</span>
+                <span class="descripcion">Aciertos</span>
+              </div>
+              <div class="stat-item">
+                <span class="numero">{{formatearTiempo(miResultado?.tiempoTotal || 0)}}</span>
+                <span class="descripcion">Tiempo</span>
+              </div>
+            </div>
           </div>
-          <div class="stat-item">
-            <span class="numero">{{miResultado?.porcentaje || 0}}%</span>
-            <span class="descripcion">Aciertos</span>
-          </div>
-          <div class="stat-item">
-            <span class="numero">{{formatearTiempo(miResultado?.tiempoTotal || 0)}}</span>
-            <span class="descripcion">Tiempo</span>
+        </div>
+
+        <!-- Cuadrante 4: Ranking Global -->
+        <div class="cuadrante ranking-global-cuadrante">
+          <h3>🌍 Ranking Global</h3>
+          <div class="ranking-global-list">
+            @for (jugador of rankingGlobal; track jugador.userId) {
+            <div class="jugador-global" [class.mi-posicion]="jugador.esMiPosicion">
+              <span class="posicion-global">#{{jugador.posicion}}</span>
+              <span class="nombre-global">{{jugador.username}}</span>
+              <span class="puntos-global">{{jugador.puntosTotales}}pts</span>
+            </div>
+            }
           </div>
         </div>
       </div>
-    </div>
 
-    <!-- Cuadrante 4: Ranking Global (Abajo Derecha) -->
-    <div class="cuadrante ranking-global-cuadrante">
-      <h3>🌍 Ranking Global</h3>
-      <div class="ranking-global-list">
-        @for (jugador of rankingGlobal; track jugador.userId) {
-        <div class="jugador-global" [class.mi-posicion]="jugador.esMiPosicion">
-
-          <span class="posicion-global">#{{jugador.posicion}}</span>
-          <span class="nombre-global">{{jugador.username}}</span>
-          <span class="puntos-global">{{jugador.puntosTotales}}pts</span>
+      <!-- Estadísticas del Equipo -->
+      @if (estadisticasEquipo && !esEntrenamiento) {
+      <div class="estadisticas-equipo">
+        <h3>📊 Estadísticas del Equipo</h3>
+        <div class="stats-grid">
+          <div class="stat-card">
+            <span class="stat-number">{{estadisticasEquipo.respuestasCorrectasTotales}}/{{estadisticasEquipo.respuestasTotales}}</span>
+            <span class="stat-label">Respuestas Correctas</span>
+          </div>
+          <div class="stat-card">
+            <span class="stat-number">{{estadisticasEquipo.promedioAciertos}}%</span>
+            <span class="stat-label">Promedio Aciertos</span>
+          </div>
+          <div class="stat-card">
+            <span class="stat-number">{{formatearTiempo(estadisticasEquipo.mejorTiempo)}}</span>
+            <span class="stat-label">Mejor Tiempo</span>
+          </div>
         </div>
-        } @empty {
-        <div class="loading-message">
-          Cargando ranking global...
-        </div>
-        }
       </div>
-    </div>
-  </div>
+      }
 
-  <!-- Estadísticas del Equipo -->
-  @if (estadisticasEquipo && !esEntrenamiento) {
-  <div class="estadisticas-equipo">
-    <h3>📊 Estadísticas del Equipo</h3>
-    <div class="stats-grid">
-      <div class="stat-card">
-        <span
-          class="stat-number">{{estadisticasEquipo.respuestasCorrectasTotales}}/{{estadisticasEquipo.respuestasTotales}}</span>
-        <span class="stat-label">Respuestas Correctas Totales</span>
+      <div class="acciones-section">
+        <button class="btn-primary" (click)="volverAlDashboard()">
+          🏠 Volver al Dashboard
+        </button>
       </div>
-      <div class="stat-card">
-        <span class="stat-number">{{estadisticasEquipo.promedioAciertos}}%</span>
-        <span class="stat-label">Promedio de Aciertos</span>
-      </div>
-      <div class="stat-card">
-        <span class="stat-number">{{formatearTiempo(estadisticasEquipo.mejorTiempo)}}</span>
-        <span class="stat-label">Mejor Tiempo</span>
-      </div>
-      <div class="stat-card">
-        <span class="stat-number">{{formatearTiempo(estadisticasEquipo.tiempoPromedioEquipo)}}</span>
-        <span class="stat-label">Tiempo Promedio</span>
-      </div>
-    </div>
-    <div class="criterios-info">
-      <p><strong>Criterios de evaluación:</strong></p>
-      <p>1° Más respuestas correctas • 2° Menor tiempo (desempate)</p>
-    </div>
-  </div>
-  }
+    </main>
 
-  <!-- Acciones -->
-  <div class="acciones-section">
-    <button class="btn-primary" (click)="volverAlDashboard()">
-      🏠 Volver al Dashboard
-    </button>
+    <aside class="resultados-sidebar" *ngIf="roomCode && !esEntrenamiento">
+      <app-chat mode="room" [roomId]="roomCode"></app-chat>
+    </aside>
   </div>
 </div>

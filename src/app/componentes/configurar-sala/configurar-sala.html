@@ -1,38 +1,72 @@
 
 <div class="config-container">
-  <header class="config-header">
-    <h1>{{esHost ? 'Configurar Sala' : 'Generar Preguntas'}}</h1>
-    <button class="back-btn" (click)="volver()">← Volver</button>
-  </header>
+  <div class="config-layout">
+    <main class="config-main">
+      <header class="config-header">
+        <h1>{{esHost ? 'Configurar Sala' : 'Generar Preguntas'}}</h1>
+        <button class="back-btn" (click)="volver()">← Volver</button>
+      </header>
 
-  <main class="config-main">
-    <div class="config-form">
-      <div class="form-section">
-        <h2>Generar Desafío</h2>
+      <div class="config-form">
+        <div class="form-section">
+          <h2>Generar Desafío</h2>
 
-        <div class="input-group">
-          <label>Selecciona tu temática</label>
-          <p class="help-text">Máximo 3 palabras para preguntas precisas de IA</p>
-          <input type="text" placeholder="Escribe tu temática..." [(ngModel)]="configuracion.tematica"
-            (input)="validarTematica($event)" class="tematica-input" [class.error]="tematicaInvalida" maxlength="50">
+          <div class="input-group">
+            <label>Selecciona tu temática</label>
+            <p class="help-text">Máximo 3 palabras para preguntas precisas de IA</p>
+            <input type="text" placeholder="Escribe tu temática..." [(ngModel)]="configuracion.tematica"
+              (input)="validarTematica($event)" class="tematica-input" [class.error]="tematicaInvalida" maxlength="50">
 
-          @if (tematicaInvalida) {
-          <div class="validation-message">
-            ⚠️ Solo se permiten máximo 3 palabras para generar preguntas precisas
+            @if (tematicaInvalida) {
+            <div class="validation-message">
+              ⚠️ Solo se permiten máximo 3 palabras para generar preguntas precisas
+            </div>
+            }
+
+            <div class="word-counter">
+              Palabras: {{contarPalabras(configuracion.tematica)}}/3
+            </div>
+
+            @if (!configuracion.tematica) {
+            <div class="suggestions">
+              <span class="suggestions-label">💡 Sugerencias:</span>
+              <div class="suggestion-tags">
+                @for (sugerencia of sugerenciasTematicas; track sugerencia) {
+                <button type="button" class="suggestion-tag" (click)="seleccionarSugerencia(sugerencia)">
+                  {{sugerencia}}
+                </button>
+                }
+              </div>
+            </div>
+            }
           </div>
-          }
 
-          <div class="word-counter">
-            Palabras: {{contarPalabras(configuracion.tematica)}}/3
+          <div class="input-group">
+            <label>Dificultad</label>
+            <div class="difficulty-options">
+              <button class="difficulty-btn" [class.active]="configuracion.dificultad === 'baby'"
+                (click)="configuracion.dificultad = 'baby'">
+                🍼 Baby
+              </button>
+              <button class="difficulty-btn" [class.active]="configuracion.dificultad === 'conocedor'"
+                (click)="configuracion.dificultad = 'conocedor'">
+                🧠 Conocedor
+              </button>
+              <button class="difficulty-btn" [class.active]="configuracion.dificultad === 'killer'"
+                (click)="configuracion.dificultad = 'killer'">
+                💀 Killer
+              </button>
+            </div>
           </div>
 
-          @if (!configuracion.tematica) {
-          <div class="suggestions">
-            <span class="suggestions-label">💡 Sugerencias:</span>
-            <div class="suggestion-tags">
-              @for (sugerencia of sugerenciasTematicas; track sugerencia) {
-              <button type="button" class="suggestion-tag" (click)="seleccionarSugerencia(sugerencia)">
-                {{sugerencia}}
+          @if (esHost) {
+          <div class="input-group">
+            <label>Número de Jugadores</label>
+            <div class="player-options">
+              @for (num of [2, 3, 4]; track num) {
+              <button class="player-btn" [class.active]="configuracion.jugadores === num"
+                (click)="configuracion.jugadores = num">
+                {{num}} Jugadores
               </button>
               }
             </div>
@@ -40,179 +74,32 @@
           }
         </div>
 
-        <div class="input-group">
-          <label>Dificultad</label>
-          <div class="difficulty-options">
-            <button class="difficulty-btn" [class.active]="configuracion.dificultad === 'baby'"
-              (click)="configuracion.dificultad = 'baby'">
-              🍼 Baby
-            </button>
-            <button class="difficulty-btn" [class.active]="configuracion.dificultad === 'conocedor'"
-              (click)="configuracion.dificultad = 'conocedor'">
-              🧠 Conocedor
-            </button>
-            <button class="difficulty-btn" [class.active]="configuracion.dificultad === 'killer'"
-              (click)="configuracion.dificultad = 'killer'">
-              💀 Killer
-            </button>
-          </div>
-        </div>
-
-        @if (esHost) {
-        <div class="input-group">
-          <label>Número de Jugadores</label>
-          <div class="player-options">
-            @for (num of [2, 3, 4]; track num) {
-            <button class="player-btn" [class.active]="configuracion.jugadores === num"
-              (click)="configuracion.jugadores = num">
-              {{num}} Jugadores
-            </button>
-            }
-          </div>
-        </div>
-        }
-      </div>
-
-      <div class="action-buttons">
-        @if (esHost && !infoSalaExistente) {
-        <button class="create-btn" [disabled]="!esConfiguracionValida() || isLoading" (click)="crearSala()">
-          {{isLoading ? 'Iniciando...' : 'Iniciar Sala'}}
-        </button>
-        }
-        @if (!esHost) {
-        <button class="ready-btn" [disabled]="!esConfiguracionValida() || isLoading" (click)="confirmarConfiguracion()">
-          {{isLoading ? 'Uniéndose...' : 'Listo'}}
-        </button>
-        }
-      </div>
-    </div>
-
-    <!-- Panel para HOST -->
-    @if (esHost) {
-    <div class="info-panel">
-      <!-- Información sutil antes de crear la sala -->
-      @if (!infoSalaExistente) {
-      <div class="pre-creation-info">
-        <div class="info-note">
-          💡 Al crear la sala obtendrás un código para invitar amigos
-        </div>
-      </div>
-      }
-
-      <!-- Solo mostrar código después de crear la sala -->
-      @if (codigoSala && infoSalaExistente) {
-      <div class="room-code-section">
-        <h3>🎮 Código de Sala</h3>
-        <div class="code-display">
-          <span class="room-code">{{codigoSala}}</span>
-          <button class="copy-btn" [class.copied]="copiado" (click)="copiarCodigo()" title="Copiar código">
-            {{copiado ? '✓' : '📋'}}
+        <div class="action-buttons" style="margin-top: 2rem;">
+          @if (esHost && !infoSalaExistente) {
+          <button class="create-btn" [disabled]="!esConfiguracionValida() || isLoading" (click)="crearSala()">
+            {{isLoading ? 'Iniciando...' : 'Iniciar Sala'}}
           </button>
-        </div>
-        <p class="share-text">Comparte este código con tus amigos</p>
-      </div>
-      }
-
-      <div class="game-info">
-        <h4>Información del Juego</h4>
-        <div class="info-item">
-          <span class="label">Preguntas totales:</span>
-          <span class="value">5 preguntas</span>
-        </div>
-        <div class="info-item">
-          <span class="label">Distribución:</span>
-          <span class="value">{{getDistribucionPreguntas()}}</span>
-        </div>
-      </div>
-
-      <!-- Lista de jugadores en tiempo real -->
-      @if (infoSalaExistente) {
-      <div class="players-section">
-        <h4>Jugadores ({{infoSalaExistente.jugadoresActuales}}/{{infoSalaExistente.maxJugadores}})</h4>
-        <div class="players-list">
-          @for (jugador of infoSalaExistente.jugadores; track jugador.nombre) {
-          <div class="player-card">
-            <div class="player-name">
-              {{jugador.nombre}}
-              @if (jugador.esHost) {
-              <span class="host-badge">👑</span>
-              }
-            </div>
-            <div class="player-status" [class.configured]="jugador.tematica && jugador.dificultad">
-              @if (jugador.tematica && jugador.dificultad) {
-              <span>✅ Listo</span>
-              } @else {
-              <span>⏳ Configurando...</span>
-              }
-            </div>
-          </div>
+          }
+          @if (!esHost) {
+          <button class="ready-btn" [disabled]="!esConfiguracionValida() || isLoading" (click)="confirmarConfiguracion()">
+            {{isLoading ? 'Uniéndose...' : 'Listo'}}
+          </button>
           }
         </div>
 
-        <div class="info-message">
-          🎯 Una vez que todos estén listos, irán al lobby para iniciar la partida
-        </div>
-      </div>
-      }
-    </div>
-    }
-
-    <!-- Panel para INVITADO -->
-    @if (!esHost && infoSalaExistente) {
-    <div class="sala-info-panel">
-      <div class="room-header">
-        <h3>🎮 Sala: {{infoSalaExistente.codigo}}</h3>
-        <div class="host-info">
-          <span>👑 Host: {{infoSalaExistente.host}}</span>
-        </div>
-      </div>
-
-      <div class="players-section">
-        <h4>Jugadores ({{infoSalaExistente.jugadoresActuales}}/{{infoSalaExistente.maxJugadores}})</h4>
-
-        <div class="players-list">
-          @for (jugador of infoSalaExistente.jugadores; track jugador.nombre) {
-          <div class="player-card">
-            <div class="player-name">
-              {{jugador.nombre}}
-              @if (jugador.esHost) {
-              <span class="host-badge">👑</span>
-              }
-            </div>
-            <div class="player-config">
-              @if (jugador.tematica) { <span class="tema">{{jugador.tematica}}</span> }
-              @if (jugador.dificultad) { <span class="dificultad">{{jugador.dificultad}}</span> }
-              <span class="status" [class.ready]="jugador.tematica && jugador.dificultad">
-                {{(jugador.tematica && jugador.dificultad) ? '✅ Listo' : '⏳ Configurando...'}}
-              </span>
-            </div>
+        <!-- Panel de información si existe sala -->
+        @if (infoSalaExistente) {
+          <div class="info-panel" style="margin-top: 2rem;">
+            <h3>🎮 Info de Sala: {{codigoSala || infoSalaExistente.codigo}}</h3>
+            <p>Host: {{infoSalaExistente.host || 'Tú'}}</p>
+            <p>Jugadores: {{infoSalaExistente.jugadoresActuales}}/{{infoSalaExistente.maxJugadores}}</p>
           </div>
-          }
-        </div>
+        }
       </div>
+    </main>
 
-      <div class="game-preview">
-        <h4>🎯 Información del Juego</h4>
-        <div class="preview-item">
-          <span class="label">Preguntas totales:</span>
-          <span class="value">5</span>
-        </div>
-        <div class="preview-item">
-          <span class="label">Temáticas configuradas:</span>
-          <div class="temas-actuales">
-            @for (jugador of infoSalaExistente.jugadores; track jugador.nombre) {
-            <span class="tema-tag" [class.configured]="jugador.tematica">
-              {{jugador.tematica || jugador.nombre + ' (pendiente)'}}
-            </span>
-            }
-          </div>
-        </div>
-
-        <div class="info-message">
-          🎯 Una vez configurado, irás al lobby donde el host puede iniciar la partida
-        </div>
-      </div>
-    </div>
-    }
-  </main>
+    <aside class="config-sidebar">
+      <app-chat [mode]="codigoSala ? 'room' : 'global'" [roomId]="codigoSala"></app-chat>
+    </aside>
+  </div>
 </div>

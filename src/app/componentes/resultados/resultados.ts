@@ -35,10 +35,12 @@ interface EstadisticasEquipo {
   peorTiempo: number;
 }
 
+import { ChatComponent } from '../chat/chat';
+
 @Component({
   selector: 'app-resultados',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, ChatComponent],
   templateUrl: './resultados.html',
   styleUrls: ['./resultados.scss']
 })
