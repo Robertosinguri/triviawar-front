@@ -45,7 +45,7 @@ export class ChatService {
     return this.socketService.socket.fromEvent('connect');
   }
 
-  onDisconnect(): Observable<void> {
+  onDisconnect(): Observable<string> {
     return this.socketService.socket.fromEvent('disconnect');
   }
 
