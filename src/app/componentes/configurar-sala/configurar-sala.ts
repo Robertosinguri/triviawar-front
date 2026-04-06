@@ -89,7 +89,8 @@ export class ConfigurarSalaComponent implements OnInit, OnDestroy {
     // Nota: Si joinRoom emite room_updated a todos, podemos usar eso para confirmar
     this.subs.add(
       this.socketService.onRoomUpdated().subscribe((sala) => {
-        if (this.isLoading && !this.esHost && sala.id === this.codigoSala) {
+        const matchesCode = (sala.id === this.codigoSala) || (sala.roomCode === this.codigoSala);
+        if (this.isLoading && !this.esHost && matchesCode) {
           // Confirmación exitosa de unión
           setTimeout(() => {
             this.isLoading = false;
@@ -104,7 +105,8 @@ export class ConfigurarSalaComponent implements OnInit, OnDestroy {
 
     this.subs.add(
       this.socketService.onError().subscribe((err) => {
-        // alert('Error: ' + err.message);
+        console.error('Socket error event:', err);
+        alert('Hubo un error de conexión: ' + (err.message || JSON.stringify(err)));
         setTimeout(() => {
           this.isLoading = false;
           this.cdr.detectChanges();

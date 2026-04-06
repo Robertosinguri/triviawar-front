@@ -3,19 +3,18 @@
   <app-navbar>
     <div class="training-content">
       <div class="training-title">
-        <h1>🎯 Entrenamiento Individual</h1>
+        <h1>🎯 Entrenamiento</h1>
       </div>
 
       <main class="training-main">
         <div class="config-section">
           <div class="training-info">
-            <h2>Practica y Mejora tu Ranking</h2>
-            <p>Configura tu sesión de entrenamiento personalizada con IA</p>
+            <h2>Generar Desafío</h2>
           </div>
 
           <div>
             <div class="input-group">
-              <label>Tu Temática de Expertise</label>
+              <label>Selecciona tu temática</label>
               <p class="help-text">Máximo 3 palabras para preguntas precisas de IA</p>
               <input type="text" placeholder="Ej: alta cocina, machine learning, rolling stones..."
                 [(ngModel)]="configuracion.tematica" (input)="validarTematica($event)" class="tematica-input"

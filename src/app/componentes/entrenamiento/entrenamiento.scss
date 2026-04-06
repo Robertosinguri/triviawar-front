@@ -255,14 +255,48 @@
 
 
 @media (max-width: 900px) {
+  .training-content {
+    padding: 0.5rem 1rem; // Estrechar padding bajo Navbar
+  }
+
+  .training-title {
+    margin-bottom: 0.5rem; // Acercamos título "Entrenamiento"
+
+    h1 {
+      font-size: 1.2rem;
+    }
+  }
+
+  .config-section {
+    padding: 1rem; // Encogemos el gran padding interno del contenedor blanco
+  }
+
+  .training-info {
+    margin-bottom: 1rem;
+    
+    h2 {
+      font-size: 1.1rem; // Ajustamos el título "Generar Desafío"
+    }
+  }
+
+  .input-group {
+    margin-bottom: 1rem; // Todo más junto
+  }
+
   .training-main {
     grid-template-columns: 1fr;
-    padding: 1rem;
+    padding: 0rem; // Quitamos padding sobrante de grid
   }
 
   .difficulty-options {
     grid-template-columns: 1fr;
+    gap: 0.5rem; // Juntamos botones Baby/Conocedor
   }
+
+  .difficulty-btn {
+    padding: 0.8rem; // Botones más bajos
+  }
+
   
   .suggestions {
     .suggestion-tags {

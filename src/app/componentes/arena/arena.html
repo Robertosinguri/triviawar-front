@@ -1,27 +1,32 @@
 <div class="arena-container">
   <header class="arena-header">
-    <div class="arena-info">
-      <h1>{{modo === 'entrenamiento' ? 'Entrenamiento' : 'Arena'}} {{nombreJugador}}</h1>
+    <!-- Grupo Informativo (Izquierda en Desktop) -->
+    <div class="header-info-group">
       <div class="batalla-info">
-        <span class="sala-code">Sala: {{roomCode}}</span>
+        @if (roomCode && modo !== 'entrenamiento') {
+        <span class="sala-code">Sala {{roomCode}}</span>
+        }
         <span class="batalla-temas">{{getTematicasTexto()}}</span>
         <span class="dificultad dif-{{dificultad}}">{{dificultad}}</span>
       </div>
-    </div>
 
-    <div class="arena-stats">
-      <div class="pregunta-counter">
-        <span>{{preguntaActual + 1}}/{{totalPreguntas}}</span>
-      </div>
-      <div class="puntaje">
-        <span>Puntos: {{puntaje}}</span>
-      </div>
       @if (aiIndicator) {
-      <div class="ai-indicator">
+      <div class="ai-indicator" title="{{aiUsada}}">
         <span class="ai-icon">{{aiIndicator}}</span>
-        <span class="ai-text">Powered by {{aiUsada}}</span>
+        <span class="ai-label">IA</span>
+        <span class="ai-text">{{getShortAiName()}}</span>
       </div>
       }
+    </div>
+
+    <!-- Grupo de Estadísticas (Derecha en Desktop) -->
+    <div class="arena-stats">
+      <div class="puntaje">
+        <span>🎯 {{puntaje}}</span>
+      </div>
+      <div class="pregunta-counter">
+        <span>📝 {{preguntaActual + 1}}/{{totalPreguntas}}</span>
+      </div>
       <div class="timer" [class.warning]="tiempoRestante <= 5">
         <span>⏱️ {{tiempoRestante}}s</span>
       </div>
@@ -55,13 +60,16 @@
       </div>
 
       <div class="question-card">
-        <!-- Indicador de temática -->
+        <!-- Nombre del jugador como título de la tarjeta -->
+        <h2 class="player-name-card">{{nombreJugador}}</h2>
+
+        <!-- Indicador de temática como subtítulo discreto -->
         @if (preguntaActualObj) {
         <div class="question-source">
           <span class="source-badge">{{preguntaActualObj.tematica}}</span>
           @if (preguntaActualObj.aportadoPor) {
           <span class="contributed-by">
-            Aportada por {{preguntaActualObj.aportadoPor}}
+            • {{preguntaActualObj.aportadoPor}}
           </span>
           }
         </div>

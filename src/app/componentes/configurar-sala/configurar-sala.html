@@ -8,12 +8,11 @@
   <main class="config-main">
     <div class="config-form">
       <div class="form-section">
-        <h2>Tu Aporte al Cuestionario</h2>
-        <p>Comparte tu conocimiento: elige un tema donde seas experto y desafía a los demás</p>
+        <h2>Generar Desafío</h2>
 
         <div class="input-group">
-          <label>Tu Temática de Expertise</label>
-          <p class="help-text">Máximo 3 palabras (ej: alta cocina, servicios nube, rolling stones)</p>
+          <label>Selecciona tu temática</label>
+          <p class="help-text">Máximo 3 palabras para preguntas precisas de IA</p>
           <input type="text" placeholder="Escribe tu temática..." [(ngModel)]="configuracion.tematica"
             (input)="validarTematica($event)" class="tematica-input" [class.error]="tematicaInvalida" maxlength="50">
 

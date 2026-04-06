@@ -158,6 +158,15 @@ export class ArenaComponent implements OnInit, OnDestroy {
     }
   }
 
+  getShortAiName(): string {
+    const model = (this.aiUsada || '').toLowerCase();
+    if (model.includes('groq')) return 'Groq';
+    if (model.includes('cohere')) return 'Cohere';
+    if (model.includes('hugging') || (model.includes('llama') && !model.includes('groq'))) return 'Llama';
+    if (model.includes('openrouter')) return 'OpenRouter';
+    return 'IA';
+  }
+
   // Método legacy eliminado: obtenerPreguntas() ya no debe llamar a generate-questions
   private async obtenerPreguntas() {
     // Placeholder porsiaca
