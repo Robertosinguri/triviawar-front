@@ -27,8 +27,21 @@ jobs:
           echo "$ENV_CONTENT" > src/environments/environment.prod.ts
           echo "$ENV_CONTENT" > src/environments/environment.ts
 
+      - name: Cache npm dependencies
+        uses: actions/cache@v4
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-npm-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-npm-
+
       - name: Instalar y Compilar Angular
-        run: npm ci && npm run build
+        run: |
+          npm config set registry https://registry.npmjs.org/
+          npm config set fetch-retry-mintimeout 20000
+          npm config set fetch-retry-maxtimeout 120000
+          npm ci --no-audit || npm ci --no-audit || npm ci --no-audit
+          npm run build
 
       - name: Desplegar a Firebase
         env:
