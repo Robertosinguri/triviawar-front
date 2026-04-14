@@ -1,4 +1,15 @@
 @use '../../theme/variables.scss' as *;
+ 
+:host {
+  @include mobile-only {
+    display: flex !important;
+    flex-direction: column !important;
+    height: 100vh !important;
+    height: 100dvh !important;
+    flex: 1 !important;
+    overflow: hidden !important;
+  }
+}
 
 .dashboard-header {
   @extend %page-header;
@@ -225,7 +236,16 @@
 .navbar-content {
   display: flex;
   min-height: calc(100vh - 80px);
-  position: relative; // Para posicionar elementos internos si es necesario
+  position: relative; 
+
+  @include mobile-only {
+    display: flex !important;
+    flex-direction: column !important;
+    flex: 1 !important; // Ocupa todo el espacio restante bajo el header
+    min-height: 0 !important;
+    overflow: hidden !important;
+    height: auto !important; // Altura manejada por flex: 1
+  }
 }
 
 .stats-overlay {

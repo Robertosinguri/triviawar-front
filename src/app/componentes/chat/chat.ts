@@ -1,4 +1,4 @@
-import { Component, Input, OnInit, OnDestroy, inject, ViewChild, ElementRef } from '@angular/core';
+import { Component, Input, OnInit, OnDestroy, OnChanges, SimpleChanges, inject, ViewChild, ElementRef, effect, signal, untracked } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ChatService, ChatMessage, GroupUpdateMessage } from '../../servicios/chat.service';
@@ -12,7 +12,7 @@ import { Subscription } from 'rxjs';
   templateUrl: './chat.html',
   styleUrls: ['./chat.scss']
 })
-export class ChatComponent implements OnInit, OnDestroy {
+export class ChatComponent implements OnInit, OnDestroy, OnChanges {
   @Input() mode: 'global' | 'room' = 'global';
   @Input() roomId: string | null = null;
   
@@ -56,46 +56,60 @@ export class ChatComponent implements OnInit, OnDestroy {
   commonEmojis = this.chatState.commonEmojis;
   
   private subscriptions = new Subscription();
+  private isSending = false; 
+  private isReconnecting = false; 
   private clickListenerAdded = false;
   private scrollTimeout: any = null;
-  private isSending = false; // Flag para prevenir envíos duplicados
-  private isReconnecting = false; // Flag para controlar reconexiones
+
+  // Señales internas para reactividad de inputs
+  private roomIdSignal = signal<string | null>(null);
+  private modeSignal = signal<'global' | 'room'>('global');
+
+  constructor() {
+    // EL MOTOR MAESTRO: Reacciona a cualquier cambio de Identidad, Sala o Conexión
+    effect(() => {
+      const user = this.username();
+      const room = this.roomIdSignal();
+      const connected = this.isConnected();
+      const mode = this.modeSignal();
+
+      // No sincronizar si no hay conexión o el usuario es el genérico inicial
+      if (!connected) return;
+
+      untracked(() => {
+        this.masterSync(user, room, mode);
+      });
+    });
+  }
+
+  ngOnChanges(changes: SimpleChanges) {
+    if (changes['roomId']) {
+      this.roomIdSignal.set(changes['roomId'].currentValue);
+    }
+    if (changes['mode']) {
+      this.modeSignal.set(changes['mode'].currentValue);
+    }
+  }
 
   ngOnInit() {
     // Asegurar conexión de socket
     this.chatService.connect();
 
-    // Escuchar eventos de conexión
+    // Actualizar estado de conexión inicial
+    if (this.chatService.isConnected()) {
+      this.chatState.updateConnectionStatus(true);
+    }
+
+    // Escuchar eventos de conexión (para futuras reconexiones)
     this.subscriptions.add(
       this.chatService.onConnect().subscribe(() => {
-        console.log('✅ Socket conectado para chat');
+        console.log('✅ [Chat] Socket conectado/reconectado');
         this.chatState.updateConnectionStatus(true);
-        
-        // Marcar que estamos en proceso de reconexión
         this.isReconnecting = true;
         
-        // Limpiar estado del chat al reconectar (para evitar persistencia no deseada)
-        console.log('🔄 [Chat] Reconexión detectada, limpiando estado del chat');
-        this.chatState.clearAllChatState();
+        // El 'effect' se encargará de la sincronización al detectar isConnected() -> true
         
-        // Notificar entrada al chat una vez conectado
-        this.chatService.joinChat(this.username(), this.roomId);
-
-        // Si es modo sala, unirse a la sala de chat de socket.io
-        if (this.mode === 'room' && this.roomId) {
-          this.chatService.joinChatRoom(this.roomId);
-        }
-        
-        // Solicitar información del grupo privado
-        setTimeout(() => {
-          this.chatService.getPrivateGroup(this.username());
-        }, 1000);
-        
-        // Resetear flag de reconexión después de un tiempo
-        setTimeout(() => {
-          this.isReconnecting = false;
-          console.log('🔄 [Chat] Proceso de reconexión completado');
-        }, 2000);
+        setTimeout(() => { this.isReconnecting = false; }, 2000);
       })
     );
 
@@ -115,21 +129,13 @@ export class ChatComponent implements OnInit, OnDestroy {
       })
     );
 
-    // ESCUCHAR MENSAJES GLOBALES/SALA
+    // ESCUCHAR MENSAJES GLOBALES
     this.subscriptions.add(
       this.chatService.onMessage().subscribe((msg: ChatMessage) => {
-        console.log('📬 Mensaje GLOBAL recibido:', msg.text);
+        console.log('📬 Mensaje recibido:', msg.text);
         
-        // Filtrar por sala si estamos en modo sala
-        if (this.mode === 'room') {
-          if (msg.roomId === this.roomId) {
-            this.addMessageWithScroll(msg);
-          }
-        } else {
-          if (!msg.roomId) {
-            this.addMessageWithScroll(msg);
-          }
-        }
+        // Procesar todo como global (sin filtros de sala por instrucción del usuario)
+        this.addMessageWithScroll(msg);
 
         // Manejo de notificaciones en móvil
         if (!this.isMobileExpanded() && !msg.isSystem) {
@@ -346,11 +352,6 @@ export class ChatComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
-    if (this.mode === 'room' && this.roomId) {
-      this.chatService.leaveChatRoom(this.roomId);
-      // Limpiar mensajes de esta sala cuando se destruye el componente
-      this.chatState.clearRoomMessages(this.roomId);
-    }
     this.subscriptions.unsubscribe();
     this.removeDocumentClickListener();
     if (this.scrollTimeout) {
@@ -366,7 +367,7 @@ export class ChatComponent implements OnInit, OnDestroy {
     if (!text || this.isSending) return;
 
     this.isSending = true;
-    this.chatService.sendMessage(text, this.username(), this.roomId);
+    this.chatService.sendMessage(text, this.username(), null); // Siempre sin roomId
     this.publicMessage.set('');
     this.showEmojiPicker.set(false);
     this.removeDocumentClickListener();
@@ -469,6 +470,30 @@ export class ChatComponent implements OnInit, OnDestroy {
 
   formatTime(date: any): string {
     return this.chatState.formatTime(date);
+  }
+
+  // === LÓGICA MAESTRA DE SINCRONIZACIÓN (UNIFICADA) ===
+  private masterSync(user: string, room: string | null, mode: 'global' | 'room') {
+    // Solo sincronizamos si cambia el USUARIO (Identidad) y no coincide con la sesión activa global
+    if (user === this.chatState.activeSessionUser()) {
+      return;
+    }
+
+    console.log(`📡 [Chat MasterSync] Sincronizando identidad para: ${user}`);
+
+    // Unirse al canal global del usuario
+    this.chatService.joinChat(user, null);
+
+    // Actualizar la sesión activa global para que otros componentes sepan que ya estamos sincronizados
+    this.chatState.activeSessionUser.set(user);
+
+    // Limpiar estado solo si el usuario cambió de verdad (logout/login)
+    // Nota: El reset real lo maneja ChatStateService.clearOnUserChange si es necesario
+    
+    // Asegurar grupo privado
+    setTimeout(() => {
+      this.chatService.getPrivateGroup(user);
+    }, 500);
   }
 
   toggleEmojiPicker(event: Event) {

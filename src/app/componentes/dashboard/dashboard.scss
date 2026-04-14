@@ -99,7 +99,16 @@
   display: flex;
   flex-direction: column;
   height: 100vh;
+  height: 100dvh; // Usar dynamic height para navegadores móviles
   overflow: hidden;
+
+  @include mobile-only {
+    display: flex !important;
+    flex-direction: column !important;
+    height: 100vh !important;
+    height: 100dvh !important;
+    overflow: hidden !important;
+  }
 }
 
 .dashboard-layout {
@@ -113,8 +122,10 @@
   min-height: 0;
 
   @include mobile-only {
-    flex-direction: column;
-    overflow-y: auto;
+    display: flex !important;
+    flex-direction: column !important;
+    overflow: hidden !important; // El layout no scrollea, scrollea su hijo 'main'
+    height: 100% !important;
     padding: 0;
   }
 }
@@ -490,7 +501,9 @@
   
   @include mobile-only {
     padding: 1rem;
-    overflow-y: visible;
+    overflow-y: auto !important; // AQUÍ ocurre el scroll del contenido
+    flex: 1 !important; // Toma todo el espacio disponible entre menú y chat
+    min-height: 0;
   }
 }
 
@@ -515,9 +528,12 @@
   }
 
   @include mobile-only {
-    display: block; // El chat se posicionará solo mediante su componente interno fixed
     width: 100%;
-    z-index: 100;
+    z-index: 1000;
+    padding: 0;
+    height: 20vh !important; // Chat compacto (reducido 40%)
+    flex-shrink: 0 !important;
+    margin: 0;
   }
 }
 

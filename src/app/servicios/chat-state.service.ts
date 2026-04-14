@@ -47,6 +47,9 @@ export class ChatStateService {
   // Estado de conexión del socket
   isConnected = signal(false);
   
+  // Identidad actualmente sincronizada en el socket (para evitar re-joins innecesarios)
+  activeSessionUser = signal<string | null>(null);
+  
   // === COMPUTED SIGNALS ===
   
   // Nombre de usuario actual
@@ -213,6 +216,7 @@ export class ChatStateService {
     this.showUserSuggestions.set(false);
     this.isMobileExpanded.set(false);
     this.unreadCount.set(0);
+    this.activeSessionUser.set(null); // Resetear sesión al limpiar todo
     
     console.log('✅ [ChatState] Estado del chat completamente limpiado');
   }
