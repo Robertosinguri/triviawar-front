@@ -21,15 +21,15 @@ export class AudioService {
   private cargarSonidos() {
     this.sonidos = {
       // Efectos cortos
-      correcto: this.crearAudio('audio/correcto.wav', 1),
-      incorrecto: this.crearAudio('audio/incorrecto.wav', 1),
-      click: this.crearAudio('audio/click.wav', 0.8),
+      correcto: this.crearAudio('/audio/correcto.wav', 1),
+      incorrecto: this.crearAudio('/audio/incorrecto.wav', 1),
+      click: this.crearAudio('/audio/click.wav', 0.8),
 
       // Música de fondo Entrenamiento
-      fondo: this.crearAudio('audio/fondo-entrenamiento.mp3', 0.3, true),
+      fondo: this.crearAudio('/audio/fondo-entrenamiento.mp3', 0.3, true),
 
       // Música de fondo Arena
-      arena: this.crearAudio('audio/fondo-arena.mp3', 0.25, true) 
+      arena: this.crearAudio('/audio/fondo-arena.mp3', 0.25, true) 
     };
   }
 
