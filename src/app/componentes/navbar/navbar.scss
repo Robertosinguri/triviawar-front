@@ -243,8 +243,10 @@
     flex-direction: column !important;
     flex: 1 !important; // Ocupa todo el espacio restante bajo el header
     min-height: 0 !important;
-    overflow: hidden !important;
+    overflow-y: auto !important;  // Permitir scroll vertical en páginas que lo necesiten
+    overflow-x: hidden !important;
     height: auto !important; // Altura manejada por flex: 1
+    -webkit-overflow-scrolling: touch;
   }
 }
 
