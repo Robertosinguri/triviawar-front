@@ -8,21 +8,6 @@
   overflow: hidden;
 }
 
-.lobby-header {
-  @extend %page-header;
-  padding: 1rem 1.5rem;
-  flex-shrink: 0;
-
-  h1 {
-    color: $primary-yellow;
-    margin: 0;
-  }
-  
-  .back-btn {
-    @extend %back-btn;
-    margin: 0;
-  }
-}
 
 .lobby-layout {
   display: flex;
@@ -31,6 +16,9 @@
   position: relative;
   padding: 0 2rem;
   gap: 2rem;
+  
+  height: calc(100vh - 120px);
+  min-height: 0;
 
   @include mobile-only {
     flex-direction: column;
@@ -44,6 +32,8 @@
   flex: 1;
   padding: 2rem 0;
   overflow-y: auto;
+  height: 100%;
+  min-height: 0;
   
   @include mobile-only {
     overflow-y: visible;
@@ -58,7 +48,7 @@
   flex-direction: column;
   flex-shrink: 0;
   overflow: hidden;
-  height: calc(100vh - 120px);
+  height: 100%;
   min-height: 0;
 
   app-chat {

@@ -1,11 +1,8 @@
 
 <div class="lobby-container">
-  <div class="lobby-layout">
-    <main class="lobby-main">
-      <header class="lobby-header">
-        <h1>Sala: {{codigoSala || 'CARGANDO...'}}</h1>
-        <button class="back-btn" (click)="salirSala()">← Volver</button>
-      </header>
+  <app-navbar>
+    <div class="lobby-layout">
+      <main class="lobby-main">
 
       <!-- Código de Sala -->
       <div class="room-code-section">
@@ -91,4 +88,5 @@
       <app-chat mode="room" [roomId]="codigoSala"></app-chat>
     </aside>
   </div>
+  </app-navbar>
 </div>

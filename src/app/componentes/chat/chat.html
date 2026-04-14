@@ -74,6 +74,15 @@
         <span class="emoji-icon">😊</span>
       </button>
 
+      <!-- Panel de Emojis para chat público -->
+      @if (showEmojiPicker()) {
+        <div class="emoji-picker-popup">
+          @for (emoji of commonEmojis; track emoji) {
+            <button (click)="addEmoji(emoji)" class="emoji-item">{{ emoji }}</button>
+          }
+        </div>
+      }
+
       <input 
         type="text" 
         [ngModel]="publicMessage()" 
@@ -103,6 +112,10 @@
         </div>
       }
 
+      <button class="emoji-trigger" (click)="toggleEmojiPicker($event)">
+        <span class="emoji-icon">😊</span>
+      </button>
+
       <!-- Panel de Emojis -->
       @if (showEmojiPicker()) {
         <div class="emoji-picker-popup">
@@ -111,10 +124,6 @@
           }
         </div>
       }
-
-      <button class="emoji-trigger" (click)="toggleEmojiPicker($event)">
-        <span class="emoji-icon">😊</span>
-      </button>
 
       <input 
         type="text" 

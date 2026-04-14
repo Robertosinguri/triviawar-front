@@ -8,11 +8,12 @@ import { SocketService } from '../../servicios/websocket/socket.service';
 import { Subscription } from 'rxjs';
 
 import { ChatComponent } from '../chat/chat';
+import { NavbarComponent } from '../navbar/navbar';
 
 @Component({
   selector: 'app-lobby',
   standalone: true,
-  imports: [FormsModule, CommonModule, ChatComponent],
+  imports: [FormsModule, CommonModule, ChatComponent, NavbarComponent],
   templateUrl: './lobby.html',
   styleUrls: ['./lobby.scss']
 })

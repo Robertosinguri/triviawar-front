@@ -57,6 +57,7 @@ export class ChatComponent implements OnInit, OnDestroy {
   private clickListenerAdded = false;
   private scrollTimeout: any = null;
   private isSending = false; // Flag para prevenir envíos duplicados
+  private isReconnecting = false; // Flag para controlar reconexiones
 
   ngOnInit() {
     // Asegurar conexión de socket
@@ -67,6 +68,13 @@ export class ChatComponent implements OnInit, OnDestroy {
       this.chatService.onConnect().subscribe(() => {
         console.log('✅ Socket conectado para chat');
         this.chatState.updateConnectionStatus(true);
+        
+        // Marcar que estamos en proceso de reconexión
+        this.isReconnecting = true;
+        
+        // Limpiar estado del chat al reconectar (para evitar persistencia no deseada)
+        console.log('🔄 [Chat] Reconexión detectada, limpiando estado del chat');
+        this.chatState.clearAllChatState();
         
         // Notificar entrada al chat una vez conectado
         this.chatService.joinChat(this.username(), this.roomId);
@@ -80,6 +88,12 @@ export class ChatComponent implements OnInit, OnDestroy {
         setTimeout(() => {
           this.chatService.getPrivateGroup(this.username());
         }, 1000);
+        
+        // Resetear flag de reconexión después de un tiempo
+        setTimeout(() => {
+          this.isReconnecting = false;
+          console.log('🔄 [Chat] Proceso de reconexión completado');
+        }, 2000);
       })
     );
 
@@ -213,6 +227,12 @@ export class ChatComponent implements OnInit, OnDestroy {
     if (this.mode === 'global') {
       this.subscriptions.add(
         this.chatService.onHistory().subscribe((history: ChatMessage[]) => {
+          // Ignorar historial si estamos en proceso de reconexión
+          if (this.isReconnecting) {
+            console.log('📜 [Chat] Ignorando historial durante reconexión');
+            return;
+          }
+          
           console.log('📜 Historial cargado:', history.length, 'mensajes');
           this.chatState.loadHistory(history);
           this.scheduleScroll();
@@ -250,6 +270,8 @@ export class ChatComponent implements OnInit, OnDestroy {
 
   switchTab(tab: 'global' | 'private') {
     this.chatState.switchTab(tab);
+    this.showEmojiPicker.set(false);
+    this.removeDocumentClickListener();
     this.scheduleScroll();
   }
 
@@ -305,6 +327,8 @@ export class ChatComponent implements OnInit, OnDestroy {
   ngOnDestroy() {
     if (this.mode === 'room' && this.roomId) {
       this.chatService.leaveChatRoom(this.roomId);
+      // Limpiar mensajes de esta sala cuando se destruye el componente
+      this.chatState.clearRoomMessages(this.roomId);
     }
     this.subscriptions.unsubscribe();
     this.removeDocumentClickListener();

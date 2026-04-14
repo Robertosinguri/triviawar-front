@@ -444,45 +444,90 @@ input {
 }
 
 // ============================================================
-// EMOJI PICKER POPUP
+// EMOJI PICKER POPUP - Versión ultra sutil y flotante
 // ============================================================
 
 .emoji-picker-popup {
   position: absolute;
-  bottom: 100%;
-  right: 0;
-  margin-bottom: 6px;
-  background: rgba(26, 20, 50, 0.95);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 8px;
-  padding: 10px;
+  bottom: calc(100% + 10px); // Aparece justo arriba del botón
+  left: 0; // Alineado con el borde izquierdo del botón
+  transform: translateX(0); // Sin desplazamiento adicional
+  background: rgba(0, 0, 0, 0.22); // Fondo aún más sutil y transparente
+  backdrop-filter: blur(45px);
+  -webkit-backdrop-filter: blur(45px);
+  border: 1px solid rgba(255, 255, 255, 0.012); // Borde casi imperceptible
+  border-radius: 18px;
+  padding: 16px;
+  
+  // Utilizar Grid para una distribución matricial perfecta
   display: grid;
-  grid-template-columns: repeat(5, 1fr);
-  gap: 6px;
+  grid-template-columns: repeat(5, 32px); // 5 columnas exactas con el ancho del emoji
+  gap: 12px;
+  justify-content: center;
+  align-items: center;
+  
   z-index: 1000;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
-  width: 180px;
+  box-shadow: 
+    0 0.5px 10px rgba(0, 0, 0, 0.06), // Sombra muy sutil
+    0 0 0 0.5px rgba(255, 255, 255, 0.003) inset; // Borde interior casi invisible
+  width: max-content; // Se ajusta al contenido exacto del grid
+  animation: fadeInUp 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  
+  // El contenedor crece automáticamente hacia arriba según el contenido
+  // No hay altura máxima fija ni scroll
+  
+  // Efecto de vidrio esmerilado ultra sutil
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(
+      135deg,
+      rgba(255, 255, 255, 0.006) 0%,
+      rgba(255, 255, 255, 0.002) 50%,
+      rgba(255, 255, 255, 0.006) 100%
+    );
+    border-radius: 18px;
+    pointer-events: none;
+    z-index: -1;
+  }
 }
 
 .emoji-item {
-  width: 28px;
-  height: 28px;
+  width: 32px;
+  height: 32px;
   border: none;
-  background: rgba(255, 255, 255, 0.04);
-  border-radius: 5px;
+  background: transparent;
+  border-radius: 8px;
   cursor: pointer;
-  font-size: 14px;
+  font-size: 16px;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: all 0.15s ease;
+  transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
   padding: 0;
+  margin: 0; // Aseguramos que no haya márgenes ocultos que rompan el diseño
+  position: relative;
+  z-index: 1;
 
+  // Efecto de brillo sutil al hover
   &:hover {
-    background: rgba($primary-violet, 0.15);
-    transform: scale(1.1);
+    background: rgba($primary-violet, 0.1);
+    transform: scale(1.25);
+    box-shadow: 
+      0 0 15px rgba($primary-violet, 0.3),
+      0 0 30px rgba($primary-violet, 0.15),
+      inset 0 0 10px rgba(255, 255, 255, 0.05);
+    z-index: 2;
+  }
+
+  // Efecto de pulso sutil para hacerlos parecer flotantes
+  &:active {
+    transform: scale(1.15);
+    transition: transform 0.1s ease;
   }
 }
 
@@ -498,6 +543,17 @@ input {
   to {
     opacity: 1;
     transform: translateY(0);
+  }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
   }
 }
 
@@ -536,7 +592,9 @@ input {
   }
 
   .emoji-picker-popup {
-    grid-template-columns: repeat(4, 1fr);
-    width: 148px;
+    grid-template-columns: repeat(4, 32px); // 4 columnas en móvil
+    gap: 8px;
+    padding: 14px;
+    width: max-content;
   }
 }

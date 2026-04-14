@@ -1,7 +1,9 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { Router, RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FirebaseAuthService } from '../../servicios/auth/firebase-auth.service';
+import { SocketService } from '../../servicios/websocket/socket.service';
+import { ChatStateService } from '../../servicios/chat-state.service';
 import { EstadisticasService, EstadisticasUsuario } from '../../servicios/estadisticas/estadisticas.service';
 
 @Component({
@@ -22,6 +24,9 @@ export class NavbarMobileComponent implements OnInit {
     '13.png', '14.png', '15.png', '16.png', '17.png', '18.png',
     '19.png', '20.png', '21.png', '22.png', '23.png', '24.png'
   ];
+
+  private socketService = inject(SocketService);
+  private chatStateService = inject(ChatStateService);
 
   constructor(
     private router: Router,
@@ -105,7 +110,12 @@ export class NavbarMobileComponent implements OnInit {
 
   async logout() {
     try {
+      // Limpiar estado del chat antes de hacer logout
+      this.chatStateService.clearMessages();
+      this.chatStateService.clearPrivateGroup();
+      
       await this.authService.logout();
+      this.socketService.disconnect();
       this.router.navigate(['/login']);
     } catch (error) {
       console.error('Error en logout:', error);

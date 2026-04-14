@@ -622,6 +622,8 @@
   transition: all 0.3s ease;
   background: linear-gradient(45deg, $primary-purple, $primary-violet);
   color: white;
+  width: 100%;
+  padding: 1rem;
   @include touch-friendly;
 
   &:hover {
@@ -639,6 +641,8 @@
   cursor: pointer;
   transition: all 0.3s ease;
   color: $primary-aqua;
+  width: 100%;
+  padding: 1rem;
   @include touch-friendly;
 
   &:hover:not(:disabled) {
@@ -663,17 +667,13 @@
   transition: all 0.3s ease;
   background: linear-gradient(45deg, $primary-pink, $primary-yellow);
   color: white;
+  width: 100%;
+  padding: 1rem;
   @include touch-friendly;
 
   &:hover {
     transform: scale(1.05);
     box-shadow: 0 5px 15px rgba(255, 80, 140, 0.4);
-  }
-}
-
-.training-room {
-  .training-btn {
-    width: 100%;
   }
 }
 

@@ -1,105 +1,118 @@
 
 <div class="config-container">
-  <div class="config-layout">
-    <main class="config-main">
-      <header class="config-header">
-        <h1>{{esHost ? 'Configurar Sala' : 'Generar Preguntas'}}</h1>
-        <button class="back-btn" (click)="volver()">← Volver</button>
-      </header>
-
-      <div class="config-form">
-        <div class="form-section">
-          <h2>Generar Desafío</h2>
-
-          <div class="input-group">
-            <label>Selecciona tu temática</label>
-            <p class="help-text">Máximo 3 palabras para preguntas precisas de IA</p>
-            <input type="text" placeholder="Escribe tu temática..." [(ngModel)]="configuracion.tematica"
-              (input)="validarTematica($event)" class="tematica-input" [class.error]="tematicaInvalida" maxlength="50">
-
-            @if (tematicaInvalida) {
-            <div class="validation-message">
-              ⚠️ Solo se permiten máximo 3 palabras para generar preguntas precisas
-            </div>
-            }
-
-            <div class="word-counter">
-              Palabras: {{contarPalabras(configuracion.tematica)}}/3
+  <app-navbar>
+    <div class="config-layout">
+      <main class="config-main">
+        <div class="config-content">
+          <div class="config-section">
+            <div class="config-info">
+              <h2>{{ esHost ? '🎮 Configurar Sala' : '🎯 Generar Preguntas' }}</h2>
             </div>
 
-            @if (!configuracion.tematica) {
-            <div class="suggestions">
-              <span class="suggestions-label">💡 Sugerencias:</span>
-              <div class="suggestion-tags">
-                @for (sugerencia of sugerenciasTematicas; track sugerencia) {
-                <button type="button" class="suggestion-tag" (click)="seleccionarSugerencia(sugerencia)">
-                  {{sugerencia}}
+            <div>
+              <div class="input-group">
+                <label>Selecciona tu temática</label>
+                <p class="help-text">Máximo 3 palabras para preguntas precisas de IA</p>
+                <input type="text" placeholder="Ej: alta cocina, machine learning, rolling stones..."
+                  [(ngModel)]="configuracion.tematica" (input)="validarTematica($event)" class="tematica-input"
+                  [class.error]="tematicaInvalida" maxlength="50">
+
+                @if (tematicaInvalida) {
+                <div class="validation-message">
+                  ⚠️ Máximo 3 palabras para que la IA genere preguntas precisas
+                </div>
+                }
+
+                <div class="word-counter">
+                  Palabras: {{contarPalabras(configuracion.tematica)}}/3
+                </div>
+
+                @if (!configuracion.tematica) {
+                <div class="suggestions">
+                  <span class="suggestions-label">💡 Ideas populares:</span>
+                  <div class="suggestion-tags">
+                    @for (sugerencia of sugerenciasTematicas; track sugerencia) {
+                    <button type="button" class="suggestion-tag" (click)="seleccionarSugerencia(sugerencia)">
+                      {{sugerencia}}
+                    </button>
+                    }
+                  </div>
+                </div>
+                }
+              </div>
+
+              <div class="input-group">
+                <label>Nivel de Dificultad</label>
+                <div class="difficulty-options">
+                  <button class="difficulty-btn" [class.active]="configuracion.dificultad === 'baby'"
+                    (click)="configuracion.dificultad = 'baby'">
+                    🍼 Baby
+                    <span class="difficulty-desc">Preguntas básicas</span>
+                  </button>
+                  <button class="difficulty-btn" [class.active]="configuracion.dificultad === 'conocedor'"
+                    (click)="configuracion.dificultad = 'conocedor'">
+                    🧠 Conocedor
+                    <span class="difficulty-desc">Nivel intermedio</span>
+                  </button>
+                  <button class="difficulty-btn" [class.active]="configuracion.dificultad === 'killer'"
+                    (click)="configuracion.dificultad = 'killer'">
+                    💀 Killer
+                    <span class="difficulty-desc">Experto extremo</span>
+                  </button>
+                </div>
+              </div>
+
+              @if (esHost) {
+              <div class="input-group">
+                <label>Número de Jugadores</label>
+                <div class="player-options">
+                  @for (num of [2, 3, 4]; track num) {
+                  <button class="player-btn" [class.active]="configuracion.jugadores === num"
+                    (click)="configuracion.jugadores = num">
+                    {{num}} Jugadores
+                  </button>
+                  }
+                </div>
+              </div>
+              }
+
+              <div class="action-section">
+                @if (esHost && !infoSalaExistente) {
+                <button class="start-config-btn" [disabled]="!esConfiguracionValida() || isLoading" (click)="crearSala()">
+                  @if (!isLoading) {
+                  <span>🚀 Iniciar Sala</span>
+                  } @else {
+                  <span>🤖 Creando sala...</span>
+                  }
+                </button>
+                }
+                @if (!esHost) {
+                <button class="ready-config-btn" [disabled]="!esConfiguracionValida() || isLoading" (click)="confirmarConfiguracion()">
+                  @if (!isLoading) {
+                  <span>✅ Listo para Jugar</span>
+                  } @else {
+                  <span>🤖 Uniéndose...</span>
+                  }
                 </button>
                 }
               </div>
-            </div>
-            }
-          </div>
 
-          <div class="input-group">
-            <label>Dificultad</label>
-            <div class="difficulty-options">
-              <button class="difficulty-btn" [class.active]="configuracion.dificultad === 'baby'"
-                (click)="configuracion.dificultad = 'baby'">
-                🍼 Baby
-              </button>
-              <button class="difficulty-btn" [class.active]="configuracion.dificultad === 'conocedor'"
-                (click)="configuracion.dificultad = 'conocedor'">
-                🧠 Conocedor
-              </button>
-              <button class="difficulty-btn" [class.active]="configuracion.dificultad === 'killer'"
-                (click)="configuracion.dificultad = 'killer'">
-                💀 Killer
-              </button>
-            </div>
-          </div>
-
-          @if (esHost) {
-          <div class="input-group">
-            <label>Número de Jugadores</label>
-            <div class="player-options">
-              @for (num of [2, 3, 4]; track num) {
-              <button class="player-btn" [class.active]="configuracion.jugadores === num"
-                (click)="configuracion.jugadores = num">
-                {{num}} Jugadores
-              </button>
+              <!-- Panel de información si existe sala -->
+              @if (infoSalaExistente) {
+              <div class="info-panel">
+                <h3>🎮 Info de Sala: {{codigoSala || infoSalaExistente.codigo}}</h3>
+                <p>Host: {{infoSalaExistente.host || 'Tú'}}</p>
+                <p>Jugadores: {{infoSalaExistente.jugadoresActuales}}/{{infoSalaExistente.maxJugadores}}</p>
+              </div>
               }
             </div>
           </div>
-          }
         </div>
+      </main>
 
-        <div class="action-buttons" style="margin-top: 2rem;">
-          @if (esHost && !infoSalaExistente) {
-          <button class="create-btn" [disabled]="!esConfiguracionValida() || isLoading" (click)="crearSala()">
-            {{isLoading ? 'Iniciando...' : 'Iniciar Sala'}}
-          </button>
-          }
-          @if (!esHost) {
-          <button class="ready-btn" [disabled]="!esConfiguracionValida() || isLoading" (click)="confirmarConfiguracion()">
-            {{isLoading ? 'Uniéndose...' : 'Listo'}}
-          </button>
-          }
-        </div>
-
-        <!-- Panel de información si existe sala -->
-        @if (infoSalaExistente) {
-          <div class="info-panel" style="margin-top: 2rem;">
-            <h3>🎮 Info de Sala: {{codigoSala || infoSalaExistente.codigo}}</h3>
-            <p>Host: {{infoSalaExistente.host || 'Tú'}}</p>
-            <p>Jugadores: {{infoSalaExistente.jugadoresActuales}}/{{infoSalaExistente.maxJugadores}}</p>
-          </div>
-        }
-      </div>
-    </main>
-
-    <aside class="config-sidebar">
-      <app-chat [mode]="codigoSala ? 'room' : 'global'" [roomId]="codigoSala"></app-chat>
-    </aside>
-  </div>
+      <aside class="config-sidebar">
+        <app-chat [mode]="codigoSala ? 'room' : 'global'" [roomId]="codigoSala"></app-chat>
+      </aside>
+    </div>
+  </app-navbar>
 </div>

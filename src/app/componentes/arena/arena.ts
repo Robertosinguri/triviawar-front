@@ -251,7 +251,7 @@ export class ArenaComponent implements OnInit, OnDestroy {
       const tiempoTotal = Math.floor((Date.now() - this.tiempoInicio) / 1000);
 
       // Enviar resultado al backend para que se guarde y se refleje en el ranking
-      const response = await fetch(`${environment.apiUrl}/games/submit-result`, {
+      const response = await fetch(`${environment.apiUrl}/api/games/submit-result`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -387,7 +387,7 @@ export class ArenaComponent implements OnInit, OnDestroy {
 
       try {
         // Usar GET en lugar de POST para verificar estado
-        const response = await fetch(`${environment.apiUrl}/rooms/${this.roomCode}`);
+        const response = await fetch(`${environment.apiUrl}/api/rooms/${this.roomCode}`);
         const salaData = await response.json();
 
         // Verificar si la sala tiene resultados finales

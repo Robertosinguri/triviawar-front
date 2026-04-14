@@ -1,25 +1,8 @@
 
 <div class="resultados-container">
-  <div class="resultados-layout">
-    <main class="resultados-main">
-      <header class="resultados-header">
-        <div class="header-title-group">
-          <h1>
-            <span class="full-title">{{esEntrenamiento ? '📉 Resumen de Entrenamiento' : '🏆 Resultados Finales'}}</span>
-            <span class="mobile-title">{{esEntrenamiento ? 'Resumen' : 'Resultados'}}</span>
-          </h1>
-        </div>
-
-        <div class="header-info-group">
-          <div class="game-info">
-            @if (roomCode && !esEntrenamiento) {
-            <span class="room-code">Sala {{roomCode}}</span>
-            }
-            <span class="tema">{{tematica}}</span>
-            <span class="dificultad dif-{{dificultad}}">{{dificultad}}</span>
-          </div>
-        </div>
-      </header>
+  <app-navbar>
+    <div class="resultados-layout">
+      <main class="resultados-main">
 
       <div class="resultados-grid" [class.modo-entrenamiento]="esEntrenamiento">
         <!-- Cuadrante 1: Ganador (Arriba Izquierda) -->
@@ -133,4 +116,5 @@
       <app-chat mode="room" [roomId]="roomCode"></app-chat>
     </aside>
   </div>
+  </app-navbar>
 </div>

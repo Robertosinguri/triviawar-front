@@ -170,10 +170,56 @@ export class ChatStateService {
   
   // Limpiar mensajes (útil para testing o logout)
   clearMessages() {
+    console.log('🧹 [ChatState] Limpiando todos los mensajes');
     this.messages.set([]);
     this.privateMessages.set([]);
   }
-  
+
+  // Limpiar mensajes de una sala específica
+  clearRoomMessages(roomId: string) {
+    if (!roomId) return;
+    
+    console.log(`🧹 [ChatState] Limpiando mensajes de sala: ${roomId}`);
+    this.messages.update(current => 
+      current.filter(msg => msg.roomId !== roomId)
+    );
+    // Nota: los mensajes privados no están asociados a salas, así que no los filtramos
+  }
+
+  // Limpiar TODO el estado del chat (mensajes, grupos, inputs, etc.)
+  clearAllChatState() {
+    console.log('🧹 [ChatState] Limpiando TODO el estado del chat');
+    
+    // Limpiar mensajes
+    this.messages.set([]);
+    this.privateMessages.set([]);
+    
+    // Limpiar grupos privados
+    this.privateGroupMembers.set([]);
+    
+    // Limpiar inputs
+    this.publicMessage.set('');
+    this.privateMessage.set('');
+    
+    // Resetear pestaña a global
+    this.activeTab.set('global');
+    
+    // Limpiar estado de UI
+    this.showEmojiPicker.set(false);
+    this.showUserSuggestions.set(false);
+    
+    console.log('✅ [ChatState] Estado del chat completamente limpiado');
+  }
+
+  // Limpiar estado cuando cambia el usuario (por si hay cambio de usuario sin logout)
+  clearOnUserChange(newUsername: string) {
+    const currentUsername = this.username();
+    if (currentUsername !== newUsername && currentUsername !== 'Invitado') {
+      console.log(`🔄 [ChatState] Cambio de usuario detectado: ${currentUsername} -> ${newUsername}. Limpiando chat.`);
+      this.clearAllChatState();
+    }
+  }
+
   // Cargar historial desde backend
   loadHistory(history: ChatMessage[]) {
     console.log('📜 [ChatState] Cargando historial:', history.length, 'mensajes');

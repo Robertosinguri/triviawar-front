@@ -14,11 +14,12 @@ interface ConfiguracionJugador {
 }
 
 import { ChatComponent } from '../chat/chat';
+import { NavbarComponent } from '../navbar/navbar';
 
 @Component({
   selector: 'app-configurar-sala',
   standalone: true,
-  imports: [FormsModule, CommonModule, ChatComponent],
+  imports: [FormsModule, CommonModule, ChatComponent, NavbarComponent],
   templateUrl: './configurar-sala.html',
   styleUrls: ['./configurar-sala.scss']
 })

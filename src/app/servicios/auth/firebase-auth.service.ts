@@ -31,7 +31,7 @@ export interface SignUpData {
 export class FirebaseAuthService {
     private auth = inject(Auth);
     private http = inject(HttpClient);
-    private readonly API_URL = `${environment.apiUrl}/auth`;
+    private readonly API_URL = `${environment.apiUrl}/api/auth`;
 
     // Signals para compatibilidad con código existente
     private readonly isAuthenticated = signal(false);

@@ -88,7 +88,7 @@ export class EntrenamientoComponent {
       // 1. Llamar a la API para generar preguntas
       console.log('🤖 Generando preguntas de entrenamiento...');
       const response = await firstValueFrom(
-        this.http.post<any>(`${environment.apiUrl}/games/generate-questions`, {
+        this.http.post<any>(`${environment.apiUrl}/api/games/generate-questions`, {
           tematicas: [this.configuracion.tematica],
           dificultad: this.configuracion.dificultad
         })

@@ -1,6 +1,21 @@
 <header class="dashboard-header">
   <div class="logo-section">
     <h1>TRIVIA WAR</h1>
+    @if (pageTitle || showBackBtn) {
+    <div class="navbar-context-bar">
+      @if (showBackBtn) {
+      <button class="context-back-btn" (click)="onBackClick()">
+        <span class="back-icon">←</span> <span class="back-text">Volver</span>
+      </button>
+      }
+      @if (pageTitle) {
+        @if (showBackBtn) {
+        <span class="context-separator">|</span>
+        }
+      <span class="context-title">{{ pageTitle }}</span>
+      }
+    </div>
+    }
   </div>
 
   <nav class="main-menu">
@@ -91,7 +106,7 @@
     </div>
   </div>
 
-  <ng-content></ng-content>
+
 </div>
 
 <!-- Selector de Avatar Modal -->

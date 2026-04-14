@@ -36,11 +36,12 @@ interface EstadisticasEquipo {
 }
 
 import { ChatComponent } from '../chat/chat';
+import { NavbarComponent } from '../navbar/navbar';
 
 @Component({
   selector: 'app-resultados',
   standalone: true,
-  imports: [CommonModule, ChatComponent],
+  imports: [CommonModule, ChatComponent, NavbarComponent],
   templateUrl: './resultados.html',
   styleUrls: ['./resultados.scss']
 })

@@ -8,22 +8,6 @@
   overflow: hidden;
 }
 
-.config-header {
-  @extend %page-header;
-  padding: 1rem 1.5rem;
-  flex-shrink: 0;
-
-  h1 {
-    color: $primary-yellow;
-    margin: 0;
-  }
-
-  .back-btn {
-    @extend %back-btn;
-    margin: 0;
-  }
-}
-
 .config-layout {
   display: flex;
   flex: 1;
@@ -31,6 +15,9 @@
   position: relative;
   padding: 0 2rem;
   gap: 2rem;
+  
+  height: calc(100vh - 120px); // Altura fija para sincronizar panel y chat
+  min-height: 0;
 
   @include mobile-only {
     flex-direction: column;
@@ -44,10 +31,253 @@
   flex: 1;
   padding: 2rem 0;
   overflow-y: auto;
+  height: 100%;
+  min-height: 0;
   
   @include mobile-only {
     overflow-y: visible;
     padding: 1rem;
+  }
+}
+
+.config-content {
+  max-width: 800px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+
+.config-main {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.config-section {
+  @extend %content-panel;
+  padding: 1.25rem;
+
+  .config-info {
+    margin-bottom: 1rem;
+
+    h2 {
+      font-family: $font-victor-mono;
+      color: $primary-violet;
+      margin-bottom: 0.5rem;
+    }
+
+    p {
+      opacity: 0.8;
+      font-size: 1.1rem;
+      color: $dark-text;
+    }
+  }
+}
+
+.input-group {
+  margin-bottom: 1.25rem;
+
+  label {
+    display: block;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+    color: $primary-aqua;
+    font-size: 1.1rem;
+  }
+
+  .help-text {
+    font-size: 0.9rem;
+    opacity: 0.8;
+    margin-bottom: 0.75rem;
+    color: $primary-yellow;
+    font-style: italic;
+  }
+
+  .tematica-input {
+    @extend %tematica-input;
+    padding: 0.75rem;
+    border-radius: 8px;
+    font-size: 1.05rem;
+    
+    &:focus {
+      border-color: $primary-pink;
+      box-shadow: 0 0 15px rgba(255, 80, 140, 0.3);
+    }
+    
+    &.error {
+      border-color: $primary-pink;
+      box-shadow: 0 0 15px rgba(255, 80, 140, 0.5);
+    }
+  }
+  
+  .validation-message {
+    background: rgba(255, 80, 140, 0.2);
+    color: $primary-pink;
+    padding: 0.5rem;
+    border-radius: 5px;
+    font-size: 0.85rem;
+    margin-top: 0.5rem;
+    border: 1px solid rgba(255, 80, 140, 0.3);
+  }
+  
+  .word-counter {
+    text-align: right;
+    font-size: 0.8rem;
+    color: $primary-yellow;
+    margin-top: 0.25rem;
+    opacity: 0.8;
+  }
+  
+  .suggestions {
+    @extend %suggestions-container;
+    border-radius: 10px;
+    margin-top: 1rem;
+    
+    .suggestions-label {
+      display: block;
+      font-size: 0.9rem;
+      color: $primary-aqua;
+      margin-bottom: 0.5rem;
+      font-weight: 600;
+    }
+    
+    .suggestion-tags {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 0.4rem;
+      align-items: stretch;
+      margin-top: 0.5rem;
+
+      .suggestion-tag {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+        width: 100%;
+        height: 100%;
+        padding: 0.4rem 0.5rem;
+        border-radius: 15px;
+        font-size: 0.8rem;
+        line-height: 1.1;
+      }
+    }
+  }
+}
+
+.difficulty-options {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+}
+
+.difficulty-btn {
+  @extend %difficulty-btn;
+  padding: 1rem 0.8rem;
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+
+  .difficulty-desc {
+    font-size: 0.85rem;
+    opacity: 0.8;
+  }
+
+  &:hover {
+    transform: translateY(-3px);
+  }
+
+  &.active {
+    background: $primary-pink;
+    border-color: $primary-pink;
+    box-shadow: 0 0 20px rgba(255, 80, 140, 0.4);
+  }
+}
+
+.player-options {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+  
+  .player-btn {
+    @extend %difficulty-btn;
+    padding: 1rem 0.8rem;
+    border-radius: 12px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 0.3rem;
+
+    &:hover {
+      transform: translateY(-3px);
+    }
+    
+    &.active {
+      background: $primary-aqua;
+      border-color: $primary-aqua;
+      box-shadow: 0 0 20px rgba(1, 186, 154, 0.4);
+      color: $dark-bg;
+    }
+  }
+}
+
+.action-section {
+  display: flex;
+  justify-content: center;
+  margin-top: 1.5rem;
+  
+  .start-config-btn,
+  .ready-config-btn {
+    padding: 1.2rem 3rem;
+    background: linear-gradient(45deg, $primary-pink, $primary-yellow);
+    border: none;
+    border-radius: 30px;
+    color: white;
+    font-family: $font-red-hat;
+    font-weight: 700;
+    font-size: 1.2rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    min-width: 200px;
+    
+    &:hover:not(:disabled) {
+      transform: scale(1.05);
+      box-shadow: 0 8px 25px rgba(255, 80, 140, 0.4);
+    }
+    
+    &:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+  }
+  
+  .ready-config-btn {
+    background: linear-gradient(45deg, $primary-aqua, $primary-purple);
+    
+    &:hover:not(:disabled) {
+      box-shadow: 0 8px 25px rgba($primary-aqua, 0.4);
+    }
+  }
+}
+
+.info-panel {
+  margin-top: 2rem;
+  background: rgba($primary-violet, 0.1);
+  border: 1px solid rgba($primary-violet, 0.2);
+  border-radius: 12px;
+  padding: 1.5rem;
+  
+  h3 {
+    font-family: $font-victor-mono;
+    color: $primary-violet;
+    margin-bottom: 1rem;
+    font-size: 1.2rem;
+  }
+  
+  p {
+    margin: 0.5rem 0;
+    color: $dark-text;
+    opacity: 0.9;
   }
 }
 
@@ -58,7 +288,7 @@
   flex-direction: column;
   flex-shrink: 0;
   overflow: hidden;
-  height: calc(100vh - 120px);
+  height: 100%; // Hereda la altura del padre sincronizado
   min-height: 0;
   
   app-chat {
@@ -93,567 +323,45 @@
   }
 }
 
-.config-form {
-  @extend %content-panel;
-  padding: 2rem;
-}
-
-.form-section {
-  h2 {
-    font-family: $font-victor-mono;
-    color: $primary-violet;
-    margin-bottom: 0.5rem;
-  }
-
-  p {
-    opacity: 0.8;
-    margin-bottom: 2rem;
-  }
-}
-
-.input-group {
-  margin-bottom: 2rem;
-
-  label {
-    display: block;
-    font-weight: 700;
-    margin-bottom: 0.5rem;
-    color: $primary-aqua;
-  }
-
-  .tematica-input {
-    @extend %tematica-input;
-    font-size: 1rem;
-    
-    &:focus {
-      border-color: $primary-aqua;
-    }
-    
-    &.error {
-      border-color: $primary-pink;
-      box-shadow: 0 0 10px rgba(255, 80, 140, 0.3);
-    }
-  }
-  
-  .validation-message {
-    background: rgba(255, 80, 140, 0.2);
-    color: $primary-pink;
-    padding: 0.5rem;
-    border-radius: 5px;
-    font-size: 0.85rem;
-    margin-top: 0.5rem;
-    border: 1px solid rgba(255, 80, 140, 0.3);
-  }
-  
-  .word-counter {
-    text-align: right;
-    font-size: 0.8rem;
-    margin-top: 0.25rem;
-    opacity: 0.7;
-    font-family: $font-victor-mono;
-  }
-
-  .help-text {
-    font-size: 0.85rem;
-    opacity: 0.8;
-    margin-bottom: 0.75rem;
-    color: $primary-yellow;
-    font-style: italic;
-  }
-}
-
-.difficulty-options, .player-options {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 1rem;
-}
-
-.difficulty-btn, .player-btn {
-  @extend %difficulty-btn;
-}
-
-.suggestions {
-  @extend %suggestions-container;
-  border-radius: 10px;
-  
-  .suggestion-tags {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr); // 2 filas de 4 columnas en Desktop
-    gap: 0.5rem;
-    align-items: stretch;
-    margin-top: 1rem;
-
-    .suggestion-tag {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      text-align: center;
-      width: 100%;
-      height: 100%;
-      padding: 0.6rem 0.5rem;
-      border-radius: 20px;
-      font-size: 0.85rem;
-      line-height: 1.1;
-    }
-  }
-}
-
-.action-buttons {
-  display: flex;
-  justify-content: center;
-  margin-top: 2rem;
-}
-
-.create-btn, .ready-btn {
-  padding: 1rem 3rem;
-  background: linear-gradient(45deg, $primary-purple, $primary-violet);
-  border: none;
-  border-radius: 25px;
-  color: white;
-  font-family: $font-red-hat;
-  font-weight: 700;
-  font-size: 1.1rem;
-  cursor: pointer;
-  transition: all 0.3s ease;
-
-  &:hover:not(:disabled) {
-    transform: scale(1.05);
-    box-shadow: 0 5px 20px rgba(129, 79, 196, 0.4);
-  }
-
-  &:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-  }
-}
-
-.info-panel, .sala-info-panel {
-  @extend %content-panel;
-  height: fit-content;
-  min-width: 300px;
-
-  h3 {
-    font-family: $font-victor-mono;
-    color: $primary-yellow;
-    margin-bottom: 1rem;
-    text-align: center;
-  }
-
-  h4 {
-    color: $primary-aqua;
-    margin: 1rem 0 0.5rem 0;
-    font-size: 1rem;
-  }
-}
-
-// Sección informativa sutil antes de crear la sala
-.pre-creation-info {
-  margin-bottom: 1.5rem;
-  
-  .info-note {
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 8px;
-    padding: 0.8rem;
-    font-size: 0.85rem;
-    color: rgba(255, 255, 255, 0.7);
-    text-align: center;
-    font-style: italic;
-  }
-}
-
-// Nuevos estilos para código de sala y jugadores
-.room-code-section {
-  text-align: center;
-  margin-bottom: 2rem;
-  
-  h3 {
-    margin-bottom: 1rem;
-  }
-  
-  .code-display {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 1rem;
-    margin-bottom: 0.5rem;
-    
-    .room-code {
-      font-family: $font-victor-mono;
-      font-size: 2rem;
-      font-weight: 700;
-      color: $primary-yellow;
-      background: rgba(230, 189, 0, 0.1);
-      padding: 0.5rem 1rem;
-      border-radius: 10px;
-      border: 2px solid $primary-yellow;
-      letter-spacing: 0.2em;
-    }
-    
-    .copy-btn {
-      padding: 0.3rem 0.6rem;
-      background: transparent;
-      color: $primary-aqua;
-      border: 1px solid $primary-aqua;
-      border-radius: 6px;
-      cursor: pointer;
-      font-size: 0.9rem;
-      min-width: 32px;
-      height: 32px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: all 0.3s ease;
-      
-      &:hover {
-        background: rgba(1, 186, 154, 0.1);
-        transform: scale(1.05);
-      }
-      
-      &.copied {
-        background: rgba(34, 197, 94, 0.2);
-        border-color: #22c55e;
-        color: #22c55e;
-      }
-    }
-  }
-  
-  .share-text {
-    font-size: 0.9rem;
-    opacity: 0.8;
-    margin: 0;
-  }
-}
-
-.game-info {
-  margin-bottom: 2rem;
-}
-
-.players-section {
-  .players-list {
-    margin-bottom: 1rem;
-  }
-  
-  .player-card {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 0.75rem;
-    background: rgba(255, 255, 255, 0.05);
-    border-radius: 8px;
-    margin-bottom: 0.5rem;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    
-    .player-name {
-      font-weight: 600;
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      
-      .host-badge {
-        font-size: 0.8rem;
-      }
-    }
-    
-    .player-status {
-      font-size: 0.85rem;
-      
-      &.configured {
-        color: $primary-aqua;
-      }
-      
-      &:not(.configured) {
-        color: $primary-yellow;
-        opacity: 0.7;
-      }
-    }
-    
-    .player-config {
-      display: flex;
-      flex-direction: column;
-      align-items: flex-end;
-      gap: 0.25rem;
-      
-      .tema {
-        font-size: 0.85rem;
-        color: $primary-aqua;
-        text-transform: capitalize;
-      }
-      
-      .dificultad {
-        font-size: 0.75rem;
-        padding: 0.2rem 0.5rem;
-        border-radius: 10px;
-        font-weight: 600;
-        background: rgba(230, 189, 0, 0.2);
-        color: $primary-yellow;
-      }
-      
-      .status {
-        font-size: 0.8rem;
-        
-        &.ready {
-          color: $primary-aqua;
-        }
-        
-        &:not(.ready) {
-          color: $primary-yellow;
-          opacity: 0.7;
-        }
-      }
-    }
-  }
-  
-  .start-game-btn {
-    width: 100%;
-    padding: 1rem;
-    background: linear-gradient(45deg, $primary-purple, $primary-violet);
-    border: none;
-    border-radius: 15px;
-    color: white;
-    font-family: $font-red-hat;
-    font-weight: 700;
-    font-size: 1.1rem;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    margin-top: 1rem;
-    
-    &:hover:not(:disabled) {
-      transform: scale(1.02);
-      box-shadow: 0 5px 20px rgba(129, 79, 196, 0.4);
-    }
-    
-    &:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
-    }
-  }
-}
-
-.room-header {
-  text-align: center;
-  margin-bottom: 1.5rem;
-  
-  h3 {
-    margin-bottom: 0.5rem;
-  }
-  
-  .host-info {
-    background: rgba(230, 189, 0, 0.1);
-    padding: 0.5rem;
-    border-radius: 8px;
-    font-size: 0.9rem;
-    color: $primary-yellow;
-  }
-}
-
-.waiting-message, .ready-message {
-  text-align: center;
-  padding: 1rem;
-  border-radius: 8px;
-  margin-top: 1rem;
-  font-weight: 600;
-}
-
-.waiting-message {
-  background: rgba(230, 189, 0, 0.1);
-  color: $primary-yellow;
-}
-
-.ready-message {
-  background: rgba(1, 186, 154, 0.1);
-  color: $primary-aqua;
-}
-
-.tema-tag {
-  &.configured {
-    background: rgba(1, 186, 154, 0.2);
-    color: $primary-aqua;
-  }
-  
-  &:not(.configured) {
-    background: rgba(255, 255, 255, 0.1);
-    color: rgba(255, 255, 255, 0.5);
-    font-style: italic;
-  }
-}
-
-.sala-info-panel {
-  .jugadores-list {
-    margin-bottom: 1rem;
-  }
-
-  .jugador-item {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 0.75rem;
-    background: rgba(255, 255, 255, 0.05);
-    border-radius: 8px;
-    margin-bottom: 0.5rem;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-
-    .jugador-nombre {
-      font-weight: 600;
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-
-      .host-badge {
-        font-size: 0.8rem;
-      }
-    }
-
-    .jugador-config {
-      display: flex;
-      flex-direction: column;
-      align-items: flex-end;
-      gap: 0.25rem;
-
-      .tema {
-        font-size: 0.85rem;
-        color: $primary-aqua;
-        text-transform: capitalize;
-      }
-
-      .dificultad {
-        font-size: 0.75rem;
-        padding: 0.2rem 0.5rem;
-        border-radius: 10px;
-        font-weight: 600;
-
-        &.dif-baby { background: rgba(1, 186, 154, 0.2); color: $primary-aqua; }
-        &.dif-conocedor { background: rgba(230, 189, 0, 0.2); color: $primary-yellow; }
-        &.dif-killer { background: rgba(255, 80, 140, 0.2); color: $primary-pink; }
-      }
-    }
-  }
-
-  .tu-aporte {
-    background: rgba(182, 1, 255, 0.1);
-    padding: 1rem;
-    border-radius: 8px;
-    margin-bottom: 1rem;
-    text-align: center;
-
-    h4 {
-      margin-top: 0;
-      color: $primary-violet;
-    }
-
-    p {
-      margin: 0;
-      font-size: 0.9rem;
-      opacity: 0.8;
-    }
-  }
-
-  .game-preview {
-    .preview-item {
-      display: flex;
-      justify-content: space-between;
-      margin-bottom: 0.75rem;
-      padding-bottom: 0.5rem;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-
-      .label {
-        opacity: 0.8;
-        font-size: 0.9rem;
-      }
-
-      .value {
-        font-weight: 700;
-        color: $primary-aqua;
-      }
-    }
-
-    .temas-actuales {
-      display: flex;
-      flex-direction: column;
-      gap: 0.25rem;
-    }
-
-    .tema-tag {
-      background: rgba(1, 186, 154, 0.2);
-      color: $primary-aqua;
-      padding: 0.25rem 0.5rem;
-      border-radius: 12px;
-      font-size: 0.8rem;
-      text-transform: capitalize;
-      text-align: center;
-
-      &.pending {
-        background: rgba(182, 1, 255, 0.2);
-        color: $primary-violet;
-        border: 1px dashed rgba(182, 1, 255, 0.5);
-      }
-    }
-  }
-}
-
-.info-item {
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: 0.75rem;
-  padding-bottom: 0.5rem;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-
-  .label {
-    font-weight: 500;
-    opacity: 0.8;
-  }
-
-  .value {
-    font-weight: 700;
-    color: $primary-aqua;
-  }
-}
-
-.config-header {
-  @include mobile-responsive;
-}
-
-@media (max-width: 900px) {
-  .config-main {
-    grid-template-columns: 1fr;
-    padding: 0.5rem;
-    gap: 1rem;
-  }
-
-  .config-header {
-    padding: 0.5rem 1rem;
-    h1 {
-      font-size: 1.2rem;
-    }
-  }
-
-  .config-form {
+// Responsive
+@include mobile-only {
+  .config-content {
     padding: 1rem;
   }
-
-  .form-section {
-    h2 {
-      font-size: 1.1rem;
-    }
-  }
-
-  .input-group {
-    margin-bottom: 1rem;
-  }
-
-  .difficulty-options, .player-options {
-    grid-template-columns: 1fr;
-    gap: 0.5rem;
-  }
-
-  .difficulty-btn, .player-btn {
-    padding: 0.8rem;
-    text-align: center;
+  
+  .config-section {
+    padding: 1.5rem;
   }
   
   .suggestions {
     .suggestion-tags {
-      grid-template-columns: repeat(2, 1fr); // 4 filas de 2 columnas en Mobile
+      grid-template-columns: repeat(2, 1fr); // Pasa de 4 columnas a 2 en mobile
+    }
+  }
+
+  .difficulty-options {
+    grid-template-columns: 1fr;
+    gap: 0.5rem;
+  }
+
+  .difficulty-btn {
+    padding: 0.8rem;
+  }
+  
+  .player-options {
+    grid-template-columns: 1fr;
+    gap: 0.5rem;
+  }
+  
+  .player-btn {
+    padding: 0.8rem;
+  }
+  
+  .action-section {
+    .start-config-btn,
+    .ready-config-btn {
+      width: 100%;
+      min-width: auto;
     }
   }
 }

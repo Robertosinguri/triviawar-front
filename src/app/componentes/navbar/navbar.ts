@@ -1,8 +1,9 @@
-import { Component, OnInit, inject, OnDestroy, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, inject, OnDestroy, ChangeDetectorRef, Input, Output, EventEmitter } from '@angular/core';
 import { Router, RouterModule, RouterLink, RouterLinkActive } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FirebaseAuthService } from '../../servicios/auth/firebase-auth.service';
 import { SocketService } from '../../servicios/websocket/socket.service';
+import { ChatStateService } from '../../servicios/chat-state.service';
 import { Subscription } from 'rxjs';
 
 
@@ -17,9 +18,14 @@ export class NavbarComponent implements OnInit, OnDestroy {
   private authService = inject(FirebaseAuthService);
   private router = inject(Router);
   private socketService = inject(SocketService);
+  private chatStateService = inject(ChatStateService);
   private cdr = inject(ChangeDetectorRef);
   private statsSub?: Subscription;
   // private estadisticasService = inject(EstadisticasService);
+
+  @Input() pageTitle?: string;
+  @Input() showBackBtn: boolean = false;
+  @Output() onBack = new EventEmitter<void>();
 
   showStats = false;
   estadisticas: any | null = null;
@@ -39,6 +45,9 @@ export class NavbarComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     console.log('🖥️ NAVBAR DESKTOP INICIALIZADO');
+
+    // Mover lógica a otro lado si es necesario
+    // ...
 
     // 📊 Suscribirse a las estadísticas desde el socket
     this.statsSub = this.socketService.onMyStatsReceived().subscribe(stats => {
@@ -161,9 +170,18 @@ export class NavbarComponent implements OnInit, OnDestroy {
     this.closeMobileMenu();
   }
 
+  // Emite acción al presionar "Volver" en la barra de contexto de la página
+  onBackClick() {
+    this.onBack.emit();
+  }
+
   async logout() {
     console.log('🚪 LOGOUT EJECUTADO');
     try {
+      // Limpiar estado del chat antes de hacer logout
+      this.chatStateService.clearMessages();
+      this.chatStateService.clearPrivateGroup();
+      
       await this.authService.logout();
       this.socketService.disconnect();
       this.router.navigate(['/login']);
