@@ -127,6 +127,14 @@ export class ChatService {
     }
   }
 
+  // Abandonar conversación privada (Bidireccional)
+  leavePrivateGroup(targetUsername: string, fromUsername: string) {
+    if (this.isConnected()) {
+      console.log(`📤 Solicitando abandonar privado con: ${targetUsername}`);
+      this.socketService.socket.emit('chat:leave_private', { targetUsername, fromUsername });
+    }
+  }
+
   // Obtener miembros del grupo privado desde el backend
   getPrivateGroup(username: string) {
     if (this.isConnected()) {
@@ -134,6 +142,8 @@ export class ChatService {
       this.socketService.socket.emit('chat:get_private_group', { username });
     }
   }
+
+
 
   // Unirse a sala de chat específica
   joinChatRoom(roomId: string) {

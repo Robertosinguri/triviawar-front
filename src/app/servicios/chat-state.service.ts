@@ -151,6 +151,12 @@ export class ChatStateService {
   clearPrivateGroup() {
     this.privateGroupMembers.set([]);
   }
+
+  // Sobrescribir grupo privado (Sincronización con Backend)
+  setPrivateGroup(members: string[]) {
+    console.log('👥 [ChatState] Sincronizando grupo privado:', members);
+    this.privateGroupMembers.set(members);
+  }
   
   // Verificar si un usuario está en el grupo privado
   isInPrivateGroup(username: string): boolean {

@@ -62,8 +62,8 @@ export class ChatComponent implements OnInit, OnDestroy, OnChanges {
   private scrollTimeout: any = null;
 
   // Señales internas para reactividad de inputs
-  private roomIdSignal = signal<string | null>(null);
-  private modeSignal = signal<'global' | 'room'>('global');
+  public roomIdSignal = signal<string | null>(null);
+  public modeSignal = signal<'global' | 'room'>('global');
 
   constructor() {
     // EL MOTOR MAESTRO: Reacciona a cualquier cambio de Identidad, Sala o Conexión
@@ -90,6 +90,8 @@ export class ChatComponent implements OnInit, OnDestroy, OnChanges {
       this.modeSignal.set(changes['mode'].currentValue);
     }
   }
+
+
 
   ngOnInit() {
     // Asegurar conexión de socket
@@ -193,43 +195,24 @@ export class ChatComponent implements OnInit, OnDestroy, OnChanges {
       })
     );
 
-    // ESCUCHAR ACTUALIZACIONES DE GRUPO
+    // ESCUCHAR ACTUALIZACIONES DE GRUPO (Única fuente de verdad)
     this.subscriptions.add(
       this.chatService.onGroupUpdate().subscribe((update: GroupUpdateMessage) => {
-        console.log('👥 [Grupo Update] Recibido:', update);
-        
         if (update.username === this.username()) {
-          console.log('👥 [Grupo Update] Actualizando nuestro grupo con:', update.members);
-          
-          // Sincronizar nuestro grupo local con el del backend
-          const currentMembers = this.privateGroupMembers();
+          console.log('👥 [ChatSync] Actualización de grupo recibida:', update.members);
           const newMembers = update.members.filter(m => m !== this.username());
-          
-          // Agregar miembros que no tenemos
-          newMembers.forEach(member => {
-            if (!currentMembers.includes(member)) {
-              this.chatState.addToPrivateGroup(member);
-            }
-          });
+          this.chatState.setPrivateGroup(newMembers);
         }
       })
     );
 
-    // ESCUCHAR INFORMACIÓN DE GRUPO
+    // ESCUCHAR INFORMACIÓN INICIAL DE GRUPO
     this.subscriptions.add(
       this.chatService.onGroupInfo().subscribe((info: GroupUpdateMessage) => {
-        console.log('👥 [Grupo Info] Recibido:', info);
-        
         if (info.username === this.username()) {
-          console.log('👥 [Grupo Info] Sincronizando grupo con backend:', info.members);
-          
-          // Limpiar y sincronizar completamente
-          this.chatState.clearPrivateGroup();
-          info.members.forEach(member => {
-            if (member !== this.username()) {
-              this.chatState.addToPrivateGroup(member);
-            }
-          });
+          console.log('👥 [ChatSync] Info inicial de grupo recibida:', info.members);
+          const newMembers = info.members.filter(m => m !== this.username());
+          this.chatState.setPrivateGroup(newMembers);
         }
       })
     );
@@ -241,22 +224,20 @@ export class ChatComponent implements OnInit, OnDestroy, OnChanges {
       })
     );
 
-    // Escuchar historial (solo para global)
-    if (this.mode === 'global') {
-      this.subscriptions.add(
-        this.chatService.onHistory().subscribe((history: ChatMessage[]) => {
-          // Ignorar historial si estamos en proceso de reconexión
-          if (this.isReconnecting) {
-            console.log('📜 [Chat] Ignorando historial durante reconexión');
-            return;
-          }
-          
-          console.log('📜 Historial cargado:', history.length, 'mensajes');
-          this.chatState.loadHistory(history);
-          this.scheduleScroll();
-        })
-      );
-    }
+    // Escuchar historial (siempre global ahora)
+    this.subscriptions.add(
+      this.chatService.onHistory().subscribe((history: ChatMessage[]) => {
+        // Ignorar historial si estamos en proceso de reconexión
+        if (this.isReconnecting) {
+          console.log('📜 [Chat] Ignorando historial durante reconexión');
+          return;
+        }
+        
+        console.log('📜 Historial cargado:', history.length, 'mensajes');
+        this.chatState.loadHistory(history);
+        this.scheduleScroll();
+      })
+    );
   }
 
   onInputChange(event: any) {
@@ -481,19 +462,29 @@ export class ChatComponent implements OnInit, OnDestroy, OnChanges {
 
     console.log(`📡 [Chat MasterSync] Sincronizando identidad para: ${user}`);
 
-    // Unirse al canal global del usuario
+    // Unirse al canal GLOBAL del usuario (siempre, sin importar el modo o la sala)
+    // El mode/roomId son solo visuales (CSS, títulos)
     this.chatService.joinChat(user, null);
 
-    // Actualizar la sesión activa global para que otros componentes sepan que ya estamos sincronizados
+    // Actualizar la sesión activa global
     this.chatState.activeSessionUser.set(user);
 
-    // Limpiar estado solo si el usuario cambió de verdad (logout/login)
-    // Nota: El reset real lo maneja ChatStateService.clearOnUserChange si es necesario
-    
     // Asegurar grupo privado
     setTimeout(() => {
       this.chatService.getPrivateGroup(user);
     }, 500);
+  }
+
+  removeUserFromPrivateGroup(user: string) {
+    console.log('👥 [Chat] Solicitando desconexión bidireccional del privado:', user);
+    
+    // Notificar al servidor para que el "divorcio" sea mutuo
+    this.chatService.leavePrivateGroup(user, this.username());
+    
+    // Si ya no quedan usuarios, cerrar el selector de emojis si estaba abierto
+    if (this.privateGroupMembers().length <= 1) {
+      this.showEmojiPicker.set(false);
+    }
   }
 
   toggleEmojiPicker(event: Event) {

@@ -1,13 +1,13 @@
 <div class="chat-container" 
-     [class.global-mode]="mode === 'global'" 
-     [class.room-mode]="mode === 'room'"
+     [class.global-mode]="modeSignal() === 'global'" 
+     [class.room-mode]="modeSignal() === 'room'"
      [class.expanded]="isMobileExpanded()">
   
   <!-- BARRA DE TOGGLE MÓVIL (Sutil) -->
   <div class="mobile-toggle-bar" (click)="toggleMobileChat()">
     <div class="toggle-indicator"></div>
     <span class="toggle-title">
-      {{ activeTab() === 'global' ? (mode === 'global' ? 'Chat Global' : 'Chat de Sala') : 'Chat Privado' }}
+      {{ activeTab() === 'global' ? (modeSignal() === 'global' ? 'Chat Global' : 'Chat de Sala') : 'Chat Privado' }}
     </span>
     @if (unreadCount() > 0 && !isMobileExpanded()) {
       <span class="unread-badge">{{ unreadCount() }}</span>
@@ -19,7 +19,7 @@
     <!-- Cabecera con Pestañas -->
     <div class="chat-header">
       <button class="tab-btn global-tab" [class.active]="activeTab() === 'global'" (click)="switchTab('global')">
-        {{ mode === 'global' ? 'Conectados' : 'Sala' }}
+        {{ modeSignal() === 'global' ? 'Conectados' : 'Sala' }}
       </button>
       <button class="tab-btn private-tab" [class.active]="activeTab() === 'private'" (click)="switchTab('private')">
         Privados
@@ -45,8 +45,22 @@
             </div>
           }
         }
-      } @else {
-        <!-- Pestaña de Mensajes Privados -->
+      }
+
+      <!-- Pestaña de Mensajes Privados -->
+      @if (activeTab() === 'private') {
+        <!-- Lista de usuarios activos en el grupo privado -->
+        @if (hasPrivateGroup()) {
+          <div class="private-group-members">
+            @for (m of privateGroupMembers(); track m) {
+              <div class="member-chip" (click)="removeUserFromPrivateGroup(m)">
+                <span class="member-name">@{{ m }}</span>
+                <button class="remove-member-btn">×</button>
+              </div>
+            }
+          </div>
+        }
+
         @for (msg of privateMessages(); track msg.id) {
           <div class="message-item private" [class.own-message]="msg.username === username()">
             <div class="message-meta">

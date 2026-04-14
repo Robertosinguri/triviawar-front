@@ -178,9 +178,8 @@ export class NavbarComponent implements OnInit, OnDestroy {
   async logout() {
     console.log('🚪 LOGOUT EJECUTADO');
     try {
-      // Limpiar estado del chat antes de hacer logout
-      this.chatStateService.clearMessages();
-      this.chatStateService.clearPrivateGroup();
+      // Limpiar TODO el estado del chat proactivamente antes de salir
+      this.chatStateService.clearAllChatState();
       
       await this.authService.logout();
       this.socketService.disconnect();

@@ -43,6 +43,13 @@
       }
     }
   }
+
+  // ANULACIÓN GLOBAL PARA BOTONES DEL CHAT (Evitar botones gigantes)
+  button {
+    min-height: 0 !important;
+    min-width: 0 !important;
+    padding: 0;
+  }
 }
 
 // ============================================================
@@ -295,6 +302,67 @@
 }
 
 // ============================================================
+// PRIVATE GROUP MEMBERS (CHIPS)
+// ============================================================
+
+.private-group-members {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 8px 0;
+  margin-bottom: 10px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.member-chip {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba($primary-pink, 0.12);
+  border: 1px solid rgba($primary-pink, 0.25);
+  padding: 3px 8px;
+  border-radius: 20px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  animation: fadeIn 0.3s ease;
+
+  &:hover {
+    background: rgba($primary-pink, 0.25);
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba($primary-pink, 0.2);
+
+    .remove-member-btn {
+      background: rgba(255, 255, 255, 0.2);
+    }
+  }
+
+  .member-name {
+    color: $primary-pink;
+    font-size: 10px;
+    font-weight: 600;
+    text-shadow: 0 0 5px rgba($primary-pink, 0.3);
+  }
+
+  .remove-member-btn {
+    width: 16px !important;
+    height: 16px !important;
+    min-width: 16px !important;
+    min-height: 16px !important;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+    font-size: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    line-height: 1;
+  }
+}
+
+// ============================================================
 // INPUT AREA
 // ============================================================
 
@@ -350,10 +418,10 @@ input {
   background: rgba(255, 255, 255, 0.05);
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 7px;
-  width: 32px;
-  height: 32px;
-  min-width: 32px;
-  min-height: 32px;
+  width: 28px !important;
+  height: 28px !important;
+  min-width: 28px !important;
+  min-height: 28px !important;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -377,10 +445,10 @@ input {
   background: linear-gradient(135deg, rgba($primary-purple, 0.7), rgba($primary-violet, 0.7));
   border: 1px solid rgba($primary-violet, 0.3);
   border-radius: 7px;
-  width: 32px;
-  height: 32px;
-  min-width: 32px;
-  min-height: 32px;
+  width: 28px !important;
+  height: 28px !important;
+  min-width: 28px !important;
+  min-height: 28px !important;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -675,9 +743,10 @@ input {
     }
 
     .emoji-trigger, .send-btn {
-      width: 28px;
-      height: 28px;
-      min-width: 28px;
+      width: 26px !important;
+      height: 26px !important;
+      min-width: 26px !important;
+      min-height: 26px !important;
     }
   }
 
@@ -686,6 +755,27 @@ input {
     width: 90vw;
     left: 5vw;
     bottom: 70px;
+  }
+
+  .private-group-members {
+    padding: 2px 0;
+    margin-bottom: 5px;
+    gap: 4px;
+  }
+
+  .member-chip {
+    padding: 2px 6px;
+    border-radius: 12px;
+    
+    .member-name {
+      font-size: 9px;
+    }
+    
+    .remove-member-btn {
+      width: 12px;
+      height: 12px;
+      font-size: 8px;
+    }
   }
 }
 
