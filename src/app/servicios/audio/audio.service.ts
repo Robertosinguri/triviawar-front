@@ -17,13 +17,13 @@ export class AudioService {
   private cargarSonidos() {
     this.sonidos = {
       // Efectos cortos - Usando ruta absoluta para evitar problemas con rutas de Angular
-      correcto: this.crearAudio('assets/audio/correcto.wav', 1),
-      incorrecto: this.crearAudio('assets/audio/incorrecto.wav', 1),
-      click: this.crearAudio('asset/audio/click.wav', 0.8),
+      correcto: this.crearAudio('/assets/audio/correcto.wav', 1),
+      incorrecto: this.crearAudio('/assets/audio/incorrecto.wav', 1),
+      click: this.crearAudio('/assets/audio/click.wav', 0.8),
 
       // Música de fondo
-      fondo: this.crearAudio('assets/audio/fondo-entrenamiento.mp3', 0.3, true),
-      arena: this.crearAudio('assets/audio/fondo-arena.mp3', 0.25, true) 
+      fondo: this.crearAudio('/assets/audio/fondo-entrenamiento.mp3', 0.3, true),
+      arena: this.crearAudio('/assets/audio/fondo-arena.mp3', 0.25, true) 
     };
   }
 
@@ -32,9 +32,7 @@ export class AudioService {
    */
   private crearAudio(src: string, volumen: number = 1, loop: boolean = false): HTMLAudioElement {
     const audio = new Audio();
-    
-    // 1. Configurar CORS (Crucial para archivos en hosting externo o AWS)
-    audio.crossOrigin = 'anonymous';
+  
     
     // 2. Preload en 'auto' fuerza al navegador a intentar la descarga de inmediato
     audio.preload = 'auto';
