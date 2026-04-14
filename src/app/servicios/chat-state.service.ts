@@ -40,6 +40,10 @@ export class ChatStateService {
   showEmojiPicker = signal(false);
   showUserSuggestions = signal(false);
   
+  // Estado Responsive
+  isMobileExpanded = signal(false);
+  unreadCount = signal(0);
+  
   // Estado de conexión del socket
   isConnected = signal(false);
   
@@ -207,6 +211,8 @@ export class ChatStateService {
     // Limpiar estado de UI
     this.showEmojiPicker.set(false);
     this.showUserSuggestions.set(false);
+    this.isMobileExpanded.set(false);
+    this.unreadCount.set(0);
     
     console.log('✅ [ChatState] Estado del chat completamente limpiado');
   }

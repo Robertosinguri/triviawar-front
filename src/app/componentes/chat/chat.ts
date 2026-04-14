@@ -40,6 +40,8 @@ export class ChatComponent implements OnInit, OnDestroy {
   showEmojiPicker = this.chatState.showEmojiPicker;
   showUserSuggestions = this.chatState.showUserSuggestions;
   isConnected = this.chatState.isConnected;
+  isMobileExpanded = this.chatState.isMobileExpanded;
+  unreadCount = this.chatState.unreadCount;
   
   // Computed signals del estado
   username = this.chatState.username;
@@ -128,6 +130,11 @@ export class ChatComponent implements OnInit, OnDestroy {
             this.addMessageWithScroll(msg);
           }
         }
+
+        // Manejo de notificaciones en móvil
+        if (!this.isMobileExpanded() && !msg.isSystem) {
+          this.unreadCount.update(c => c + 1);
+        }
       })
     );
 
@@ -171,6 +178,11 @@ export class ChatComponent implements OnInit, OnDestroy {
         // Scroll si estamos en pestaña de privados
         if (this.activeTab() === 'private') {
           this.scheduleScroll();
+        }
+
+        // Manejo de notificaciones en móvil para privados
+        if (!this.isMobileExpanded() && msg.username !== this.username()) {
+          this.unreadCount.update(c => c + 1);
         }
       })
     );
@@ -322,6 +334,15 @@ export class ChatComponent implements OnInit, OnDestroy {
         });
       }
     } catch (err) {}
+  }
+
+  toggleMobileChat() {
+    const newState = !this.isMobileExpanded();
+    this.isMobileExpanded.set(newState);
+    if (newState) {
+      this.unreadCount.set(0);
+      this.scheduleScroll();
+    }
   }
 
   ngOnDestroy() {

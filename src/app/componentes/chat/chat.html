@@ -1,142 +1,160 @@
-<div class="chat-container" [class.global-mode]="mode === 'global'" [class.room-mode]="mode === 'room'">
-  <!-- Cabecera con Pestañas -->
-  <div class="chat-header">
-    <button class="tab-btn global-tab" [class.active]="activeTab() === 'global'" (click)="switchTab('global')">
-      {{ mode === 'global' ? 'Conectados' : 'Sala' }}
-    </button>
-    <button class="tab-btn private-tab" [class.active]="activeTab() === 'private'" (click)="switchTab('private')">
-      Privados
-    </button>
+<div class="chat-container" 
+     [class.global-mode]="mode === 'global'" 
+     [class.room-mode]="mode === 'room'"
+     [class.expanded]="isMobileExpanded()">
+  
+  <!-- BARRA DE TOGGLE MÓVIL (Sutil) -->
+  <div class="mobile-toggle-bar" (click)="toggleMobileChat()">
+    <div class="toggle-indicator"></div>
+    <span class="toggle-title">
+      {{ activeTab() === 'global' ? (mode === 'global' ? 'Chat Global' : 'Chat de Sala') : 'Chat Privado' }}
+    </span>
+    @if (unreadCount() > 0 && !isMobileExpanded()) {
+      <span class="unread-badge">{{ unreadCount() }}</span>
+    }
+    <button class="expand-icon">{{ isMobileExpanded() ? '↓' : '↑' }}</button>
   </div>
 
-  <div class="messages-viewport" #scrollMe>
-    <!-- Renderizado dinámico según la pestaña activa -->
-    @if (activeTab() === 'global') {
-      @for (msg of messages(); track msg.id) {
-        @if (msg.isSystem) {
-          <div class="system-message">
-            <span class="system-text">{{ msg.text }}</span>
-          </div>
-        } @else {
-          <div class="message-item" [class.own-message]="msg.username === username()">
+  <div class="chat-main-content">
+    <!-- Cabecera con Pestañas -->
+    <div class="chat-header">
+      <button class="tab-btn global-tab" [class.active]="activeTab() === 'global'" (click)="switchTab('global')">
+        {{ mode === 'global' ? 'Conectados' : 'Sala' }}
+      </button>
+      <button class="tab-btn private-tab" [class.active]="activeTab() === 'private'" (click)="switchTab('private')">
+        Privados
+      </button>
+    </div>
+
+    <div class="messages-viewport" #scrollMe>
+      <!-- Renderizado dinámico según la pestaña activa -->
+      @if (activeTab() === 'global') {
+        @for (msg of messages(); track msg.id) {
+          @if (msg.isSystem) {
+            <div class="system-message">
+              <span class="system-text">{{ msg.text }}</span>
+            </div>
+          } @else {
+            <div class="message-item" [class.own-message]="msg.username === username()">
+              <div class="message-meta">
+                <span class="status-dot-mini online"></span>
+                <span class="sender">{{ msg.username }}</span>
+                <span class="time">{{ formatTime(msg.timestamp) }}</span>
+              </div>
+              <div class="message-bubble">{{ msg.text }}</div>
+            </div>
+          }
+        }
+      } @else {
+        <!-- Pestaña de Mensajes Privados -->
+        @for (msg of privateMessages(); track msg.id) {
+          <div class="message-item private" [class.own-message]="msg.username === username()">
             <div class="message-meta">
-              <span class="status-dot-mini online"></span>
-              <span class="sender">{{ msg.username }}</span>
+              <span class="sender">
+                {{ msg.username === username() ? 'Para: ' + formatTargets(msg.target) : '@' + msg.username }}
+              </span>
               <span class="time">{{ formatTime(msg.timestamp) }}</span>
             </div>
-            <div class="message-bubble">{{ msg.text }}</div>
+            <div class="message-bubble private">{{ msg.text }}</div>
           </div>
         }
       }
-    } @else {
-      <!-- Pestaña de Mensajes Privados -->
-      @for (msg of privateMessages(); track msg.id) {
-        <div class="message-item private" [class.own-message]="msg.username === username()">
-          <div class="message-meta">
-            <span class="sender">
-              {{ msg.username === username() ? 'Para: ' + formatTargets(msg.target) : '@' + msg.username }}
-            </span>
-            <span class="time">{{ formatTime(msg.timestamp) }}</span>
-          </div>
-          <div class="message-bubble private">{{ msg.text }}</div>
+
+      @if (!hasMessages()) {
+        <div class="empty-state">
+          @if (activeTab() === 'global') {
+            <p>No hay mensajes globales. ¡Sé el primero en escribir! 👋</p>
+          } @else {
+            <div class="private-empty-state">
+              <p>💬 <strong>Chat Privado</strong></p>
+              <p class="instructions">
+                Usa <code>@usuario</code> para agregar personas al grupo.<br>
+                Una vez agregadas, podrás escribirles sin usar @.
+              </p>
+              @if (hasPrivateGroup()) {
+                <p class="group-info">👥 Grupo activo con {{ privateGroupMembers().length }} usuario(s)</p>
+              } @else {
+                <p class="group-info">👤 Aún no hay usuarios en el grupo</p>
+              }
+            </div>
+          }
         </div>
       }
-    }
+    </div>
 
-    @if (!hasMessages()) {
-      <div class="empty-state">
-        @if (activeTab() === 'global') {
-          <p>No hay mensajes globales. ¡Sé el primero en escribir! 👋</p>
-        } @else {
-          <div class="private-empty-state">
-            <p>💬 <strong>Chat Privado</strong></p>
-            <p class="instructions">
-              Usa <code>@usuario</code> para agregar personas al grupo.<br>
-              Una vez agregadas, podrás escribirles sin usar @.
-            </p>
-            @if (hasPrivateGroup()) {
-              <p class="group-info">👥 Grupo activo con {{ privateGroupMembers().length }} usuario(s)</p>
-            } @else {
-              <p class="group-info">👤 Aún no hay usuarios en el grupo</p>
+    <!-- ÁREA DE INPUT SEPARADA POR PESTAÑA -->
+    
+    <!-- Input para Chat Público (solo visible en pestaña Global) -->
+    @if (activeTab() === 'global') {
+      <div class="chat-input-area public">
+        <button class="emoji-trigger" (click)="toggleEmojiPicker($event)">
+          <span class="emoji-icon">😊</span>
+        </button>
+
+        <!-- Panel de Emojis para chat público -->
+        @if (showEmojiPicker()) {
+          <div class="emoji-picker-popup">
+            @for (emoji of commonEmojis; track emoji) {
+              <button (click)="addEmoji(emoji)" class="emoji-item">{{ emoji }}</button>
             }
           </div>
         }
+
+        <input 
+          type="text" 
+          [ngModel]="publicMessage()" 
+          (ngModelChange)="publicMessage.set($event)"
+          (keyup.enter)="sendPublicMessage()" 
+          placeholder="Escribe un mensaje público..."
+          maxlength="200"
+        >
+        <button (click)="sendPublicMessage()" [disabled]="!publicMessage().trim()" class="send-btn">
+          <span class="send-icon">🚀</span>
+        </button>
+      </div>
+    }
+
+    <!-- Input para Chat Privado (solo visible en pestaña Privado) -->
+    @if (activeTab() === 'private') {
+      <div class="chat-input-area private">
+        <!-- Sugerencias de Usuarios para @ menciones -->
+        @if (showUserSuggestions() && filteredUsers().length > 0) {
+          <div class="user-suggestions-popup">
+            @for (user of filteredUsers(); track user) {
+              <button (click)="selectMention(user)" class="suggestion-item">
+                <span class="status-dot-mini online"></span>
+                @{{ user }}
+              </button>
+            }
+          </div>
+        }
+
+        <button class="emoji-trigger" (click)="toggleEmojiPicker($event)">
+          <span class="emoji-icon">😊</span>
+        </button>
+
+        <!-- Panel de Emojis -->
+        @if (showEmojiPicker()) {
+          <div class="emoji-picker-popup">
+            @for (emoji of commonEmojis; track emoji) {
+              <button (click)="addEmoji(emoji)" class="emoji-item">{{ emoji }}</button>
+            }
+          </div>
+        }
+
+        <input 
+          type="text" 
+          [ngModel]="privateMessage()" 
+          (ngModelChange)="privateMessage.set($event)"
+          (input)="onInputChange($event)"
+          (keyup.enter)="sendPrivateMessage()" 
+          placeholder="{{ hasPrivateGroup() ? 'Escribe al grupo privado...' : 'Usa @usuario para agregar al grupo...' }}"
+          maxlength="200"
+        >
+        <button (click)="sendPrivateMessage()" [disabled]="!privateMessage().trim()" class="send-btn">
+          <span class="send-icon">🚀</span>
+        </button>
       </div>
     }
   </div>
-
-  <!-- ÁREA DE INPUT SEPARADA POR PESTAÑA -->
-  
-  <!-- Input para Chat Público (solo visible en pestaña Global) -->
-  @if (activeTab() === 'global') {
-    <div class="chat-input-area public">
-      <button class="emoji-trigger" (click)="toggleEmojiPicker($event)">
-        <span class="emoji-icon">😊</span>
-      </button>
-
-      <!-- Panel de Emojis para chat público -->
-      @if (showEmojiPicker()) {
-        <div class="emoji-picker-popup">
-          @for (emoji of commonEmojis; track emoji) {
-            <button (click)="addEmoji(emoji)" class="emoji-item">{{ emoji }}</button>
-          }
-        </div>
-      }
-
-      <input 
-        type="text" 
-        [ngModel]="publicMessage()" 
-        (ngModelChange)="publicMessage.set($event)"
-        (keyup.enter)="sendPublicMessage()" 
-        placeholder="Escribe un mensaje público..."
-        maxlength="200"
-      >
-      <button (click)="sendPublicMessage()" [disabled]="!publicMessage().trim()" class="send-btn">
-        <span class="send-icon">🚀</span>
-      </button>
-    </div>
-  }
-
-  <!-- Input para Chat Privado (solo visible en pestaña Privado) -->
-  @if (activeTab() === 'private') {
-    <div class="chat-input-area private">
-      <!-- Sugerencias de Usuarios para @ menciones -->
-      @if (showUserSuggestions() && filteredUsers().length > 0) {
-        <div class="user-suggestions-popup">
-          @for (user of filteredUsers(); track user) {
-            <button (click)="selectMention(user)" class="suggestion-item">
-              <span class="status-dot-mini online"></span>
-              @{{ user }}
-            </button>
-          }
-        </div>
-      }
-
-      <button class="emoji-trigger" (click)="toggleEmojiPicker($event)">
-        <span class="emoji-icon">😊</span>
-      </button>
-
-      <!-- Panel de Emojis -->
-      @if (showEmojiPicker()) {
-        <div class="emoji-picker-popup">
-          @for (emoji of commonEmojis; track emoji) {
-            <button (click)="addEmoji(emoji)" class="emoji-item">{{ emoji }}</button>
-          }
-        </div>
-      }
-
-      <input 
-        type="text" 
-        [ngModel]="privateMessage()" 
-        (ngModelChange)="privateMessage.set($event)"
-        (input)="onInputChange($event)"
-        (keyup.enter)="sendPrivateMessage()" 
-        placeholder="{{ hasPrivateGroup() ? 'Escribe al grupo privado...' : 'Usa @usuario para agregar al grupo...' }}"
-        maxlength="200"
-      >
-      <button (click)="sendPrivateMessage()" [disabled]="!privateMessage().trim()" class="send-btn">
-        <span class="send-icon">🚀</span>
-      </button>
-    </div>
-  }
 </div>

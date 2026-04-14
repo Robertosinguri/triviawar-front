@@ -40,7 +40,7 @@ export interface JugadorRanking {
 })
 export class EstadisticasService {
     private http = inject(HttpClient);
-    private readonly API_URL = `${environment.apiUrl}/api/stats`;
+    private readonly API_URL = `${environment.apiUrl}/stats`;
 
     obtenerEstadisticasPersonales(userId: string, username: string): Observable<EstadisticasUsuario> {
         return this.http.get<any>(`${this.API_URL}/personal?userId=${userId}&username=${username}`).pipe(
@@ -55,8 +55,7 @@ export class EstadisticasService {
     }
 
     guardarResultado(resultado: any): Promise<any> {
-        // El juego ya llama a /games/submit-result directamente
-        return this.http.post(`${environment.apiUrl}/api/games/submit-result`, resultado).toPromise();
+        return this.http.post(`${environment.apiUrl}/games/submit-result`, resultado).toPromise();
     }
 
     // Alias para compatibilidad

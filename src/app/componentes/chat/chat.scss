@@ -573,28 +573,125 @@ input {
 // ============================================================
 
 @include mobile-only {
-  .chat-header {
+  .chat-container {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 80vh; // Altura cuando está expandido
+    z-index: 10000;
+    background: rgba(15, 15, 30, 0.95);
+    backdrop-filter: blur(20px);
+    border-radius: 20px 20px 0 0;
+    border: none;
+    border-top: 1px solid rgba($primary-aqua, 0.3);
+    box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.6);
+    
+    // Estado colapsado por defecto
+    transform: translateY(calc(100% - 45px));
+    transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+
+    &.expanded {
+      transform: translateY(0);
+    }
+  }
+
+  .mobile-toggle-bar {
+    display: flex;
+    align-items: center;
+    padding: 0 1.25rem;
+    height: 45px;
+    background: rgba(1, 186, 154, 0.1);
+    cursor: pointer;
+    gap: 10px;
+
+    .toggle-indicator {
+      width: 40px;
+      height: 4px;
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 2px;
+      position: absolute;
+      top: 8px;
+      left: 50%;
+      transform: translateX(-50%);
+    }
+
+    .toggle-title {
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: $primary-aqua;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .unread-badge {
+      background: $primary-pink;
+      color: white;
+      font-size: 0.7rem;
+      padding: 2px 6px;
+      border-radius: 10px;
+      font-weight: bold;
+      box-shadow: 0 0 10px rgba($primary-pink, 0.5);
+      animation: pulse 2s infinite;
+    }
+
+    .expand-icon {
+      margin-left: auto;
+      background: none;
+      border: none;
+      color: white;
+      font-size: 1.2rem;
+      opacity: 0.5;
+    }
+  }
+
+  .chat-main-content {
+    height: calc(80vh - 45px);
+    display: flex;
     flex-direction: column;
-    align-items: stretch;
-    gap: 6px;
   }
 
-  .tabs-control {
-    justify-content: center;
+  .chat-header {
+    flex-direction: row; // Volvemos a fila en el cajón expandido
+    background: rgba(0, 0, 0, 0.2);
+    padding: 0;
   }
 
-  .private-group-info {
-    justify-content: center;
+  .tab-btn {
+    padding: 12px;
+    font-size: 0.75rem;
   }
 
   .message-item {
-    max-width: 95%;
+    max-width: 90%;
+    
+    .message-bubble {
+      font-size: 14px; // Un poco más grande para legibilidad móvil
+      padding: 8px 12px;
+    }
+  }
+
+  .chat-input-area {
+    padding: 12px;
+    padding-bottom: calc(12px + env(safe-area-inset-bottom));
   }
 
   .emoji-picker-popup {
-    grid-template-columns: repeat(4, 32px); // 4 columnas en móvil
-    gap: 8px;
-    padding: 14px;
-    width: max-content;
+    grid-template-columns: repeat(6, 1fr);
+    width: 90vw;
+    left: 5vw;
+    bottom: 70px;
   }
 }
+
+// Estilos desktop para los nuevos elementos (ocultar toggle bar)
+.mobile-toggle-bar {
+  display: none;
+}
+
+@keyframes pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+  100% { transform: scale(1); }
+}
+
