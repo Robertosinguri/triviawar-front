@@ -647,8 +647,6 @@ input {
 
   .chat-main-content {
     height: calc(80vh - 45px);
-    display: flex;
-    flex-direction: column;
   }
 
   .chat-header {
@@ -693,5 +691,14 @@ input {
   0% { transform: scale(1); }
   50% { transform: scale(1.1); }
   100% { transform: scale(1); }
+}
+
+// Clase global para el contenido principal del chat
+.chat-main-content {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0; // Crucial para permitir el scroll interno en flexbox
+  width: 100%;
 }
 
