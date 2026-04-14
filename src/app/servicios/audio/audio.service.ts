@@ -17,13 +17,13 @@ export class AudioService {
   private cargarSonidos() {
     this.sonidos = {
       // Efectos cortos - Usando ruta absoluta para evitar problemas con rutas de Angular
-      correcto: this.crearAudio('/audio/correcto.wav', 1),
-      incorrecto: this.crearAudio('/audio/incorrecto.wav', 1),
-      click: this.crearAudio('/audio/click.wav', 0.8),
+      correcto: this.crearAudio('assets/audio/correcto.wav', 1),
+      incorrecto: this.crearAudio('assets/audio/incorrecto.wav', 1),
+      click: this.crearAudio('asset/audio/click.wav', 0.8),
 
       // Música de fondo
-      fondo: this.crearAudio('/audio/fondo-entrenamiento.mp3', 0.3, true),
-      arena: this.crearAudio('/audio/fondo-arena.mp3', 0.25, true) 
+      fondo: this.crearAudio('assets/audio/fondo-entrenamiento.mp3', 0.3, true),
+      arena: this.crearAudio('assets/audio/fondo-arena.mp3', 0.25, true) 
     };
   }
 
