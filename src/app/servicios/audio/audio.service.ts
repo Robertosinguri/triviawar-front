@@ -24,16 +24,42 @@ export class AudioService {
   }
 
   private cargarSonidos() {
+    // Estrategia robusta para rutas de audio que funcione en cualquier entorno
+    const getAudioPath = (filename: string): string => {
+      // Probar diferentes estrategias de rutas
+      const baseHref = document.querySelector('base')?.getAttribute('href') || '/';
+      const basePath = baseHref.endsWith('/') ? baseHref.slice(0, -1) : baseHref;
+      
+      // Estrategias en orden de prioridad:
+      const strategies = [
+        `./audio/${filename}`,                  // Ruta relativa con punto (funciona mejor)
+        `audio/${filename}`,                    // Ruta relativa (funciona en desarrollo)
+        `${basePath}/audio/${filename}`,        // Ruta relativa a base href
+        `/audio/${filename}`,                   // Ruta absoluta desde raíz
+        `/frontend/audio/${filename}`,          // Ruta para producción AWS
+      ];
+      
+      // Devolver la primera estrategia, pero registrar todas para depuración
+      const selectedPath = strategies[0];
+      console.log(`🎵 Ruta de audio para ${filename}: ${selectedPath} (opciones: ${strategies.join(', ')})`);
+      return selectedPath;
+    };
+    
     this.sonidos = {
-      // Efectos cortos - Archivos en public/audio, accesibles desde /audio/
-      correcto: this.crearAudio('/audio/correcto.wav', 1),
-      incorrecto: this.crearAudio('/audio/incorrecto.wav', 1),
-      click: this.crearAudio('/audio/click.wav', 0.8),
+      // Efectos cortos - Archivos en public/audio
+      correcto: this.crearAudio(getAudioPath('correcto.wav'), 1),
+      incorrecto: this.crearAudio(getAudioPath('incorrecto.wav'), 1),
+      click: this.crearAudio(getAudioPath('click.wav'), 0.8),
 
       // Música de fondo
-      fondo: this.crearAudio('/audio/fondo-entrenamiento.mp3', 0.3, true),
-      arena: this.crearAudio('/audio/fondo-arena.mp3', 0.25, true) 
+      fondo: this.crearAudio(getAudioPath('fondo-entrenamiento.mp3'), 0.3, true),
+      arena: this.crearAudio(getAudioPath('fondo-arena.mp3'), 0.25, true) 
     };
+    
+    console.log('🎵 AudioService cargado. Rutas de audio:');
+    Object.keys(this.sonidos).forEach(key => {
+      console.log(`  ${key}: ${this.sonidos[key].src}`);
+    });
   }
 
   /**
