@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { environment } from '../../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
@@ -25,28 +26,18 @@ export class AudioService {
 
   private cargarSonidos() {
     // Estrategia robusta para rutas de audio que funcione en cualquier entorno
+    // Ahora usa las rutas de API del backend
     const getAudioPath = (filename: string): string => {
-      // Probar diferentes estrategias de rutas
-      const baseHref = document.querySelector('base')?.getAttribute('href') || '/';
-      const basePath = baseHref.endsWith('/') ? baseHref.slice(0, -1) : baseHref;
+      // Usar la URL base de la API desde environment
+      const apiBaseUrl = environment.apiUrl.replace(/\/$/, ''); // Remover trailing slash si existe
+      const audioUrl = `${apiBaseUrl}/audio/${filename}`;
       
-      // Estrategias en orden de prioridad:
-      const strategies = [
-        `./audio/${filename}`,                  // Ruta relativa con punto (funciona mejor)
-        `audio/${filename}`,                    // Ruta relativa (funciona en desarrollo)
-        `${basePath}/audio/${filename}`,        // Ruta relativa a base href
-        `/audio/${filename}`,                   // Ruta absoluta desde raíz
-        `/frontend/audio/${filename}`,          // Ruta para producción AWS
-      ];
-      
-      // Devolver la primera estrategia, pero registrar todas para depuración
-      const selectedPath = strategies[0];
-      console.log(`🎵 Ruta de audio para ${filename}: ${selectedPath} (opciones: ${strategies.join(', ')})`);
-      return selectedPath;
+      console.log(`🎵 Ruta de audio API para ${filename}: ${audioUrl}`);
+      return audioUrl;
     };
     
     this.sonidos = {
-      // Efectos cortos - Archivos en public/audio
+      // Efectos cortos - Archivos servidos por API del backend
       correcto: this.crearAudio(getAudioPath('correcto.wav'), 1),
       incorrecto: this.crearAudio(getAudioPath('incorrecto.wav'), 1),
       click: this.crearAudio(getAudioPath('click.wav'), 0.8),
@@ -56,7 +47,7 @@ export class AudioService {
       arena: this.crearAudio(getAudioPath('fondo-arena.mp3'), 0.25, true) 
     };
     
-    console.log('🎵 AudioService cargado. Rutas de audio:');
+    console.log('🎵 AudioService cargado con rutas de API. Rutas de audio:');
     Object.keys(this.sonidos).forEach(key => {
       console.log(`  ${key}: ${this.sonidos[key].src}`);
     });
