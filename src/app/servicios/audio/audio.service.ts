@@ -9,21 +9,30 @@ export class AudioService {
   private audioActivo: boolean = true;
   private fondoSonando: string | null = null;
   private fadeInterval: any = null;
+  private usuarioInteractuo: boolean = false;
 
   constructor() {
     this.cargarSonidos();
+    this.configurarInteraccionUsuario();
+  }
+
+  private configurarInteraccionUsuario() {
+    // Marcar que el usuario ha interactuado cuando hace clic en cualquier parte
+    document.addEventListener('click', () => {
+      this.usuarioInteractuo = true;
+    }, { once: true }); // Solo necesitamos el primer clic
   }
 
   private cargarSonidos() {
     this.sonidos = {
-      // Efectos cortos - Usando ruta absoluta para evitar problemas con rutas de Angular
-      correcto: this.crearAudio('/assets/audio/correcto.wav', 1),
-      incorrecto: this.crearAudio('/assets/audio/incorrecto.wav', 1),
-      click: this.crearAudio('/assets/audio/click.wav', 0.8),
+      // Efectos cortos - Archivos en public/audio, accesibles desde /audio/
+      correcto: this.crearAudio('/audio/correcto.wav', 1),
+      incorrecto: this.crearAudio('/audio/incorrecto.wav', 1),
+      click: this.crearAudio('/audio/click.wav', 0.8),
 
       // Música de fondo
-      fondo: this.crearAudio('/assets/audio/fondo-entrenamiento.mp3', 0.3, true),
-      arena: this.crearAudio('/assets/audio/fondo-arena.mp3', 0.25, true) 
+      fondo: this.crearAudio('/audio/fondo-entrenamiento.mp3', 0.3, true),
+      arena: this.crearAudio('/audio/fondo-arena.mp3', 0.25, true) 
     };
   }
 
@@ -125,7 +134,18 @@ export class AudioService {
           this.aplicarFadeIn(pista, volumenObjetivo, 3000);
           console.log(`🎵 Sonando con Fade In: ${nombre}`);
         })
-        .catch(err => console.warn('Esperando interacción del usuario para iniciar música:', err));
+        .catch(err => {
+          console.warn('Esperando interacción del usuario para iniciar música:', err);
+          // Intentar de nuevo después de que el usuario interactúe
+          if (!this.usuarioInteractuo) {
+            const intentarDeNuevo = () => {
+              this.usuarioInteractuo = true;
+              this.reproducirMusicaLarga(nombre, volumenObjetivo);
+              document.removeEventListener('click', intentarDeNuevo);
+            };
+            document.addEventListener('click', intentarDeNuevo, { once: true });
+          }
+        });
     }
   }
 
