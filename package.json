@@ -30,7 +30,7 @@
   "devDependencies": {
     "@angular-devkit/build-angular": "^20.0.0",
     "@angular/cli": "^20.0.0",
-    "@angular/compiler-cli": "^20.0.0",
+    "@angular/compiler-cli": "20.3.19",
     "@types/node": "^20.17.19",
     "typescript": "~5.9.3"
   },
