@@ -1,4 +1,4 @@
-import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, OnDestroy } from '@angular/core';
 import { Router, RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
@@ -7,6 +7,7 @@ import { EstadisticasService, JugadorRanking } from '../../servicios/estadistica
 import { ChatComponent } from '../chat/chat';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../environments/environment';
+import { AudioService } from '../../servicios/audio/audio.service'; // 🔊 Importar AudioService
 
 @Component({
   selector: 'app-dashboard',
@@ -15,7 +16,7 @@ import { environment } from '../../../environments/environment';
   templateUrl: './dashboard.html',
   styleUrls: ['./dashboard.scss']
 })
-export class DashboardComponent implements OnInit {
+export class DashboardComponent implements OnInit, OnDestroy {
   codigoSala: string = '';
   codigoSalaValido: boolean = true;
   rankingMinimalista: JugadorRanking[] | null = null;
@@ -26,10 +27,13 @@ export class DashboardComponent implements OnInit {
     private router: Router,
     private estadisticasService: EstadisticasService,
     private http: HttpClient,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private audioService: AudioService // 🔊 Inyectar AudioService
   ) {}
 
   ngOnInit() {
+    // 🔊 Iniciar música de fondo del dashboard
+    this.audioService.playFondoDashboard(); 
     this.cargarRankingMinimalista();
     this.cargarSalasPublicas();
     
@@ -43,6 +47,8 @@ export class DashboardComponent implements OnInit {
     if (this.intervaloSalas) {
       clearInterval(this.intervaloSalas);
     }
+    // 🔊 Detener música al salir del dashboard
+    this.audioService.stopFondoDashboard();
   }
 
   private cargarRankingMinimalista(): void {
@@ -70,6 +76,7 @@ export class DashboardComponent implements OnInit {
   }
 
   crearSala() {
+    this.audioService.play('click');
     this.router.navigate(['/crear-sala']);
   }
 
@@ -82,8 +89,8 @@ export class DashboardComponent implements OnInit {
   unirseASala(codigo?: string) {
     const salaAUnirse = codigo || this.codigoSala.trim().toUpperCase();
     if (salaAUnirse) {
-      // Si viene de la lista de salas públicas (trae código), vamos DIRECTO al lobby
-      // Si viene del input manual (no trae código en el parámetro), también vamos directo ahora.
+      this.audioService.play('click');
+      // Vamos DIRECTO al lobby, saltando componentes intermedios
       this.router.navigate(['/lobby'], { 
         queryParams: { codigo: salaAUnirse, host: 'false' } 
       });
@@ -91,6 +98,7 @@ export class DashboardComponent implements OnInit {
   }
 
   iniciarEntrenamiento() {
+    this.audioService.play('click'); // Mismo efecto 
     this.router.navigate(['/entrenamiento']);
   }
 }
