@@ -44,7 +44,8 @@ export class AudioService {
 
       // Música de fondo
       fondo: this.crearAudio(getAudioPath('fondo-entrenamiento.mp3'), 0.3, true),
-      arena: this.crearAudio(getAudioPath('fondo-arena.mp3'), 0.25, true) 
+      arena: this.crearAudio(getAudioPath('fondo-arena.mp3'), 0.25, true),
+      dashboard: this.crearAudio (getAudioPath('fondo-dashboard.mp3'), 0.25, true)
     };
     
     console.log('🎵 AudioService cargado con rutas de API. Rutas de audio:');
@@ -134,6 +135,10 @@ export class AudioService {
     this.reproducirMusicaLarga('arena', 0.25);
   }
 
+  playFondoDashboard() {
+  this.reproducirMusicaLarga('fondoDashboard', 0.25);
+}
+
   private reproducirMusicaLarga(nombre: string, volumenObjetivo: number) {
     if (!this.audioActivo) return;
     if (this.fondoSonando === nombre) return;
@@ -173,6 +178,11 @@ export class AudioService {
   stopArena() {
     this.stop('arena');
   }
+
+  stopFondoDashboard() {
+  this.stop('fondoDashboard');
+}
+
 
   toggleAudio() {
     this.audioActivo = !this.audioActivo;
