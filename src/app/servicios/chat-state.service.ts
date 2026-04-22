@@ -2,15 +2,6 @@ import { Injectable, signal, computed, inject } from '@angular/core';
 import { ChatMessage } from './chat.service';
 import { FirebaseAuthService } from './auth/firebase-auth.service';
 
-export interface PrivateMessage {
-  id: string;
-  text: string;
-  username: string;
-  target: string;
-  timestamp: Date;
-  isPrivate: boolean;
-}
-
 @Injectable({ providedIn: 'root' })
 export class ChatStateService {
   private authService = inject(FirebaseAuthService);
@@ -20,25 +11,17 @@ export class ChatStateService {
   // Mensajes globales/sala (persistentes durante toda la sesión)
   messages = signal<ChatMessage[]>([]);
   
-  // Mensajes privados/sub-chats (persistentes durante toda la sesión)
-  privateMessages = signal<PrivateMessage[]>([]);
-  
   // Usuarios conectados (actualizado en tiempo real)
   connectedUsers = signal<string[]>([]);
   
-  // Pestaña activa (global o private)
-  activeTab = signal<'global' | 'private'>('global');
+  // Pestaña activa (solo global ahora)
+  activeTab = signal<'global'>('global');
   
-  // Mensaje actual en el input (separado por pestaña)
-  publicMessage = signal('');      // Para pestaña Global
-  privateMessage = signal('');     // Para pestaña Privado
-  
-  // Grupo privado persistente (usuarios agregados al chat privado)
-  privateGroupMembers = signal<string[]>([]);
+  // Mensaje actual en el input
+  publicMessage = signal('');
   
   // Estado de UI
   showEmojiPicker = signal(false);
-  showUserSuggestions = signal(false);
   
   // Estado Responsive
   isMobileExpanded = signal(false);
@@ -58,41 +41,14 @@ export class ChatStateService {
     return user?.username || 'Invitado';
   });
   
-  // ¿Hay mensajes en la pestaña activa?
-  hasMessages = computed(() => {
-    const list = this.activeTab() === 'global' ? this.messages() : this.privateMessages();
-    return list.length > 0;
-  });
+  // ¿Hay mensajes?
+  hasMessages = computed(() => this.messages().length > 0);
   
-  // Conteo de mensajes globales
+  // Conteo de mensajes
   messagesCount = computed(() => this.messages().length);
   
-  // Conteo de mensajes privados
-  privateMessagesCount = computed(() => this.privateMessages().length);
-  
-  // Mensaje actual según pestaña activa
-  currentMessage = computed(() => {
-    return this.activeTab() === 'global' ? this.publicMessage() : this.privateMessage();
-  });
-  
-  // Usuarios filtrados para sugerencias de @ (solo en privado)
-  filteredUsers = computed(() => {
-    const text = this.privateMessage();
-    const index = text.lastIndexOf('@');
-    if (index === -1) return [];
-    
-    const query = text.substring(index + 1).toLowerCase();
-    const currentUser = this.username();
-    
-    return this.connectedUsers().filter(u => 
-      u.toLowerCase().includes(query) && 
-      u !== currentUser &&
-      !this.privateGroupMembers().includes(u) // No mostrar ya agregados
-    );
-  });
-  
-  // ¿Hay usuarios en el grupo privado?
-  hasPrivateGroup = computed(() => this.privateGroupMembers().length > 0);
+  // Mensaje actual
+  currentMessage = computed(() => this.publicMessage());
   
   // === MÉTODOS PARA MANIPULAR EL ESTADO ===
   
@@ -100,12 +56,6 @@ export class ChatStateService {
   addMessage(msg: ChatMessage) {
     console.log('📝 [ChatState] Agregando mensaje global:', msg.text, 'Total:', this.messages().length + 1);
     this.messages.update(current => [...current, msg]);
-  }
-  
-  // Agregar mensaje privado
-  addPrivateMessage(msg: PrivateMessage) {
-    console.log('📝 [ChatState] Agregando mensaje privado:', msg.text, 'Total:', this.privateMessages().length + 1);
-    this.privateMessages.update(current => [...current, msg]);
   }
   
   // Actualizar lista de usuarios conectados
@@ -118,49 +68,11 @@ export class ChatStateService {
     this.isConnected.set(connected);
   }
   
-  // Cambiar pestaña activa
-  switchTab(tab: 'global' | 'private') {
+  // Cambiar pestaña activa (solo global ahora)
+  switchTab(tab: 'global') {
     console.log('🔄 [ChatState] Cambiando pestaña a:', tab, 
-                'Globales:', this.messages().length, 
-                'Privados:', this.privateMessages().length,
-                'Miembros grupo:', this.privateGroupMembers().length);
+                'Globales:', this.messages().length);
     this.activeTab.set(tab);
-  }
-  
-  // === GRUPO PRIVADO PERSISTENTE ===
-  
-  // Agregar usuario al grupo privado
-  addToPrivateGroup(username: string) {
-    if (!this.privateGroupMembers().includes(username)) {
-      console.log('👥 [ChatState] Agregando usuario al grupo privado:', username);
-      this.privateGroupMembers.update(members => [...members, username]);
-    }
-  }
-  
-  // Agregar múltiples usuarios al grupo privado
-  addMultipleToPrivateGroup(usernames: string[]) {
-    usernames.forEach(username => this.addToPrivateGroup(username));
-  }
-  
-  // Remover usuario del grupo privado
-  removeFromPrivateGroup(username: string) {
-    this.privateGroupMembers.update(members => members.filter(u => u !== username));
-  }
-  
-  // Limpiar grupo privado
-  clearPrivateGroup() {
-    this.privateGroupMembers.set([]);
-  }
-
-  // Sobrescribir grupo privado (Sincronización con Backend)
-  setPrivateGroup(members: string[]) {
-    console.log('👥 [ChatState] Sincronizando grupo privado:', members);
-    this.privateGroupMembers.set(members);
-  }
-  
-  // Verificar si un usuario está en el grupo privado
-  isInPrivateGroup(username: string): boolean {
-    return this.privateGroupMembers().includes(username);
   }
   
   // === MÉTODOS DE UTILIDAD ===
@@ -176,16 +88,15 @@ export class ChatStateService {
     return username === this.username();
   }
   
-  // Obtener mensajes para la pestaña activa
+  // Obtener mensajes activos
   getActiveMessages() {
-    return this.activeTab() === 'global' ? this.messages() : this.privateMessages();
+    return this.messages();
   }
   
   // Limpiar mensajes (útil para testing o logout)
   clearMessages() {
     console.log('🧹 [ChatState] Limpiando todos los mensajes');
     this.messages.set([]);
-    this.privateMessages.set([]);
   }
 
   // Limpiar mensajes de una sala específica
@@ -196,30 +107,23 @@ export class ChatStateService {
     this.messages.update(current => 
       current.filter(msg => msg.roomId !== roomId)
     );
-    // Nota: los mensajes privados no están asociados a salas, así que no los filtramos
   }
 
-  // Limpiar TODO el estado del chat (mensajes, grupos, inputs, etc.)
+  // Limpiar TODO el estado del chat
   clearAllChatState() {
     console.log('🧹 [ChatState] Limpiando TODO el estado del chat');
     
     // Limpiar mensajes
     this.messages.set([]);
-    this.privateMessages.set([]);
     
-    // Limpiar grupos privados
-    this.privateGroupMembers.set([]);
-    
-    // Limpiar inputs
+    // Limpiar input
     this.publicMessage.set('');
-    this.privateMessage.set('');
     
     // Resetear pestaña a global
     this.activeTab.set('global');
     
     // Limpiar estado de UI
     this.showEmojiPicker.set(false);
-    this.showUserSuggestions.set(false);
     this.isMobileExpanded.set(false);
     this.unreadCount.set(0);
     this.activeSessionUser.set(null); // Resetear sesión al limpiar todo

@@ -11,6 +11,7 @@ interface ConfiguracionJugador {
   tematica: string;
   dificultad: 'baby' | 'conocedor' | 'killer' | '';
   jugadores?: number;
+  nombreSala?: string;
 }
 
 import { ChatComponent } from '../chat/chat';
@@ -36,7 +37,8 @@ export class ConfigurarSalaComponent implements OnInit, OnDestroy {
   configuracion: ConfiguracionJugador = {
     tematica: '',
     dificultad: '',
-    jugadores: 2
+    jugadores: 2,
+    nombreSala: ''
   };
 
   esHost: boolean = true;
@@ -62,6 +64,7 @@ export class ConfigurarSalaComponent implements OnInit, OnDestroy {
     this.socketService.connect();
 
     this.esHost = this.router.url.includes('crear');
+    console.log('🔍 [DEBUG] ConfigurarSala - esHost:', this.esHost, 'URL:', this.router.url);
 
     if (!this.esHost) {
       this.codigoSala = this.route.snapshot.queryParams['codigo'] || '';
@@ -138,9 +141,10 @@ export class ConfigurarSalaComponent implements OnInit, OnDestroy {
   }
 
   esConfiguracionValida(): boolean {
-    return this.configuracion.tematica.trim() !== '' &&
-      this.configuracion.dificultad !== '' &&
-      (!this.esHost || (this.configuracion.jugadores || 0) >= 2);
+    if (this.esHost) {
+      return (this.configuracion.jugadores || 0) >= 2 && !!this.configuracion.nombreSala?.trim();
+    }
+    return true; // Para invitados ya no hay configuración previa al lobby
   }
 
   // Getter helper para plantilla
@@ -161,17 +165,17 @@ export class ConfigurarSalaComponent implements OnInit, OnDestroy {
     const userId = user.email || user.uid || 'anon-' + Date.now();
 
     const roomData = {
-      nombre: `${user.username || user.name}'s Game`,
+      nombre: this.configuracion.nombreSala?.trim() || `${user.username || user.name}'s Game`,
       maxJugadores: this.configuracion.jugadores!,
       host: {
         id: userId,
         nombre: user.name || user.username || 'Host',
-        tematica: this.configuracion.tematica.trim(),
-        dificultad: this.configuracion.dificultad
+        tematica: '',
+        dificultad: ''
       }
     };
 
-    // Emitir via socket
+    console.log('📡 [DEBUG] Enviando create_room:', JSON.stringify(roomData, null, 2));
     this.socketService.createRoom(roomData);
   }
 
@@ -185,8 +189,8 @@ export class ConfigurarSalaComponent implements OnInit, OnDestroy {
     const jugadorData = {
       id: user.email || user.uid || 'anon-' + Date.now(),
       nombre: user.name || user.username || 'Invitado',
-      tematica: this.configuracion.tematica.trim(),
-      dificultad: this.configuracion.dificultad
+      tematica: '',
+      dificultad: ''
     };
 
     this.socketService.joinRoom(this.codigoSala, jugadorData);

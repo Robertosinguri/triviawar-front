@@ -10,20 +10,32 @@
             <button class="primary-btn" (click)="crearSala()">Crear Sala</button>
           </div>
 
-          <div class="option-card join-room">
-            <h2>Unirse a Sala</h2>
-            <p>Únete a una partida existente</p>
-            <input type="text" placeholder="Ej: ABC123" [(ngModel)]="codigoSala" (input)="validarCodigoSala()"
-              [class.error]="!codigoSalaValido" class="room-input" maxlength="6">
-
-            @if (!codigoSalaValido) {
-            <div class="validation-message">
-              ⚠️ El código debe tener 6 caracteres (letras y números)
+          <!-- Salas Activas Públicas -->
+          <div class="join-card" style="margin-top: 0.5rem;">
+            <h2 style="color: #01BA9A; margin-bottom: 20px;">🌐 Salas Activas</h2>
+            <div style="max-height: 400px; overflow-y: auto; margin-top: 10px;">
+              @if (salasPublicas.length === 0) {
+              <div style="text-align: center; padding: 2rem; background: rgba(255,255,255,0.05); border-radius: 10px;">
+                <p style="color: #888; font-size: 1.1rem;">No hay salas activas en este momento.</p>
+                <p style="color: #666; font-size: 0.9rem;">¡Sé el primero en crear una!</p>
+              </div>
+              }
+              @for (sala of salasPublicas; track sala.id) {
+              <div
+                style="background: rgba(255,255,255,0.05); padding: 15px; border-radius: 12px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; border: 1px solid rgba(1, 186, 154, 0.2); transition: transform 0.2s; cursor: default;">
+                <div>
+                  <strong style="color: #01BA9A; font-size: 1.2rem;">{{sala.nombre || 'Sala de Trivia'}}</strong>
+                  <div style="font-size: 0.9rem; color: #ccc; margin-top: 4px;">
+                    👥 {{sala.jugadores?.length || 0}} / {{sala.maxJugadores}} jugadores
+                  </div>
+                </div>
+                <button (click)="unirseASala(sala.id)"
+                  style="background: linear-gradient(45deg, #01BA9A, #00a085); color: white; border: none; padding: 10px 20px; border-radius: 20px; cursor: pointer; font-weight: bold; box-shadow: 0 4px 10px rgba(1, 186, 154, 0.2);">
+                  Unirse
+                </button>
+              </div>
+              }
             </div>
-            }
-
-            <button class="secondary-btn" [disabled]="!codigoSalaValido || !codigoSala.trim()"
-              (click)="unirseASala()">Unirse</button>
           </div>
 
           <div class="option-card training-room">

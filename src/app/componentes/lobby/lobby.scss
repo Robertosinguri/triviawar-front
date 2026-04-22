@@ -138,3 +138,53 @@
     color: #22c55e !important;
   }
 }
+
+// Overlay de inicio de partida
+.game-starting-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.9);
+  z-index: 9999;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  animation: fadeIn 0.3s ease-out;
+
+  .countdown-content {
+    text-align: center;
+    
+    .countdown-label {
+      display: block;
+      color: $primary-aqua;
+      font-size: 2rem;
+      text-transform: uppercase;
+      letter-spacing: 4px;
+      margin-bottom: 1rem;
+      animation: pulseScale 1s infinite;
+    }
+
+    .countdown-number {
+      display: block;
+      color: $primary-yellow;
+      font-size: 12rem;
+      font-weight: 900;
+      line-height: 1;
+      text-shadow: 0 0 50px rgba(230, 189, 0, 0.5);
+      animation: zoomInNumber 1s infinite;
+    }
+  }
+}
+
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+@keyframes pulseScale {
+  0%, 100% { transform: scale(1); opacity: 0.8; }
+  50% { transform: scale(1.1); opacity: 1; }
+}
+@keyframes zoomInNumber {
+  0% { transform: scale(0.5); opacity: 0; }
+  30% { transform: scale(1.2); opacity: 1; }
+  100% { transform: scale(1); opacity: 0.8; }
+}

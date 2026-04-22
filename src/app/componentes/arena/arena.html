@@ -3,9 +3,6 @@
     <!-- Grupo Informativo (Izquierda en Desktop) -->
     <div class="header-info-group">
       <div class="batalla-info">
-        @if (roomCode && modo !== 'entrenamiento') {
-        <span class="sala-code">Sala {{roomCode}}</span>
-        }
         <span class="batalla-temas">{{getTematicasTexto()}}</span>
         <span class="dificultad dif-{{dificultad}}">{{dificultad}}</span>
       </div>
@@ -51,8 +48,25 @@
   </div>
   }
 
+  <!-- Intermedio de Ronda -->
+  @if (mostrarIntermedio) {
+  <div class="loading-state">
+    <div class="loading-content">
+      <div class="spinner-arena"></div>
+      <h2 style="color: #E6BD00;">🏁 ¡Ronda {{rondaActual - 1}} Finalizada!</h2>
+      <p>Puntaje Parcial: <strong style="color: #01BA9A; font-size: 2rem;">{{puntaje}}</strong> pts</p>
+      <div class="next-round-info">
+        <p>Siguiente desafío en...</p>
+        <div class="countdown-circle-small">
+          <span class="countdown-number">{{cuentaRegresivaIntermedio}}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+  }
+
   <!-- Arena activa -->
-  @if (estadoJuego === 'jugando') {
+  @if (estadoJuego === 'jugando' && !mostrarIntermedio) {
   <main class="arena-main">
     <div class="battle-section">
       <div class="progress-bar">
@@ -67,6 +81,10 @@
         @if (preguntaActualObj) {
         <div class="question-source">
           <span class="source-badge">{{preguntaActualObj.tematica}}</span>
+          <span class="source-badge" style="background: rgba(230, 189, 0, 0.2); color: #E6BD00; margin-left: 10px;">
+            {{preguntaActualObj.dificultad | uppercase}} 
+            (+{{preguntaActualObj.dificultad === 'killer' ? 30 : (preguntaActualObj.dificultad === 'conocedor' ? 20 : 10)}} pts)
+          </span>
           @if (preguntaActualObj.aportadoPor) {
           <span class="contributed-by">
             • {{preguntaActualObj.aportadoPor}}

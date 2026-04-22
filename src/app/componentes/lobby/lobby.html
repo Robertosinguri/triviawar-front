@@ -4,24 +4,30 @@
     <div class="lobby-layout">
       <main class="lobby-main">
 
-      <!-- Código de Sala -->
-      <div class="room-code-section">
-        <h2>✅ Sala Creada</h2>
-        <p class="share-text">Comparte este código con tus amigos:</p>
-
-        <div class="code-display">
-          <div class="room-code">
-            {{codigoSala || 'NO-CODE'}}
-          </div>
-          <button (click)="copiarCodigo()" [class.copied]="copiado" class="copy-btn-destacado"
-            style="background: transparent; color: #E6BD00; border: 1px solid #E6BD00; padding: 8px 12px; border-radius: 5px; cursor: pointer; font-weight: 500; font-size: 0.9rem; transition: all 0.3s ease;">
-            {{copiado ? '✓' : 'Copiar'}}
-          </button>
+      <!-- Información de la Sala -->
+      <div class="room-info-header" style="text-align: center; margin-bottom: 2rem;">
+        <h2 style="color: white; font-size: 2rem; margin-bottom: 5px;">🎮 {{sala?.nombre || 'Sala de Trivia'}}</h2>
+        <div style="display: flex; justify-content: center; align-items: center; gap: 15px;">
+          <span style="background: rgba(1, 186, 154, 0.2); color: #01BA9A; padding: 4px 12px; border-radius: 15px; font-size: 0.9rem;">
+            Estado: Esperando Jugadores
+          </span>
         </div>
+      </div>
 
-        <p class="validity-text">
-          Este código es válido hasta que termine la partida
-        </p>
+      <!-- Selección de temática para el jugador actual -->
+      <div style="background: rgba(255,255,255,0.1); border-radius: 12px; padding: 25px; margin: 0 auto 2rem; max-width: 600px; text-align: center; border: 1px solid rgba(1, 186, 154, 0.3);">
+        <h3 style="color: #01BA9A; margin-bottom: 5px;">Tu Configuración</h3>
+        <p style="color: #ccc; font-size: 0.9rem; margin-bottom: 20px;">Indica tu temática para generar preguntas (máximo 3 palabras).</p>
+        
+        <input type="text" [(ngModel)]="tematicaJugador" [disabled]="estaListo" 
+          placeholder="Ej: Star Wars, React JS, Fútbol Argentino..." 
+          style="padding: 12px 15px; width: 85%; border-radius: 8px; border: 1px solid #01BA9A; margin-bottom: 20px; background: rgba(0,0,0,0.4); color: white; font-size: 1.1rem;" />
+        <br>
+        <button (click)="toggleListo()"
+          [style.background]="estaListo ? 'rgba(230, 189, 0, 0.8)' : 'linear-gradient(45deg, #01BA9A, #00a085)'"
+          style="color: white; border: none; padding: 15px 40px; border-radius: 30px; font-size: 1.2rem; font-weight: bold; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 5px 15px rgba(0,0,0,0.3);">
+          {{estaListo ? '❌ Cancelar (No Listo)' : '✅ ¡Estoy Listo!'}}
+        </button>
       </div>
 
       <!-- Lista de Jugadores -->
@@ -41,6 +47,7 @@
           <div>
             @if (jugador.configurado) {
             <span style="color: #01BA9A;">✅ Listo</span>
+            <span style="color: #FFF; font-size: 0.8rem; margin-left: 10px;">Tema: {{jugador.tematica}}</span>
             } @else {
             <span style="color: #E6BD00;">⏳ Configurando...</span>
             }
@@ -57,28 +64,16 @@
         }
       </div>
 
-      <!-- Botón de Iniciar Partida (solo para host) -->
-      @if (esHost && todosListos()) {
-      <div style="text-align: center; margin-bottom: 2rem;">
-        <button (click)="iniciarPartida()" [disabled]="iniciandoPartida"
-          [style.background]="iniciandoPartida ? 'rgba(1, 186, 154, 0.5)' : 'linear-gradient(45deg, #01BA9A, #00a085)'"
-          [style.cursor]="iniciandoPartida ? 'not-allowed' : 'pointer'"
-          style="color: white; border: none; padding: 20px 40px; border-radius: 25px; font-size: 1.3rem; font-weight: 700; box-shadow: 0 5px 15px rgba(1, 186, 154, 0.4); transition: all 0.3s ease;">
-          {{iniciandoPartida ? '⏳ Iniciando...' : '🚀 Iniciar Partida'}}
-        </button>
-      </div>
-      }
-
       <!-- Estado del Juego -->
       <div style="text-align: center;">
-        @if (!todosListos()) {
+        @if (!todosListos() || jugadores.length < maxJugadores) {
         <p style="color: #E6BD00; font-size: 1.1rem; margin: 0;">
-          ⏳ Esperando que se unan más jugadores...
+          ⏳ Esperando que todos los jugadores se unan y estén listos...
         </p>
         }
-        @if (todosListos() && !esHost) {
+        @if (todosListos() && jugadores.length === maxJugadores) {
         <p style="color: #01BA9A; font-size: 1.1rem; margin: 0;">
-          ✅ Todos listos! Esperando que el host inicie la partida...
+          🚀 ¡Todos listos! La partida iniciará automáticamente en breve...
         </p>
         }
       </div>
@@ -87,6 +82,13 @@
     <aside class="lobby-sidebar">
       <app-chat mode="room" [roomId]="codigoSala"></app-chat>
     </aside>
+    <!-- Overlay de Inicio de Partida -->
+  <div class="game-starting-overlay" *ngIf="cuentaRegresiva > 0">
+    <div class="countdown-content">
+      <span class="countdown-label">¡Prepárate!</span>
+      <span class="countdown-number">{{cuentaRegresiva}}</span>
+    </div>
   </div>
+</div>
   </app-navbar>
 </div>

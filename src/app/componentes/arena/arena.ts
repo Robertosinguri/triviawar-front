@@ -36,7 +36,7 @@ export class ArenaComponent implements OnInit, OnDestroy {
   estadoJuego: 'cargando' | 'jugando' | 'finalizado' = 'cargando';
   preguntas: PreguntaArena[] = [];
   preguntaActual: number = 0;
-  totalPreguntas: number = 5;
+  totalPreguntas: number = 0;
 
   // Estado de la pregunta actual
   preguntaActualObj: PreguntaArena | null = null;
@@ -44,8 +44,14 @@ export class ArenaComponent implements OnInit, OnDestroy {
   mostrarRespuesta: boolean = false;
   respuestaCorrecta: boolean = false;
 
+  // Rondas
+  rondaActual: number = 1;
+  mostrarIntermedio: boolean = false;
+  cuentaRegresivaIntermedio: number = 0;
+
   // Puntaje y tiempo
   puntaje: number = 0;
+  correctasCount: number = 0;
   tiempoRestante: number = 30;
   tiempoInicio: number = 0;
   timerInterval: any;
@@ -227,7 +233,13 @@ export class ArenaComponent implements OnInit, OnDestroy {
 
       if (this.respuestaSeleccionada === this.preguntaActualObj.respuestaCorrecta) {
         this.respuestaCorrecta = true;
-        this.puntaje++;
+        this.correctasCount++;
+        
+        let puntosBase = 10;
+        if (this.preguntaActualObj.dificultad === 'conocedor') puntosBase = 20;
+        else if (this.preguntaActualObj.dificultad === 'killer') puntosBase = 30;
+
+        this.puntaje += puntosBase;
         this.audioService.play('correcto'); //  Agregado
       } else {
         this.respuestaCorrecta = false;
@@ -241,9 +253,31 @@ export class ArenaComponent implements OnInit, OnDestroy {
     if (this.esUltimaPregunta()) {
       this.finalizarArena();
     } else {
-      this.preguntaActual++;
-      this.cargarPreguntaActual();
-      this.iniciarTimer();
+      const preguntasPorRonda = this.tematicas.length || 1;
+      // Si completamos la ronda (múltiplo exacto)
+      if ((this.preguntaActual + 1) % preguntasPorRonda === 0) {
+        this.mostrarIntermedio = true;
+        this.rondaActual++;
+        this.limpiarTimer();
+        this.cuentaRegresivaIntermedio = 5;
+
+        const intervalTimer = setInterval(() => {
+          this.cuentaRegresivaIntermedio--;
+          this.cdr.detectChanges();
+          if (this.cuentaRegresivaIntermedio <= 0) {
+            clearInterval(intervalTimer);
+            this.mostrarIntermedio = false;
+            this.preguntaActual++;
+            this.cargarPreguntaActual();
+            this.iniciarTimer();
+            this.cdr.detectChanges();
+          }
+        }, 1000);
+      } else {
+        this.preguntaActual++;
+        this.cargarPreguntaActual();
+        this.iniciarTimer();
+      }
     }
   }
 
@@ -270,7 +304,7 @@ export class ArenaComponent implements OnInit, OnDestroy {
           userId,
           username: displayName,
           puntaje: this.puntaje,
-          respuestasCorrectas: this.puntaje,
+          respuestasCorrectas: this.correctasCount,
           totalPreguntas: this.totalPreguntas,
           tiempoTotal,
           tematica: this.tematicas.join(','),

@@ -36,12 +36,12 @@ export class LobbyComponent implements OnInit, OnDestroy {
   maxJugadores: number = 4;
   emailInvitacion: string = '';
 
-  // Modal
-  mostrarConfigModal = false;
-  configuracionJugador = { tematica: '', dificultad: '' };
+  tematicaJugador: string = '';
+  estaListo: boolean = false;
 
   isLoading = false;
-  iniciandoPartida = false; // Agregado
+  iniciandoPartida = false;
+  cuentaRegresiva: number = 0;
 
   async ngOnInit() {
     const user = this.authService.usuarioActual();
@@ -84,6 +84,14 @@ export class LobbyComponent implements OnInit, OnDestroy {
           this.sala = sala;
           this.jugadores = sala.jugadores || [];
           this.maxJugadores = sala.maxJugadores;
+
+          // Sincronizar estado local si viene del servidor
+          const me = this.jugadores.find(j => j.id === this.currentUser?.id);
+          if (me) {
+            this.estaListo = me.configurado;
+            if (me.tematica) this.tematicaJugador = me.tematica;
+          }
+
           this.cdr.detectChanges();
         }
       })
@@ -92,21 +100,39 @@ export class LobbyComponent implements OnInit, OnDestroy {
     // Escuchar inicio de juego
     this.subs.add(
       this.socketService.onGameStarted().subscribe((gameData) => {
-        console.log('🚀 Juego iniciado! Saltando a la arena...');
-        this.router.navigate(['/arena'], {
-          queryParams: {
-            roomCode: this.codigoSala
-          },
-          state: {
-            gameData: gameData
+        console.log('🚀 Juego listo! Iniciando cuenta regresiva...');
+        this.cuentaRegresiva = 3;
+        
+        const timer = setInterval(() => {
+          this.cuentaRegresiva--;
+          this.cdr.detectChanges();
+          
+          if (this.cuentaRegresiva <= 0) {
+            clearInterval(timer);
+            this.router.navigate(['/arena'], {
+              queryParams: { roomCode: this.codigoSala },
+              state: { gameData: gameData }
+            });
           }
-        });
+        }, 1000);
       })
     );
 
     // Escuchar errores
     this.subs.add(
-      this.socketService.onError().subscribe(err => console.error('Socket error:', err))
+      this.socketService.onError().subscribe((err: any) => {
+        console.error('Socket error:', err);
+        if (err && err.message && err.message.includes('tema ya fue elegido')) {
+          alert('Esa temática ya fue elegida por otro jugador. ¡Elige otra!');
+          this.estaListo = false;
+          // Revertir en backend
+          this.socketService.updateConfig(this.codigoSala, this.currentUser.id, {
+            tematica: '',
+            configurado: false
+          });
+          this.cdr.detectChanges();
+        }
+      })
     );
   }
 
@@ -143,17 +169,24 @@ export class LobbyComponent implements OnInit, OnDestroy {
   volver() { this.salirSala(); }
 
   // Configuración de jugador
-  abrirConfiguracion() { this.mostrarConfigModal = true; }
-  cerrarConfiguracion() { this.mostrarConfigModal = false; }
-
-  guardarConfiguracion() {
-    if (!this.configuracionJugador.tematica) return;
-
-    this.socketService.updateConfig(this.codigoSala, this.currentUser.id, {
-      tematica: this.configuracionJugador.tematica,
-      dificultad: this.configuracionJugador.dificultad || 'baby'
-    });
-    this.cerrarConfiguracion();
+  toggleListo() {
+    if (!this.estaListo) {
+      if (!this.tematicaJugador.trim()) {
+        alert('Por favor ingresa una temática para jugar.');
+        return;
+      }
+      this.estaListo = true;
+      this.socketService.updateConfig(this.codigoSala, this.currentUser.id, {
+        tematica: this.tematicaJugador.trim(),
+        configurado: true
+      });
+    } else {
+      this.estaListo = false;
+      this.socketService.updateConfig(this.codigoSala, this.currentUser.id, {
+        tematica: '',
+        configurado: false
+      });
+    }
   }
 
   ngOnDestroy() {

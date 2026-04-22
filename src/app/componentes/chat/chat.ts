@@ -1,9 +1,10 @@
-import { Component, Input, OnInit, OnDestroy, OnChanges, SimpleChanges, inject, ViewChild, ElementRef, effect, signal, untracked } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject, ViewChild, ElementRef, HostListener, signal, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { ChatService, ChatMessage, GroupUpdateMessage } from '../../servicios/chat.service';
-import { ChatStateService, PrivateMessage } from '../../servicios/chat-state.service';
 import { Subscription } from 'rxjs';
+import { ChatService, ChatMessage } from '../../servicios/chat.service';
+import { ChatStateService } from '../../servicios/chat-state.service';
+import { SocketService } from '../../servicios/websocket/socket.service';
 
 @Component({
   selector: 'app-chat',
@@ -12,523 +13,226 @@ import { Subscription } from 'rxjs';
   templateUrl: './chat.html',
   styleUrls: ['./chat.scss']
 })
-export class ChatComponent implements OnInit, OnDestroy, OnChanges {
-  @Input() mode: 'global' | 'room' = 'global';
-  @Input() roomId: string | null = null;
-  
+export class ChatComponent implements OnInit, OnDestroy {
   @ViewChild('scrollMe') private myScrollContainer!: ElementRef;
 
   private chatService = inject(ChatService);
   private chatState = inject(ChatStateService);
-  
-  // === ACCESO DIRECTO A LOS SIGNALS DEL ESTADO PERSISTENTE ===
-  
-  // Estado del chat (persistente durante toda la sesión)
+  private socketService = inject(SocketService);
+
+  // Señales del estado del chat
   messages = this.chatState.messages;
-  privateMessages = this.chatState.privateMessages;
   connectedUsers = this.chatState.connectedUsers;
-  activeTab = this.chatState.activeTab;
-  
-  // Mensajes separados por pestaña
+  username = this.chatState.username;
   publicMessage = this.chatState.publicMessage;
-  privateMessage = this.chatState.privateMessage;
-  
-  // Grupo privado persistente
-  privateGroupMembers = this.chatState.privateGroupMembers;
-  
-  // Estado de UI
   showEmojiPicker = this.chatState.showEmojiPicker;
-  showUserSuggestions = this.chatState.showUserSuggestions;
-  isConnected = this.chatState.isConnected;
   isMobileExpanded = this.chatState.isMobileExpanded;
   unreadCount = this.chatState.unreadCount;
-  
-  // Computed signals del estado
-  username = this.chatState.username;
   hasMessages = this.chatState.hasMessages;
   messagesCount = this.chatState.messagesCount;
-  privateMessagesCount = this.chatState.privateMessagesCount;
-  filteredUsers = this.chatState.filteredUsers;
-  hasPrivateGroup = this.chatState.hasPrivateGroup;
   currentMessage = this.chatState.currentMessage;
+
+  // Inputs del componente
+  @Input() mode: 'global' | 'room' = 'global';
+  @Input() roomId?: string;
+
+  // Señales locales
+  modeSignal = signal<'global' | 'room'>('global');
+  isSending = false;
+  isReconnecting = false;
+  clickListenerAdded = false;
+  scrollTimeout: any = null;
   
   // Emojis comunes
   commonEmojis = this.chatState.commonEmojis;
-  
+
   private subscriptions = new Subscription();
-  private isSending = false; 
-  private isReconnecting = false; 
-  private clickListenerAdded = false;
-  private scrollTimeout: any = null;
-
-  // Señales internas para reactividad de inputs
-  public roomIdSignal = signal<string | null>(null);
-  public modeSignal = signal<'global' | 'room'>('global');
-
-  constructor() {
-    // EL MOTOR MAESTRO: Reacciona a cualquier cambio de Identidad, Sala o Conexión
-    effect(() => {
-      const user = this.username();
-      const room = this.roomIdSignal();
-      const connected = this.isConnected();
-      const mode = this.modeSignal();
-
-      // No sincronizar si no hay conexión o el usuario es el genérico inicial
-      if (!connected) return;
-
-      untracked(() => {
-        this.masterSync(user, room, mode);
-      });
-    });
-  }
-
-  ngOnChanges(changes: SimpleChanges) {
-    if (changes['roomId']) {
-      this.roomIdSignal.set(changes['roomId'].currentValue);
-    }
-    if (changes['mode']) {
-      this.modeSignal.set(changes['mode'].currentValue);
-    }
-  }
-
-
 
   ngOnInit() {
-    // Asegurar conexión de socket
-    this.chatService.connect();
+    console.log('💬 ChatComponent inicializado');
+    this.setupSocketListeners();
+    this.autoJoinChat();
+  }
 
-    // Actualizar estado de conexión inicial
-    if (this.chatService.isConnected()) {
-      this.chatState.updateConnectionStatus(true);
-    }
+  ngOnDestroy() {
+    console.log('💬 ChatComponent destruido');
+    this.subscriptions.unsubscribe();
+    this.removeClickListener();
+  }
 
-    // Escuchar eventos de conexión (para futuras reconexiones)
-    this.subscriptions.add(
-      this.chatService.onConnect().subscribe(() => {
-        console.log('✅ [Chat] Socket conectado/reconectado');
-        this.chatState.updateConnectionStatus(true);
-        this.isReconnecting = true;
-        
-        // El 'effect' se encargará de la sincronización al detectar isConnected() -> true
-        
-        setTimeout(() => { this.isReconnecting = false; }, 2000);
-      })
-    );
-
-    // Escuchar errores de conexión
-    this.subscriptions.add(
-      this.chatService.onError().subscribe((error) => {
-        console.error('❌ Error en socket de chat:', error);
-        this.chatState.updateConnectionStatus(false);
-      })
-    );
-
-    // Escuchar desconexión
-    this.subscriptions.add(
-      this.chatService.onDisconnect().subscribe(() => {
-        console.log('🔌 Socket desconectado');
-        this.chatState.updateConnectionStatus(false);
-      })
-    );
-
-    // ESCUCHAR MENSAJES GLOBALES
+  private setupSocketListeners() {
+    // Escuchar mensajes del chat
     this.subscriptions.add(
       this.chatService.onMessage().subscribe((msg: ChatMessage) => {
-        console.log('📬 Mensaje recibido:', msg.text);
-        
-        // Procesar todo como global (sin filtros de sala por instrucción del usuario)
-        this.addMessageWithScroll(msg);
-
-        // Manejo de notificaciones en móvil
-        if (!this.isMobileExpanded() && !msg.isSystem) {
-          this.unreadCount.update(c => c + 1);
-        }
+        console.log('📩 Mensaje recibido:', msg.text, 'de:', msg.username);
+        this.chatState.addMessage(msg);
+        this.scrollToBottom();
       })
     );
 
-    // ESCUCHAR MENSAJES PRIVADOS (con grupos bidireccionales)
+    // Escuchar historial de mensajes
     this.subscriptions.add(
-      this.chatService.onPrivateMessage().subscribe((msg: any) => {
-        console.log('📬 Mensaje PRIVADO recibido:', msg);
-        
-        // Convertir a formato PrivateMessage
-        const privateMsg: PrivateMessage = {
-          id: msg.id || `pm-${Date.now()}`,
-          text: msg.text,
-          username: msg.username,
-          target: msg.target || msg.targetUsername || 'varios',
-          timestamp: new Date(msg.timestamp || Date.now()),
-          isPrivate: true
-        };
-        
-        // Agregar al estado persistente
-        this.chatState.addPrivateMessage(privateMsg);
-        
-        // === GRUPOS BIDIRECCIONALES AUTOMÁTICOS ===
-        // Si el mensaje tiene información de grupo bidireccional
-        if (msg.groupAction === 'add_mutual' && msg.mutualUsers) {
-          console.log('👥 [Grupo Bidireccional] Agregando usuarios mutuamente:', msg.mutualUsers);
-          
-          // Agregar todos los usuarios mutuos a nuestro grupo
-          msg.mutualUsers.forEach((user: string) => {
-            if (user !== this.username()) {
-              this.chatState.addToPrivateGroup(user);
-            }
-          });
-        }
-        
-        // Si el mensaje viene de otro usuario, agregarlo automáticamente a nuestro grupo
-        if (msg.username !== this.username()) {
-          console.log(`👥 [Auto-agregar] Agregando ${msg.username} a nuestro grupo privado`);
-          this.chatState.addToPrivateGroup(msg.username);
-        }
-        
-        // Scroll si estamos en pestaña de privados
-        if (this.activeTab() === 'private') {
-          this.scheduleScroll();
-        }
-
-        // Manejo de notificaciones en móvil para privados
-        if (!this.isMobileExpanded() && msg.username !== this.username()) {
-          this.unreadCount.update(c => c + 1);
-        }
+      this.chatService.onHistory().subscribe((history: ChatMessage[]) => {
+        console.log('📜 Historial recibido:', history.length, 'mensajes');
+        this.chatState.loadHistory(history);
+        this.scrollToBottom();
       })
     );
 
-    // ESCUCHAR ACTUALIZACIONES DE GRUPO (Única fuente de verdad)
-    this.subscriptions.add(
-      this.chatService.onGroupUpdate().subscribe((update: GroupUpdateMessage) => {
-        if (update.username === this.username()) {
-          console.log('👥 [ChatSync] Actualización de grupo recibida:', update.members);
-          const newMembers = update.members.filter(m => m !== this.username());
-          this.chatState.setPrivateGroup(newMembers);
-        }
-      })
-    );
-
-    // ESCUCHAR INFORMACIÓN INICIAL DE GRUPO
-    this.subscriptions.add(
-      this.chatService.onGroupInfo().subscribe((info: GroupUpdateMessage) => {
-        if (info.username === this.username()) {
-          console.log('👥 [ChatSync] Info inicial de grupo recibida:', info.members);
-          const newMembers = info.members.filter(m => m !== this.username());
-          this.chatState.setPrivateGroup(newMembers);
-        }
-      })
-    );
-
-    // ESCUCHAR LISTA DE USUARIOS
+    // Escuchar lista de usuarios conectados
     this.subscriptions.add(
       this.chatService.onUsersList().subscribe((users: string[]) => {
+        console.log('👥 Usuarios conectados actualizados:', users.length);
         this.chatState.updateConnectedUsers(users);
       })
     );
 
-    // Escuchar historial (siempre global ahora)
+    // Escuchar eventos de conexión
     this.subscriptions.add(
-      this.chatService.onHistory().subscribe((history: ChatMessage[]) => {
-        // Ignorar historial si estamos en proceso de reconexión
-        if (this.isReconnecting) {
-          console.log('📜 [Chat] Ignorando historial durante reconexión');
-          return;
-        }
-        
-        console.log('📜 Historial cargado:', history.length, 'mensajes');
-        this.chatState.loadHistory(history);
-        this.scheduleScroll();
+      this.chatService.onConnect().subscribe(() => {
+        console.log('✅ Socket conectado');
+        this.chatState.updateConnectionStatus(true);
+        this.isReconnecting = false;
+        this.autoJoinChat();
+      })
+    );
+
+    this.subscriptions.add(
+      this.chatService.onDisconnect().subscribe(() => {
+        console.log('❌ Socket desconectado');
+        this.chatState.updateConnectionStatus(false);
+      })
+    );
+
+    this.subscriptions.add(
+      this.chatService.onError().subscribe((error) => {
+        console.error('⚠️ Error de conexión socket:', error);
+        this.chatState.updateConnectionStatus(false);
       })
     );
   }
 
-  onInputChange(event: any) {
-    const text = this.privateMessage();
-    const index = text.lastIndexOf('@');
-    
-    // Mostrar sugerencias solo en pestaña Privado
-    if (this.activeTab() === 'private' && index !== -1) {
-      const query = text.substring(index + 1);
-      this.showUserSuggestions.set(!query.includes(' '));
-    } else {
-      this.showUserSuggestions.set(false);
-    }
-  }
+  private autoJoinChat() {
+    const username = this.username();
+    const currentSessionUser = this.chatState.activeSessionUser();
 
-  selectMention(user: string) {
-    const text = this.privateMessage();
-    const index = text.lastIndexOf('@');
-    const newText = text.substring(0, index) + '@' + user + ' ';
-    this.privateMessage.set(newText);
-    this.showUserSuggestions.set(false);
-    
-    // Devolver foco al input
-    setTimeout(() => {
-      const input = document.querySelector('.chat-input-area input') as HTMLInputElement;
-      if (input) input.focus();
-    }, 0);
-  }
-
-  switchTab(tab: 'global' | 'private') {
-    this.chatState.switchTab(tab);
-    this.showEmojiPicker.set(false);
-    this.removeDocumentClickListener();
-    this.scheduleScroll();
-  }
-
-  // Formatear destinos para mostrar en UI
-  formatTargets(target: string): string {
-    if (!target || target === 'varios') return 'varios usuarios';
-    if (target.includes(',')) {
-      const users = target.split(',').map(u => `@${u.trim()}`).join(' ');
-      return users;
-    }
-    return `@${target}`;
-  }
-
-  // Formatear miembros del grupo privado
-  formatGroupMembers(): string {
-    const members = this.privateGroupMembers();
-    if (members.length === 0) return 'Ningún usuario agregado';
-    if (members.length === 1) return `@${members[0]}`;
-    return `${members.length} usuarios: ${members.map(u => `@${u}`).join(' ')}`;
-  }
-
-  private addMessageWithScroll(msg: ChatMessage) {
-    // Agregar al estado persistente
-    this.chatState.addMessage(msg);
-    
-    // Scroll si estamos en pestaña global
-    if (this.activeTab() === 'global') {
-      this.scheduleScroll();
-    }
-  }
-
-  private scheduleScroll() {
-    if (this.scrollTimeout) {
-      clearTimeout(this.scrollTimeout);
-    }
-    this.scrollTimeout = setTimeout(() => {
-      this.scrollToBottom();
-    }, 50);
-  }
-
-  private scrollToBottom(): void {
-    try {
-      if (this.myScrollContainer && this.myScrollContainer.nativeElement) {
-        const element = this.myScrollContainer.nativeElement;
-        element.scrollTo({
-          top: element.scrollHeight,
-          behavior: 'smooth'
-        });
+    // Solo unirse si no estamos ya en la sesión
+    if (username && username !== currentSessionUser) {
+      console.log(`🤝 Auto-uniéndose al chat como: ${username}, modo: ${this.mode}, sala: ${this.roomId || 'global'}`);
+      
+      // Limpiar historial del chat anterior si hay cambio de usuario
+      if (currentSessionUser && currentSessionUser !== 'Invitado') {
+        console.log(`🔄 Cambio de usuario detectado: ${currentSessionUser} -> ${username}. Limpiando chat.`);
+        this.chatState.clearAllChatState();
       }
-    } catch (err) {}
+      
+      this.chatService.joinChat(username, this.roomId);
+      this.chatState.activeSessionUser.set(username);
+    }
   }
 
+  // Métodos de UI
   toggleMobileChat() {
-    const newState = !this.isMobileExpanded();
-    this.isMobileExpanded.set(newState);
-    if (newState) {
+    this.isMobileExpanded.set(!this.isMobileExpanded());
+    if (this.isMobileExpanded()) {
       this.unreadCount.set(0);
-      this.scheduleScroll();
+      this.scrollToBottom();
     }
   }
 
-  ngOnDestroy() {
-    this.subscriptions.unsubscribe();
-    this.removeDocumentClickListener();
-    if (this.scrollTimeout) {
-      clearTimeout(this.scrollTimeout);
+  toggleEmojiPicker(event?: Event) {
+    if (event) {
+      event.stopPropagation();
+    }
+    this.showEmojiPicker.set(!this.showEmojiPicker());
+    
+    if (this.showEmojiPicker() && !this.clickListenerAdded) {
+      setTimeout(() => {
+        document.addEventListener('click', this.handleOutsideClick.bind(this));
+        this.clickListenerAdded = true;
+      }, 0);
     }
   }
 
-  // === MÉTODOS SEPARADOS PARA CADA CHAT ===
+  private handleOutsideClick(event: Event) {
+    const target = event.target as HTMLElement;
+    if (!target.closest('.emoji-picker-popup') && !target.closest('.emoji-trigger')) {
+      this.showEmojiPicker.set(false);
+      this.removeClickListener();
+    }
+  }
 
-  // Enviar mensaje PÚBLICO (global o sala)
+  private removeClickListener() {
+    if (this.clickListenerAdded) {
+      document.removeEventListener('click', this.handleOutsideClick.bind(this));
+      this.clickListenerAdded = false;
+    }
+  }
+
+  addEmoji(emoji: string) {
+    const current = this.publicMessage();
+    this.publicMessage.set(current + emoji);
+    this.showEmojiPicker.set(false);
+    this.removeClickListener();
+  }
+
+  // Enviar mensaje público
   sendPublicMessage() {
     const text = this.publicMessage().trim();
-    if (!text || this.isSending) return;
+    const username = this.username();
 
-    this.isSending = true;
-    this.chatService.sendMessage(text, this.username(), null); // Siempre sin roomId
-    this.publicMessage.set('');
-    this.showEmojiPicker.set(false);
-    this.removeDocumentClickListener();
-    this.scheduleScroll();
-    
-    // Resetear flag después de un breve delay para permitir nuevo envío
-    setTimeout(() => {
-      this.isSending = false;
-    }, 500);
-  }
-
-  // Enviar mensaje PRIVADO al grupo (con grupos bidireccionales)
-  sendPrivateMessage() {
-    const text = this.privateMessage().trim();
-    if (!text || this.isSending) return;
-
-    this.isSending = true;
-
-    // Detectar si hay menciones @ para agregar al grupo
-    if (text.includes('@')) {
-      const mentionedUsers: string[] = [];
-      let currentText = text;
-      
-      while (currentText.includes('@')) {
-        const atIndex = currentText.indexOf('@');
-        const afterAt = currentText.substring(atIndex + 1);
-        const spaceIndex = afterAt.indexOf(' ');
-        
-        if (spaceIndex === -1) {
-          // Última palabra (el mensaje)
-          break;
-        }
-        
-        const username = afterAt.substring(0, spaceIndex);
-        if (username && this.connectedUsers().includes(username)) {
-          mentionedUsers.push(username);
-        }
-        
-        // Continuar con el resto del texto
-        currentText = afterAt.substring(spaceIndex);
-      }
-      
-      // Agregar usuarios mencionados al grupo privado
-      if (mentionedUsers.length > 0) {
-        this.chatState.addMultipleToPrivateGroup(mentionedUsers);
-        console.log(`👥 Usuarios agregados a nuestro grupo:`, mentionedUsers);
-      }
-      
-      // Extraer el mensaje (todo después del último @usuario)
-      const lastAtIndex = text.lastIndexOf('@');
-      const afterLastAt = text.substring(lastAtIndex + 1);
-      const lastSpaceIndex = afterLastAt.indexOf(' ');
-      const messagePart = afterLastAt.substring(lastSpaceIndex + 1);
-      
-      if (messagePart.trim()) {
-        this.sendPrivateMessageToGroup(messagePart, mentionedUsers);
-        this.privateMessage.set('');
-        this.isSending = false;
-        return;
-      }
-    }
-    
-    // Si no hay @, enviar a todo el grupo privado
-    this.sendPrivateMessageToGroup(text, []);
-    this.privateMessage.set('');
-    this.isSending = false;
-  }
-
-  // Enviar mensaje a todos los miembros del grupo privado
-  private sendPrivateMessageToGroup(text: string, newlyAddedUsers: string[] = []) {
-    const groupMembers = this.privateGroupMembers();
-    
-    if (groupMembers.length === 0) {
-      console.warn('⚠️ No hay usuarios en el grupo privado');
-      this.isSending = false;
+    if (!text || !username || this.isSending) {
       return;
     }
+
+    this.isSending = true;
     
-    console.log(`📤 Enviando mensaje PRIVADO a ${groupMembers.length} usuarios:`, groupMembers);
-    
-    // Enviar a cada miembro del grupo (con grupos bidireccionales)
-    this.chatService.sendPrivateMessage(groupMembers, text, this.username());
-    
-    // NOTA: NO agregamos el mensaje localmente aquí porque el backend
-    // enviará una copia de vuelta al remitente (línea 144 en chatHandler.js)
-    // Esto evita duplicación de mensajes.
-    
-    this.showEmojiPicker.set(false);
-    this.scheduleScroll();
+    try {
+      this.chatService.sendMessage(text, username, this.roomId);
+      this.publicMessage.set('');
+      
+      // Incrementar contador de no leídos si el chat está colapsado en móvil
+      if (!this.isMobileExpanded()) {
+        this.unreadCount.update(count => count + 1);
+      }
+    } catch (error) {
+      console.error('❌ Error enviando mensaje:', error);
+    } finally {
+      this.isSending = false;
+    }
   }
 
-  // Método general para enviar mensaje (compatibilidad)
-  sendMessage() {
-    if (this.activeTab() === 'global') {
-      this.sendPublicMessage();
-    } else {
-      this.sendPrivateMessage();
-    }
+  // Utilidades
+  isUserOnline(username: string): boolean {
+    return this.connectedUsers().includes(username);
   }
 
   formatTime(date: any): string {
     return this.chatState.formatTime(date);
   }
 
-  // === LÓGICA MAESTRA DE SINCRONIZACIÓN (UNIFICADA) ===
-  private masterSync(user: string, room: string | null, mode: 'global' | 'room') {
-    // Solo sincronizamos si cambia el USUARIO (Identidad) y no coincide con la sesión activa global
-    if (user === this.chatState.activeSessionUser()) {
-      return;
+  scrollToBottom() {
+    if (this.scrollTimeout) {
+      clearTimeout(this.scrollTimeout);
     }
 
-    console.log(`📡 [Chat MasterSync] Sincronizando identidad para: ${user}`);
-
-    // Unirse al canal GLOBAL del usuario (siempre, sin importar el modo o la sala)
-    // El mode/roomId son solo visuales (CSS, títulos)
-    this.chatService.joinChat(user, null);
-
-    // Actualizar la sesión activa global
-    this.chatState.activeSessionUser.set(user);
-
-    // Asegurar grupo privado
-    setTimeout(() => {
-      this.chatService.getPrivateGroup(user);
-    }, 500);
+    this.scrollTimeout = setTimeout(() => {
+      try {
+        if (this.myScrollContainer?.nativeElement) {
+          const element = this.myScrollContainer.nativeElement;
+          element.scrollTop = element.scrollHeight;
+        }
+      } catch (err) {
+        console.warn('⚠️ Error al hacer scroll:', err);
+      }
+    }, 100);
   }
 
-  removeUserFromPrivateGroup(user: string) {
-    console.log('👥 [Chat] Solicitando desconexión bidireccional del privado:', user);
-    
-    // Notificar al servidor para que el "divorcio" sea mutuo
-    this.chatService.leavePrivateGroup(user, this.username());
-    
-    // Si ya no quedan usuarios, cerrar el selector de emojis si estaba abierto
-    if (this.privateGroupMembers().length <= 1) {
-      this.showEmojiPicker.set(false);
-    }
-  }
-
-  toggleEmojiPicker(event: Event) {
-    event.preventDefault();
-    event.stopPropagation();
-    this.showEmojiPicker.update(current => !current);
-    if (this.showEmojiPicker()) this.addDocumentClickListener();
-    else this.removeDocumentClickListener();
-  }
-
-  addEmoji(emoji: string) {
-    if (this.activeTab() === 'global') {
-      this.publicMessage.update(current => current + emoji);
-    } else {
-      this.privateMessage.update(current => current + emoji);
-    }
-    
-    setTimeout(() => {
-      const input = document.querySelector('.chat-input-area input') as HTMLInputElement;
-      if (input) input.focus();
-    }, 0);
-  }
-
-  private addDocumentClickListener() {
-    if (!this.clickListenerAdded) {
-      setTimeout(() => {
-        document.addEventListener('click', this.handleDocumentClick.bind(this), true);
-        this.clickListenerAdded = true;
-      }, 0);
-    }
-  }
-
-  private removeDocumentClickListener() {
-    if (this.clickListenerAdded) {
-      document.removeEventListener('click', this.handleDocumentClick.bind(this), true);
-      this.clickListenerAdded = false;
-    }
-  }
-
-  private handleDocumentClick(event: MouseEvent) {
-    const target = event.target as HTMLElement;
-    if (this.showEmojiPicker() && !target.closest('.emoji-picker-popup') && !target.closest('.emoji-trigger')) {
-      this.showEmojiPicker.set(false);
-      this.removeDocumentClickListener();
+  @HostListener('window:resize')
+  onResize() {
+    // En móvil, si el chat está expandido, hacer scroll al fondo
+    if (this.isMobileExpanded()) {
+      this.scrollToBottom();
     }
   }
 }

@@ -14,7 +14,7 @@
             <h4>{{ganador?.username || 'Cargando...'}}</h4>
             <div class="ganador-stats">
               <div class="stat">
-                <span class="valor">{{ganador?.puntaje || 0}}/5</span>
+                <span class="valor">{{ganador?.respuestasCorrectas || 0}}/{{ganador?.totalPreguntas || 0}}</span>
                 <span class="label">correctas</span>
               </div>
               <div class="stat">
@@ -35,7 +35,7 @@
               <div class="jugador-info">
                 <span class="nombre">{{resultado.username}}</span>
               </div>
-              <span class="puntaje">{{resultado.puntaje}}/5</span>
+              <span class="puntaje">{{resultado.respuestasCorrectas || 0}}/{{resultado.totalPreguntas || 0}}</span>
             </div>
             }
           </div>
@@ -54,7 +54,7 @@
             }
             <div class="resultado-stats">
               <div class="stat-item">
-                <span class="numero">{{miResultado?.puntaje || 0}}/5</span>
+                <span class="numero">{{miResultado?.respuestasCorrectas || 0}}/{{miResultado?.totalPreguntas || 0}}</span>
                 <span class="descripcion">Correctas</span>
               </div>
               <div class="stat-item">

@@ -111,11 +111,12 @@ export class NavbarMobileComponent implements OnInit {
   async logout() {
     try {
       // Limpiar estado del chat antes de hacer logout
-      this.chatStateService.clearMessages();
-      this.chatStateService.clearPrivateGroup();
+      this.chatStateService.clearAllChatState();
+      
+      // Desconectar socket y prevenir reconexión automática
+      this.socketService.disconnect();
       
       await this.authService.logout();
-      this.socketService.disconnect();
       this.router.navigate(['/login']);
     } catch (error) {
       console.error('Error en logout:', error);
