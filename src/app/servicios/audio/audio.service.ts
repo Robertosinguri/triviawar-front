@@ -136,7 +136,7 @@ export class AudioService {
   }
 
   playFondoDashboard() {
-  this.reproducirMusicaLarga('fondoDashboard', 0.25);
+  this.reproducirMusicaLarga('dashboard', 0.25);
 }
 
   private reproducirMusicaLarga(nombre: string, volumenObjetivo: number) {
@@ -180,7 +180,7 @@ export class AudioService {
   }
 
   stopFondoDashboard() {
-  this.stop('fondoDashboard');
+  this.stop('dashboard');
 }
 
 
