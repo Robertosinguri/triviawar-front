@@ -82,7 +82,7 @@ export class ResultadosComponent implements OnInit {
       const user = this.authService.usuarioActual();
       // Usar uid primero, luego email, igual que en Arena
       this.miUserId = user?.uid || user?.email || 'anon-' + Date.now();
-      this.nombreUsuarioActual = user?.name || user?.username || 'Mi Usuario';
+      this.nombreUsuarioActual = user?.username || user?.name || 'Mi Usuario';
       console.log('👤 Usuario identificado:', this.miUserId, this.nombreUsuarioActual);
     } catch (error) {
       this.miUserId = 'anon-' + Date.now();

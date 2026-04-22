@@ -59,7 +59,7 @@ export class NavbarComponent implements OnInit, OnDestroy {
 
   getUserName(): string {
     const user = this.authService.usuarioActual();
-    return user?.name || user?.email?.split('@')[0] || user?.username || 'Usuario';
+    return user?.username || user?.name || user?.email?.split('@')[0] || 'Usuario';
   }
 
   getUserEmail(): string {

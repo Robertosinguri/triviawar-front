@@ -1,5 +1,5 @@
 import { Injectable, signal, Optional, inject } from '@angular/core';
-import { Auth, signInWithEmailAndPassword, createUserWithEmailAndPassword, updateProfile, User, authState, signOut } from '@angular/fire/auth';
+import { Auth, signInWithEmailAndPassword, createUserWithEmailAndPassword, updateProfile, User, authState, signOut, signInWithPopup, GoogleAuthProvider } from '@angular/fire/auth';
 import { BehaviorSubject, Observable, from } from 'rxjs';
 import { map, catchError } from 'rxjs/operators';
 import { HttpClient } from '@angular/common/http';
@@ -108,6 +108,34 @@ export class FirebaseAuthService {
         }
     }
 
+    async loginWithGoogle(): Promise<{ success: boolean; isNewUser?: boolean }> {
+        this.isLoading.set(true);
+        this.error.set(null);
+        try {
+            const provider = new GoogleAuthProvider();
+            const result = await signInWithPopup(this.auth, provider);
+            const user = result.user;
+            const idToken = await user.getIdToken();
+
+            // Enviar token al backend para sincronizar
+            const response: any = await this.http.post(`${this.API_URL}/google-login`, {
+                idToken
+            }).toPromise();
+
+            if (response.success) {
+                this.updateSignals(response.user);
+                return { success: true, isNewUser: response.user.isNewUser };
+            }
+            return { success: false };
+        } catch (e: any) {
+            console.error('❌ Error en Google Login:', e);
+            this.error.set(this.getErrorMessage(e));
+            return { success: false };
+        } finally {
+            this.isLoading.set(false);
+        }
+    }
+
     async signUp(data: SignUpData): Promise<boolean> {
         this.isLoading.set(true);
         this.error.set(null);
@@ -140,6 +168,36 @@ export class FirebaseAuthService {
             this.currentUser.set(null);
         } catch (e: any) {
             console.error(e);
+        } finally {
+            this.isLoading.set(false);
+        }
+    }
+
+    async actualizarPerfilCompleto(name: string, picture: string): Promise<boolean> {
+        const user = this.currentUser();
+        if (!user || !user.uid) return false;
+
+        this.isLoading.set(true);
+        try {
+            const response: any = await this.http.post(`${this.API_URL}/update-profile`, {
+                uid: user.uid,
+                picture: picture,
+                name: name
+            }).toPromise();
+
+            if (response.success) {
+                this.currentUser.set({
+                    ...user,
+                    username: name,
+                    name: name,
+                    picture: picture
+                });
+                return true;
+            }
+            return false;
+        } catch (e: any) {
+            console.error('❌ Error al actualizar perfil completo:', e);
+            return false;
         } finally {
             this.isLoading.set(false);
         }

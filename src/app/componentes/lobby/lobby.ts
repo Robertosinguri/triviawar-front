@@ -51,7 +51,7 @@ export class LobbyComponent implements OnInit, OnDestroy {
     }
     this.currentUser = {
       id: user.email || user.uid || 'anon-' + Date.now(),
-      nombre: user.name || user.username
+      nombre: user.username || user.name
     };
 
     this.codigoSala = this.route.snapshot.queryParams['codigo'];

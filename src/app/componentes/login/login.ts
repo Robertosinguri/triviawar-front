@@ -26,6 +26,7 @@ export class Login {
   protected readonly showSuccess = signal(false);
   protected readonly showResetSuccess = signal(false);
   protected readonly pendingEmail = signal('');
+  protected readonly isGoogleNewUser = signal(false);
 
 
   protected readonly isLoading = this.authService.isLoading$;
@@ -62,6 +63,40 @@ export class Login {
     });
 
     if (success) {
+      this.router.navigate(['/dashboard']);
+    }
+  }
+
+  protected async loginConGoogle(): Promise<void> {
+    const res = await this.authService.loginWithGoogle();
+    if (res.success) {
+      if (res.isNewUser) {
+        this.isGoogleNewUser.set(true);
+        // Pre-cargar el nombre que trajo Google
+        this.name.set(this.authService.usuarioActual()?.username || '');
+      } else {
+        this.router.navigate(['/dashboard']);
+      }
+    }
+  }
+
+  protected async confirmarNombreGoogle(): Promise<void> {
+    if (!this.name().trim()) return;
+    
+    // Usamos el servicio existente para actualizar el perfil
+    const success = await this.authService.actualizarAvatar(
+      this.authService.usuarioActual()?.picture || '01.png'
+    );
+    
+    // Nota: actualizarAvatar ya envía el nombre que está en el signal si lo sincronizamos bien
+    // Pero espera, actualizarAvatar en el service usa el valor de la signal currentUser.
+    // Necesito asegurarme de que el service actualice el nombre.
+    
+    // Vamos a simplificar: actualizarAvatar en el service usa el 'name' que ya está guardado.
+    // Tengo que modificar actualizarAvatar para que acepte un nuevo nombre opcional.
+    
+    const res = await this.authService.actualizarPerfilCompleto(this.name().trim(), this.authService.usuarioActual()?.picture || '01.png');
+    if (res) {
       this.router.navigate(['/dashboard']);
     }
   }

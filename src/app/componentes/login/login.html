@@ -20,6 +20,37 @@
         <div class="success-loader"></div>
         <small class="redirect-text">Volviendo al login...</small>
       </div>
+    } @else if (isGoogleNewUser()) {
+      <div class="confirmation-form welcome-card">
+        <div class="neon-user-icon">
+          <i class="material-symbols-outlined pulsing">rocket_launch</i>
+        </div>
+        
+        <h2 class="confirmation-title neon-text-cyan">🚀 ¡Bienvenido Guerrero!</h2>
+        <p class="confirmation-text">
+          Hemos recuperado tu cuenta de Google.<br>
+          ¿Cómo quieres que te llamen en la arena?
+        </p>
+        
+        <div class="form-group" style="margin: 1.5rem 0;">
+          <input 
+            type="text"
+            placeholder="Tu alias de batalla"
+            class="form-input" 
+            [value]="name()"
+            (input)="onNameChange($event.target.value)"
+            [disabled]="isLoading()"
+            required>
+        </div>
+        
+        <button 
+          type="button" 
+          class="login-button neon-btn-cyan"
+          (click)="confirmarNombreGoogle()"
+          [disabled]="isLoading() || !name().trim()">
+          ¡A la Batalla!
+        </button>
+      </div>
     } @else if (showConfirmation()) {
       <div class="confirmation-form verification-card">
         <div class="neon-envelope">
@@ -158,6 +189,19 @@
           }
         </button>
       </form>
+      
+      @if (!isSignUpMode() && !isForgotPasswordMode()) {
+        <div class="social-login">
+          <div class="divider">
+            <span>o continúa con</span>
+          </div>
+          
+          <button type="button" class="google-btn" (click)="loginConGoogle()" [disabled]="isLoading()">
+            <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google">
+            Google
+          </button>
+        </div>
+      }
       
       <div class="auth-links">
         <div class="toggle-mode">

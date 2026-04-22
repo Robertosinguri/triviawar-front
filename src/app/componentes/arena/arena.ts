@@ -88,7 +88,7 @@ export class ArenaComponent implements OnInit, OnDestroy {
   private async cargarUsuario() {
     try {
       const user = this.authService.usuarioActual();
-      this.nombreJugador = user?.name || user?.username || 'Jugador';
+      this.nombreJugador = user?.username || user?.name || 'Jugador';
     } catch (error) {
       this.nombreJugador = 'Jugador';
     }
@@ -289,7 +289,7 @@ export class ArenaComponent implements OnInit, OnDestroy {
       const usuario = this.authService.usuarioActual();
       // Si no hay sesión, usar ID temporal para que el resultado se guarde y aparezca en el ranking
       const userId = usuario?.uid || usuario?.email || 'anon-' + Date.now();
-      const displayName = usuario?.name || usuario?.username || this.nombreJugador || 'Jugador';
+      const displayName = usuario?.username || usuario?.name || this.nombreJugador || 'Jugador';
 
       const tiempoTotal = Math.floor((Date.now() - this.tiempoInicio) / 1000);
 
