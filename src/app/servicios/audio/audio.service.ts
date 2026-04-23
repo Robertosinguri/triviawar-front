@@ -11,6 +11,9 @@ export class AudioService {
   private fondoSonando: string | null = null;
   private fadeInterval: any = null;
   private usuarioInteractuo: boolean = false;
+  
+  // Controla si la música del dashboard debe estar sonando globalmente
+  private musicaDashboardActiva: boolean = false;
 
   constructor() {
     this.cargarSonidos();
@@ -45,7 +48,7 @@ export class AudioService {
       // Música de fondo
       fondo: this.crearAudio(getAudioPath('fondo-entrenamiento.mp3'), 0.3, true),
       arena: this.crearAudio(getAudioPath('fondo-arena.mp3'), 0.25, true),
-      dashboard: this.crearAudio (getAudioPath('fondo-dashboard.mp3'), 0.25, true)
+      dashboard: this.crearAudio(getAudioPath('fondo-dashboard.mp3'), 0.25, true)
     };
     
     console.log('🎵 AudioService cargado con rutas de API. Rutas de audio:');
@@ -59,7 +62,6 @@ export class AudioService {
    */
   private crearAudio(src: string, volumen: number = 1, loop: boolean = false): HTMLAudioElement {
     const audio = new Audio();
-  
     
     // 2. Preload en 'auto' fuerza al navegador a intentar la descarga de inmediato
     audio.preload = 'auto';
@@ -127,17 +129,51 @@ export class AudioService {
     });
   }
 
+  /**
+   * Inicia la música de fondo del dashboard
+   * Esta música continuará sonando entre componentes (dashboard, ranking, about)
+   */
+  iniciarMusicaDashboard() {
+    if (!this.musicaDashboardActiva && this.audioActivo) {
+      this.musicaDashboardActiva = true;
+      this.reproducirMusicaLarga('dashboard', 0.25);
+    }
+  }
+
+  /**
+   * Detiene la música de fondo del dashboard
+   * Útil cuando se navega a componentes como entrenamiento o crear sala
+   */
+  detenerMusicaDashboard() {
+    this.musicaDashboardActiva = false;
+    this.stop('dashboard');
+  }
+
+  /**
+   * Reproduce música de fondo del entrenamiento
+   * Automáticamente detiene la música del dashboard
+   */
   playFondo() {
+    this.detenerMusicaDashboard();
     this.reproducirMusicaLarga('fondo', 0.3);
   }
 
+  /**
+   * Reproduce música de fondo de la arena
+   * Automáticamente detiene la música del dashboard
+   */
   playArena() {
+    this.detenerMusicaDashboard();
     this.reproducirMusicaLarga('arena', 0.25);
   }
 
+  /**
+   * Reproduce la música del dashboard (uso directo)
+   * @deprecated Usar iniciarMusicaDashboard() en su lugar
+   */
   playFondoDashboard() {
-  this.reproducirMusicaLarga('dashboard', 0.25);
-}
+    this.reproducirMusicaLarga('dashboard', 0.25);
+  }
 
   private reproducirMusicaLarga(nombre: string, volumenObjetivo: number) {
     if (!this.audioActivo) return;
@@ -180,14 +216,18 @@ export class AudioService {
   }
 
   stopFondoDashboard() {
-  this.stop('dashboard');
-}
-
+    this.musicaDashboardActiva = false;
+    this.stop('dashboard');
+  }
 
   toggleAudio() {
     this.audioActivo = !this.audioActivo;
     if (!this.audioActivo) {
       this.stopAll();
+      this.musicaDashboardActiva = false;
+    } else if (this.musicaDashboardActiva) {
+      // Si se reactiva el audio y dashboard debería sonar, lo reiniciamos
+      this.iniciarMusicaDashboard();
     }
   }
 

@@ -7,7 +7,7 @@ import { EstadisticasService, JugadorRanking } from '../../servicios/estadistica
 import { ChatComponent } from '../chat/chat';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../environments/environment';
-import { AudioService } from '../../servicios/audio/audio.service'; // 🔊 Importar AudioService
+import { AudioService } from '../../servicios/audio/audio.service';
 
 @Component({
   selector: 'app-dashboard',
@@ -28,12 +28,12 @@ export class DashboardComponent implements OnInit, OnDestroy {
     private estadisticasService: EstadisticasService,
     private http: HttpClient,
     private cdr: ChangeDetectorRef,
-    private audioService: AudioService // 🔊 Inyectar AudioService
+    private audioService: AudioService
   ) {}
 
   ngOnInit() {
-    // 🔊 Iniciar música de fondo del dashboard
-    this.audioService.playFondoDashboard(); 
+    // 🔊 Iniciar música de fondo del dashboard (nueva lógica global)
+    this.audioService.iniciarMusicaDashboard();
     this.cargarRankingMinimalista();
     this.cargarSalasPublicas();
     
@@ -47,8 +47,8 @@ export class DashboardComponent implements OnInit, OnDestroy {
     if (this.intervaloSalas) {
       clearInterval(this.intervaloSalas);
     }
-    // 🔊 Detener música al salir del dashboard
-    this.audioService.stopFondoDashboard();
+    // ⚠️ NO detener la música aquí para que continúe en ranking/about
+    // La música se detendrá automáticamente cuando se navegue a entrenamiento o crear sala
   }
 
   private cargarRankingMinimalista(): void {
@@ -77,6 +77,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
   crearSala() {
     this.audioService.play('click');
+    // La música del dashboard se detendrá automáticamente en el componente crear-sala
     this.router.navigate(['/crear-sala']);
   }
 
@@ -98,7 +99,8 @@ export class DashboardComponent implements OnInit, OnDestroy {
   }
 
   iniciarEntrenamiento() {
-    this.audioService.play('click'); // Mismo efecto 
+    this.audioService.play('click');
+    // La música del dashboard se detendrá automáticamente en el componente entrenamiento
     this.router.navigate(['/entrenamiento']);
   }
 }
