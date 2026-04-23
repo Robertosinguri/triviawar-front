@@ -46,7 +46,7 @@ export class AudioService {
       click: this.crearAudio(getAudioPath('click.wav'), 0.8),
 
       // Música de fondo
-      fondo: this.crearAudio(getAudioPath('fondo-entrenamiento.mp3'), 0.3, true),
+      fondo: this.crearAudio(getAudioPath('fondo.mp3'), 0.3, true),
       arena: this.crearAudio(getAudioPath('fondo-arena.mp3'), 0.25, true),
       dashboard: this.crearAudio(getAudioPath('fondo-dashboard.mp3'), 0.25, true)
     };
