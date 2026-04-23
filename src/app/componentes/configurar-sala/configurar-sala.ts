@@ -6,6 +6,7 @@ import { CommonModule } from '@angular/common';
 import { FirebaseAuthService } from '../../servicios/auth/firebase-auth.service';
 import { SocketService } from '../../servicios/websocket/socket.service';
 import { Subscription } from 'rxjs';
+import { AudioService } from '../../servicios/audio/audio.service'; // 🔊 Importar AudioService
 
 interface ConfiguracionJugador {
   tematica: string;
@@ -30,6 +31,7 @@ export class ConfigurarSalaComponent implements OnInit, OnDestroy {
   private authService = inject(FirebaseAuthService);
   private socketService = inject(SocketService);
   private cdr = inject(ChangeDetectorRef);
+  private audioService = inject(AudioService); // 🔊 Inyectar AudioService
 
   private subs: Subscription = new Subscription();
 
@@ -59,6 +61,9 @@ export class ConfigurarSalaComponent implements OnInit, OnDestroy {
       return;
     }
     this.currentUserId = user.email || '';
+
+    // 🔊 Detener la música del dashboard al entrar a configurar sala
+    this.audioService.detenerMusicaDashboard();
 
     // Conectar socket si no lo está
     this.socketService.connect();
@@ -123,6 +128,8 @@ export class ConfigurarSalaComponent implements OnInit, OnDestroy {
 
   ngOnDestroy() {
     this.subs.unsubscribe();
+    // 🔊 No reiniciar la música del dashboard automáticamente
+    // El componente dashboard se encargará de reiniciarla cuando se navegue de vuelta
   }
 
   tematicaInvalida: boolean = false;
@@ -198,9 +205,11 @@ export class ConfigurarSalaComponent implements OnInit, OnDestroy {
 
   seleccionarSugerencia(sugerencia: string) {
     this.configuracion.tematica = sugerencia;
+    this.audioService.play('click'); // 🔊 Efecto de click al seleccionar sugerencia
   }
 
   volver() {
+    this.audioService.play('click'); // 🔊 Efecto de click al volver
     this.router.navigate(['/dashboard']);
   }
 
