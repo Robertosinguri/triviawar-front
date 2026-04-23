@@ -1,12 +1,12 @@
+
 import { Component, OnInit, OnDestroy, ChangeDetectorRef, inject } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
-//import { BackgroundComponent } from '../background/background';
 import { FirebaseAuthService } from '../../servicios/auth/firebase-auth.service';
 import { SocketService } from '../../servicios/websocket/socket.service';
 import { Subscription } from 'rxjs';
-import { AudioService } from '../../servicios/audio/audio.service'; // 🔊 Importar AudioService
+import { AudioService } from '../../servicios/audio/audio.service';
 
 interface ConfiguracionJugador {
   tematica: string;
@@ -31,7 +31,7 @@ export class ConfigurarSalaComponent implements OnInit, OnDestroy {
   private authService = inject(FirebaseAuthService);
   private socketService = inject(SocketService);
   private cdr = inject(ChangeDetectorRef);
-  private audioService = inject(AudioService); // 🔊 Inyectar AudioService
+  private audioService = inject(AudioService);
 
   private subs: Subscription = new Subscription();
 
@@ -62,18 +62,23 @@ export class ConfigurarSalaComponent implements OnInit, OnDestroy {
     }
     this.currentUserId = user.email || '';
 
-    // 🔊 Detener la música del dashboard al entrar a configurar sala
-    this.audioService.detenerMusicaDashboard();
+    // Determinar si es host (crear sala) o invitado (unirse)
+    this.esHost = this.router.url.includes('crear');
+    console.log('🔍 [DEBUG] ConfigurarSala - esHost:', this.esHost, 'URL:', this.router.url);
+
+    // 🔊 Si es modo crear sala, reproducir música específica
+    if (this.esHost) {
+      this.audioService.playFondo();
+    } else {
+      // Si es modo unirse, detener música del dashboard
+      this.audioService.detenerMusicaDashboard();
+    }
 
     // Conectar socket si no lo está
     this.socketService.connect();
 
-    this.esHost = this.router.url.includes('crear');
-    console.log('🔍 [DEBUG] ConfigurarSala - esHost:', this.esHost, 'URL:', this.router.url);
-
     if (!this.esHost) {
       this.codigoSala = this.route.snapshot.queryParams['codigo'] || '';
-      // Unirse como invitado al confirmar
     }
 
     // Escuchar eventos de socket
@@ -96,13 +101,11 @@ export class ConfigurarSalaComponent implements OnInit, OnDestroy {
       })
     );
 
-    // Al unirse (escuchar room_updated o success) 
-    // Nota: Si joinRoom emite room_updated a todos, podemos usar eso para confirmar
+    // Al unirse
     this.subs.add(
       this.socketService.onRoomUpdated().subscribe((sala) => {
         const matchesCode = (sala.id === this.codigoSala) || (sala.roomCode === this.codigoSala);
         if (this.isLoading && !this.esHost && matchesCode) {
-          // Confirmación exitosa de unión
           setTimeout(() => {
             this.isLoading = false;
             this.cdr.detectChanges();
@@ -128,8 +131,10 @@ export class ConfigurarSalaComponent implements OnInit, OnDestroy {
 
   ngOnDestroy() {
     this.subs.unsubscribe();
-    // 🔊 No reiniciar la música del dashboard automáticamente
-    // El componente dashboard se encargará de reiniciarla cuando se navegue de vuelta
+    // 🔊 Detener música de crear sala al salir del componente
+    if (this.esHost) {
+      this.audioService.stopFondo();
+    }
   }
 
   tematicaInvalida: boolean = false;
@@ -151,10 +156,9 @@ export class ConfigurarSalaComponent implements OnInit, OnDestroy {
     if (this.esHost) {
       return (this.configuracion.jugadores || 0) >= 2 && !!this.configuracion.nombreSala?.trim();
     }
-    return true; // Para invitados ya no hay configuración previa al lobby
+    return true;
   }
 
-  // Getter helper para plantilla
   getDistribucionPreguntas(): string {
     if (!this.configuracion.jugadores) return '';
     const p = Math.floor(5 / this.configuracion.jugadores);
@@ -162,7 +166,17 @@ export class ConfigurarSalaComponent implements OnInit, OnDestroy {
     return extra === 0 ? `${p} preguntas por jugador` : `${p}-${p + 1} preguntas por jugador`;
   }
 
+  actualizarJugadores(valor: number) {
+    this.audioService.play('click');
+    this.configuracion.jugadores = valor;
+  }
+
   async crearSala() {
+    this.audioService.play('click'); // Sonido click
+    
+    // 🔊 Detener la música de crear sala al hacer clic en "Iniciar Sala"
+    this.audioService.stopFondo();
+    
     if (!this.esConfiguracionValida() || this.isLoading) return;
     this.isLoading = true;
 
@@ -205,11 +219,15 @@ export class ConfigurarSalaComponent implements OnInit, OnDestroy {
 
   seleccionarSugerencia(sugerencia: string) {
     this.configuracion.tematica = sugerencia;
-    this.audioService.play('click'); // 🔊 Efecto de click al seleccionar sugerencia
+    this.audioService.play('click');
   }
 
   volver() {
-    this.audioService.play('click'); // 🔊 Efecto de click al volver
+    this.audioService.play('click');
+    // 🔊 Detener música de crear sala al volver
+    if (this.esHost) {
+      this.audioService.stopFondo();
+    }
     this.router.navigate(['/dashboard']);
   }
 
