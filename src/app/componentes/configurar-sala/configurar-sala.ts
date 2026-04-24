@@ -133,7 +133,7 @@ export class ConfigurarSalaComponent implements OnInit, OnDestroy {
     this.subs.unsubscribe();
     // 🔊 Detener música de crear sala al salir del componente
     if (this.esHost) {
-      this.audioService.stopFondo();
+      
     }
   }
 
@@ -175,7 +175,7 @@ export class ConfigurarSalaComponent implements OnInit, OnDestroy {
     this.audioService.play('click'); // Sonido click
     
     // 🔊 Detener la música de crear sala al hacer clic en "Iniciar Sala"
-    this.audioService.stopFondo();
+    
     
     if (!this.esConfiguracionValida() || this.isLoading) return;
     this.isLoading = true;

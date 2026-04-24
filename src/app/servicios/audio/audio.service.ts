@@ -44,6 +44,7 @@ export class AudioService {
       correcto: this.crearAudio(getAudioPath('correcto.wav'), 1),
       incorrecto: this.crearAudio(getAudioPath('incorrecto.wav'), 1),
       click: this.crearAudio(getAudioPath('click.wav'), 0.8),
+      resultados: this.crearAudio(getAudioPath('resultados.mp3'), 0.7),
 
       // Música de fondo
       fondo: this.crearAudio(getAudioPath('fondo.mp3'), 0.3, true),
@@ -127,6 +128,13 @@ export class AudioService {
     Object.keys(this.sonidos).forEach(nombre => {
       this.stop(nombre);
     });
+  }
+
+  /**
+   * Verifica si hay alguna música de fondo sonando actualmente
+   */
+  isHayMusicaSonando(): boolean {
+    return this.fondoSonando !== null;
   }
 
   /**

@@ -4,6 +4,7 @@ import { CommonModule } from '@angular/common';
 //import { BackgroundComponent } from '../background/background';
 import { EstadisticasService, JugadorRanking } from '../../servicios/estadisticas/estadisticas.service';
 import { FirebaseAuthService } from '../../servicios/auth/firebase-auth.service';
+import { AudioService } from '../../servicios/audio/audio.service'; // 🔊 Importar AudioService
 
 interface ResultadoJugador {
   userId: string;
@@ -63,7 +64,8 @@ export class ResultadosComponent implements OnInit {
     private route: ActivatedRoute,
     private estadisticasService: EstadisticasService,
     private authService: FirebaseAuthService,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private audioService: AudioService // 🔊 Inyectar AudioService
   ) { }
 
   async ngOnInit() {
@@ -176,6 +178,10 @@ export class ResultadosComponent implements OnInit {
       porcentaje: this.ganador?.porcentaje
     });
 
+    // 🔊 REPRODUCIR SONIDO DE RESULTADOS
+    this.audioService.play('resultados');
+    console.log('🎵 Sonido de resultados reproducido');
+
     // Forzar detección de cambios
     this.cdr.detectChanges();
 
@@ -197,8 +203,6 @@ export class ResultadosComponent implements OnInit {
     const segs = segundos % 60;
     return minutos > 0 ? `${minutos}m ${segs}s` : `${segs}s`;
   }
-
-
 
   private cargarRankingGlobal() {
     // Usar exactamente el mismo servicio que el dashboard
@@ -226,6 +230,7 @@ export class ResultadosComponent implements OnInit {
   }
 
   volverAlDashboard() {
+    this.audioService.play('click'); // 🔊 Sonido de click al volver
     this.router.navigate(['/dashboard']);
   }
 

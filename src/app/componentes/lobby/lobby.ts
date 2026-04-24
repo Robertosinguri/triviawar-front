@@ -2,10 +2,10 @@ import { Component, OnInit, OnDestroy, ChangeDetectorRef, inject } from '@angula
 import { Router, ActivatedRoute } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
-//import { BackgroundComponent } from '../background/background';
 import { FirebaseAuthService } from '../../servicios/auth/firebase-auth.service';
 import { SocketService } from '../../servicios/websocket/socket.service';
 import { Subscription } from 'rxjs';
+import { AudioService } from '../../servicios/audio/audio.service';
 
 import { ChatComponent } from '../chat/chat';
 import { NavbarComponent } from '../navbar/navbar';
@@ -23,6 +23,7 @@ export class LobbyComponent implements OnInit, OnDestroy {
   private authService = inject(FirebaseAuthService);
   private socketService = inject(SocketService);
   private cdr = inject(ChangeDetectorRef);
+  private audioService = inject(AudioService);
 
   private subs: Subscription = new Subscription();
 
@@ -62,15 +63,23 @@ export class LobbyComponent implements OnInit, OnDestroy {
       return;
     }
 
-    // Conectar y unirse (si no lo hizo ya en configurar-sala)
+    // 🔊 INICIAR música de lobby SOLO si no hay música sonando
+    // Caso 1: Vienes de configurar-sala → ya hay música (no se inicia nueva)
+    // Caso 2: Vienes directo del dashboard → NO hay música (se inicia)
+    if (!this.audioService.isHayMusicaSonando()) {
+      console.log('🎵 No hay música sonando, iniciando música de lobby');
+      this.audioService.playFondo();
+    } else {
+      console.log('🎵 Ya hay música sonando, continuando en lobby');
+    }
+
+    // Conectar y unirse
     this.socketService.connect();
-    // Siempre enviamos join_room al llegar al lobby por si acaso (idempotencia en backend o re-conexión)
     this.socketService.joinRoom(this.codigoSala, this.currentUser);
 
     this.escucharSocket();
   }
 
-  // Agregado helper para plantilla
   todosListos(): boolean {
     if (!this.jugadores || this.jugadores.length < 2) return false;
     return this.jugadores.every(j => j.configurado);
@@ -85,7 +94,6 @@ export class LobbyComponent implements OnInit, OnDestroy {
           this.jugadores = sala.jugadores || [];
           this.maxJugadores = sala.maxJugadores;
 
-          // Sincronizar estado local si viene del servidor
           const me = this.jugadores.find(j => j.id === this.currentUser?.id);
           if (me) {
             this.estaListo = me.configurado;
@@ -101,6 +109,10 @@ export class LobbyComponent implements OnInit, OnDestroy {
     this.subs.add(
       this.socketService.onGameStarted().subscribe((gameData) => {
         console.log('🚀 Juego listo! Iniciando cuenta regresiva...');
+        
+        // 🔊 DETENER la música de lobby/crear-sala
+        this.audioService.stopFondo();
+        
         this.cuentaRegresiva = 3;
         
         const timer = setInterval(() => {
@@ -109,6 +121,10 @@ export class LobbyComponent implements OnInit, OnDestroy {
           
           if (this.cuentaRegresiva <= 0) {
             clearInterval(timer);
+            
+            // 🔊 Iniciar música de arena
+            this.audioService.playArena();
+            
             this.router.navigate(['/arena'], {
               queryParams: { roomCode: this.codigoSala },
               state: { gameData: gameData }
@@ -125,7 +141,6 @@ export class LobbyComponent implements OnInit, OnDestroy {
         if (err && err.message && err.message.includes('tema ya fue elegido')) {
           alert('Esa temática ya fue elegida por otro jugador. ¡Elige otra!');
           this.estaListo = false;
-          // Revertir en backend
           this.socketService.updateConfig(this.codigoSala, this.currentUser.id, {
             tematica: '',
             configurado: false
@@ -138,18 +153,21 @@ export class LobbyComponent implements OnInit, OnDestroy {
 
   iniciarPartida() {
     if (this.esHost) {
+      this.audioService.play('click');
       this.socketService.startGame(this.codigoSala);
     }
   }
 
   salirSala() {
     if (this.currentUser) {
+      this.audioService.play('click');
       this.socketService.leaveRoom(this.codigoSala, this.currentUser.id);
     }
+    // Detener música de lobby al salir
+    this.audioService.stopFondo();
     this.router.navigate(['/dashboard']);
   }
 
-  // Helpers de UI
   getSlotsVacios(): any[] {
     const total = this.maxJugadores || 4;
     const ocupados = this.jugadores ? this.jugadores.length : 0;
@@ -159,17 +177,25 @@ export class LobbyComponent implements OnInit, OnDestroy {
 
   copiado = false;
   copiarCodigo() {
+    this.audioService.play('click');
     navigator.clipboard.writeText(this.codigoSala).then(() => {
       this.copiado = true;
       setTimeout(() => this.copiado = false, 2000);
     });
   }
 
-  enviarInvitacion() { this.emailInvitacion = ''; }
-  volver() { this.salirSala(); }
+  enviarInvitacion() { 
+    this.emailInvitacion = ''; 
+  }
+  
+  volver() { 
+    this.salirSala(); 
+  }
 
   // Configuración de jugador
   toggleListo() {
+    this.audioService.play('click');
+    
     if (!this.estaListo) {
       if (!this.tematicaJugador.trim()) {
         alert('Por favor ingresa una temática para jugar.');
@@ -191,5 +217,7 @@ export class LobbyComponent implements OnInit, OnDestroy {
 
   ngOnDestroy() {
     this.subs.unsubscribe();
+    // ⚠️ NO detenemos música aquí porque puede ser que estemos yendo a Arena
+    // La música se detiene en onGameStarted()
   }
 }
