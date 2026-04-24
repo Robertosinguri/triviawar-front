@@ -522,50 +522,38 @@ input {
 
 .emoji-picker-popup {
   position: absolute;
-  bottom: calc(100% + 10px); // Aparece justo arriba del botón
-  left: 0; // Alineado con el borde izquierdo del botón
-  transform: translateX(0); // Sin desplazamiento adicional
-  background: rgba(0, 0, 0, 0.22); // Fondo aún más sutil y transparente
-  backdrop-filter: blur(45px);
-  -webkit-backdrop-filter: blur(45px);
-  border: 1px solid rgba(255, 255, 255, 0.012); // Borde casi imperceptible
-  border-radius: 18px;
-  padding: 16px;
+  bottom: calc(100% + 15px); // Espacio para la flecha
+  left: 0;
+  background: rgba(20, 20, 40, 0.95); // Un poco más sólido para que destaque como burbuja
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba($primary-violet, 0.3);
+  border-radius: 15px;
+  padding: 12px;
   
-  // Utilizar Grid para una distribución matricial perfecta
   display: grid;
-  grid-template-columns: repeat(5, 32px); // 5 columnas exactas con el ancho del emoji
-  gap: 12px;
+  grid-template-columns: repeat(5, 32px);
+  gap: 8px;
   justify-content: center;
   align-items: center;
   
-  z-index: 1000;
-  box-shadow: 
-    0 0.5px 10px rgba(0, 0, 0, 0.06), // Sombra muy sutil
-    0 0 0 0.5px rgba(255, 255, 255, 0.003) inset; // Borde interior casi invisible
-  width: max-content; // Se ajusta al contenido exacto del grid
+  z-index: 2000;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.05) inset;
+  width: max-content;
   animation: fadeInUp 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
   
-  // El contenedor crece automáticamente hacia arriba según el contenido
-  // No hay altura máxima fija ni scroll
-  
-  // Efecto de vidrio esmerilado ultra sutil
-  &::before {
+  // Flecha de la burbuja de diálogo
+  &::after {
     content: '';
     position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: linear-gradient(
-      135deg,
-      rgba(255, 255, 255, 0.006) 0%,
-      rgba(255, 255, 255, 0.002) 50%,
-      rgba(255, 255, 255, 0.006) 100%
-    );
-    border-radius: 18px;
-    pointer-events: none;
-    z-index: -1;
+    bottom: -8px;
+    left: 10px; // Alineado con el botón emoji-trigger
+    width: 0;
+    height: 0;
+    border-left: 8px solid transparent;
+    border-right: 8px solid transparent;
+    border-top: 8px solid rgba(20, 20, 40, 0.95);
+    filter: drop-shadow(0 2px 2px rgba(0,0,0,0.5));
   }
 }
 
@@ -647,24 +635,17 @@ input {
 
 @include mobile-only {
   .chat-container {
-    position: sticky; // Anclado al pie pero compartiendo flujo
-    bottom: 0;
-    left: 0;
+    position: relative; // El posicionamiento fijo lo maneja ahora el componente padre
     width: 100%;
-    height: 20vh !important; // Altura reducida un 40% (de 35vh a 20vh)
-    z-index: 1000;
-    background: rgba(15, 15, 30, 0.98);
-    backdrop-filter: blur(20px);
-    border-radius: 0;
+    height: 100% !important;
+    background: transparent; // El fondo lo da el dashboard-sidebar
+    backdrop-filter: none;
     border: none;
-    border-top: 1px solid rgba(255, 255, 255, 0.05); // Borde ultra sutil casi invisible
-    box-shadow: 0 -5px 20px rgba(0, 0, 0, 0.4);
-    
-    transition: none;
-    overflow: hidden;
+    box-shadow: none;
+    overflow: visible;
 
     &.expanded {
-      height: 20vh !important;
+      height: 100% !important;
     }
   }
 
@@ -673,15 +654,17 @@ input {
   }
 
   .chat-main-content {
-    height: 20vh; // Sincronizado con el contenedor
+    height: 35vh; 
   }
 
   .chat-header {
     flex-direction: row; 
-    background: rgba(0, 0, 0, 0.2);
+    background: rgba(10, 10, 20, 0.9);
     padding: 0;
-    height: 22px; // Altura fija mínima para eliminar espacios
-    min-height: 22px;
+    height: 24px; 
+    min-height: 24px;
+    border-top: 2px solid $primary-aqua; // Línea divisoria clara (frontera)
+    box-shadow: 0 -2px 10px rgba(1, 186, 154, 0.3);
   }
 
   .tab-btn {
@@ -693,8 +676,12 @@ input {
     background: transparent !important;
     border: none !important;
     border-bottom: none !important; // Eliminación total de línea inferior
-    color: rgba(255, 255, 255, 0.4);
+    color: rgba(255, 255, 255, 0.5);
     box-shadow: none !important;
+    font-size: 0.7rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 
     &.active {
       color: $primary-yellow !important;

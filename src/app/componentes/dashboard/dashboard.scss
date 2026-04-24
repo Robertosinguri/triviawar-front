@@ -501,8 +501,9 @@
   
   @include mobile-only {
     padding: 1rem;
-    overflow-y: auto !important; // AQUÍ ocurre el scroll del contenido
-    flex: 1 !important; // Toma todo el espacio disponible entre menú y chat
+    padding-bottom: calc(35vh + 2rem); // Espacio suficiente para el chat + margen extra
+    overflow-y: auto !important; 
+    flex: 1 !important; 
     min-height: 0;
   }
 }
@@ -528,12 +529,16 @@
   }
 
   @include mobile-only {
+    position: fixed; // Ahora es fijo, flotando sobre el contenido
+    bottom: 0;
+    left: 0;
     width: 100%;
     z-index: 1000;
     padding: 0;
-    height: 20vh !important; // Chat compacto (reducido 40%)
-    flex-shrink: 0 !important;
+    height: 35vh !important;
     margin: 0;
+    background: rgba(15, 15, 30, 0.95);
+    backdrop-filter: blur(20px);
   }
 }
 
@@ -550,7 +555,7 @@
     grid-template-rows: auto;
     height: auto;
     gap: 1rem;
-    margin-bottom: 2rem;
+    margin-bottom: 0; // Eliminado el margen que causaba el hueco negro
   }
 }
 
