@@ -456,6 +456,9 @@
 .mobile-pagination, .desktop-pagination {
   margin-top: 2rem;
   text-align: center;
+  display: block; // Asegurar que sea visible si la condición se cumple
+  width: 100%;
+  clear: both;
   
   .pagination-info {
     color: rgba(255, 255, 255, 0.7);
@@ -467,30 +470,67 @@
   .pagination-controls {
     display: flex;
     justify-content: center;
-    gap: 1rem;
+    align-items: center;
+    gap: 0.8rem;
     
     .pagination-btn {
-      padding: 0.75rem 1.5rem;
+      padding: 0.6rem 1.2rem;
       background: transparent;
-      border: 1px solid $primary-aqua;
+      border: 1px solid rgba(1, 186, 154, 0.3);
       color: $primary-aqua;
-      border-radius: 20px;
+      border-radius: 12px;
       cursor: pointer;
       transition: all 0.3s ease;
       font-family: $font-red-hat;
       font-weight: 600;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 40px;
       
       &:hover:not(:disabled) {
-        background: $primary-aqua;
-        color: white;
+        background: rgba(1, 186, 154, 0.1);
+        border-color: $primary-aqua;
+        transform: translateY(-2px);
+        box-shadow: 0 0 15px rgba(1, 186, 154, 0.3);
       }
       
       &:disabled {
-        opacity: 0.3;
+        opacity: 0.2;
         cursor: not-allowed;
-        border-color: rgba(255, 255, 255, 0.2);
-        color: rgba(255, 255, 255, 0.2);
+        border-color: rgba(255, 255, 255, 0.1);
       }
+
+      &.num {
+        padding: 0.6rem;
+        width: 40px;
+        height: 40px;
+        border-radius: 10px;
+        font-family: $font-victor-mono;
+        
+        &.active {
+          background: $primary-aqua;
+          color: $dark-bg;
+          border-color: $primary-aqua;
+          box-shadow: 0 0 20px rgba(1, 186, 154, 0.6);
+        }
+      }
+
+      &.arrow {
+        font-size: 1.2rem;
+        border-color: transparent;
+        background: rgba(255, 255, 255, 0.05);
+
+        &:hover:not(:disabled) {
+          background: rgba(255, 255, 255, 0.1);
+          color: white;
+        }
+      }
+    }
+
+    .page-numbers {
+      display: flex;
+      gap: 0.5rem;
     }
   }
 }

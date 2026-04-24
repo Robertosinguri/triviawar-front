@@ -17,7 +17,7 @@ export class RankingComponent implements OnInit {
   
   // Paginación móvil
   paginaActual: number = 1;
-  elementosPorPagina: number = 10;
+  elementosPorPagina: number = 5;
   rankingPaginado: JugadorRanking[] = [];
   totalPaginas: number = 0;
 
@@ -30,7 +30,8 @@ export class RankingComponent implements OnInit {
   ngOnInit(): void {
     this.estadisticasService.obtenerRankingGlobal(50).subscribe({
       next: (data) => {
-        this.ranking = data && Array.isArray(data) ? data : [];
+        console.log('🏆 Datos de ranking recibidos:', data?.length);
+        this.ranking = Array.isArray(data) ? data : [];
         this.actualizarPaginacion();
         this.cdr.detectChanges();
       },
@@ -38,6 +39,7 @@ export class RankingComponent implements OnInit {
         console.error('❌ Error cargando ranking:', error);
         this.ranking = [];
         this.actualizarPaginacion();
+        this.cdr.detectChanges();
       }
     });
   }
@@ -65,7 +67,27 @@ export class RankingComponent implements OnInit {
     if (nuevaPagina >= 1 && nuevaPagina <= this.totalPaginas) {
       this.paginaActual = nuevaPagina;
       this.actualizarPaginacion();
+      
+      // Hacer scroll suave hacia arriba de la lista al cambiar página
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
+  }
+
+  getArrayPaginas(): number[] {
+    if (this.totalPaginas <= 0) return [];
+    const paginas: number[] = [];
+    const maxVisible = 5;
+    let inicio = Math.max(1, this.paginaActual - 2);
+    let fin = Math.min(this.totalPaginas, inicio + maxVisible - 1);
+    
+    if (fin - inicio + 1 < maxVisible) {
+      inicio = Math.max(1, fin - maxVisible + 1);
+    }
+    
+    for (let i = inicio; i <= fin; i++) {
+      paginas.push(i);
+    }
+    return paginas;
   }
 
   volverAlDashboard(): void {

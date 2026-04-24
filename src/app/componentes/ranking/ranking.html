@@ -50,19 +50,28 @@
         </table>
 
         <!-- Paginación Desktop -->
-        @if (ranking && ranking.length > 10) {
+        @if (totalPaginas > 1) {
         <div class="desktop-pagination">
           <div class="pagination-info">
-            Página {{paginaActual}} de {{totalPaginas}} - Mostrando {{rankingPaginado.length}} de {{ranking.length}}
+            Página {{paginaActual}} de {{totalPaginas}} - Mostrando {{rankingPaginado.length}} de {{ranking?.length}}
             jugadores
           </div>
           <div class="pagination-controls">
-            <button class="pagination-btn" [disabled]="paginaActual === 1" (click)="cambiarPagina(paginaActual - 1)">
-              ← Anterior
+            <button class="pagination-btn arrow" [disabled]="paginaActual === 1" (click)="cambiarPagina(paginaActual - 1)">
+              ←
             </button>
-            <button class="pagination-btn" [disabled]="paginaActual === totalPaginas"
+            
+            <div class="page-numbers">
+              @for (num of getArrayPaginas(); track num) {
+                <button class="pagination-btn num" [class.active]="num === paginaActual" (click)="cambiarPagina(num)">
+                  {{num}}
+                </button>
+              }
+            </div>
+
+            <button class="pagination-btn arrow" [disabled]="paginaActual === totalPaginas"
               (click)="cambiarPagina(paginaActual + 1)">
-              Siguiente →
+              →
             </button>
           </div>
         </div>
@@ -93,18 +102,27 @@
         </ol>
 
         <!-- Paginación Móvil -->
-        @if (ranking && ranking.length > 10) {
+        @if (totalPaginas > 1) {
         <div class="mobile-pagination">
           <div class="pagination-info">
-            Página {{paginaActual}} de {{totalPaginas}} ({{ranking.length}} jugadores)
+            Página {{paginaActual}} de {{totalPaginas}} ({{ranking?.length}} jugadores)
           </div>
           <div class="pagination-controls">
-            <button class="pagination-btn" [disabled]="paginaActual === 1" (click)="cambiarPagina(paginaActual - 1)">
-              ← Anterior
+            <button class="pagination-btn arrow" [disabled]="paginaActual === 1" (click)="cambiarPagina(paginaActual - 1)">
+              ←
             </button>
-            <button class="pagination-btn" [disabled]="paginaActual === totalPaginas"
+            
+            <div class="page-numbers">
+              @for (num of getArrayPaginas(); track num) {
+                <button class="pagination-btn num" [class.active]="num === paginaActual" (click)="cambiarPagina(num)">
+                  {{num}}
+                </button>
+              }
+            </div>
+
+            <button class="pagination-btn arrow" [disabled]="paginaActual === totalPaginas"
               (click)="cambiarPagina(paginaActual + 1)">
-              Siguiente →
+              →
             </button>
           </div>
         </div>
