@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
 import { Router } from '@angular/router';
 import { FirebaseAuthService } from '../../servicios/auth/firebase-auth.service';
 
@@ -16,22 +16,23 @@ export class SplashComponent implements OnInit, OnDestroy {
 
   constructor(
     private readonly router: Router,
-    private readonly authService: FirebaseAuthService
+    private readonly authService: FirebaseAuthService,
+    private readonly cdr: ChangeDetectorRef
   ) { }
 
   ngOnInit(): void {
-    // La barra tarda 3500ms en llegar al 100%
-    // Luego espera 300ms mostrando el 100% antes de navegar
     const TOTAL_DURATION = 3500;
     const STEPS = 100;
-    const stepTime = TOTAL_DURATION / STEPS;
+    const stepTime = TOTAL_DURATION / STEPS; // 35ms por paso
 
     this.progressInterval = setInterval(() => {
       if (this.progress < 100) {
         this.progress++;
+        this.cdr.markForCheck(); // Forzar re-render en cada tick
       } else {
         clearInterval(this.progressInterval);
-        // Breve pausa para mostrar la barra completa antes de navegar
+        this.cdr.markForCheck();
+        // Pausa breve para mostrar la barra completa antes de navegar
         setTimeout(() => {
           const isAuthenticated = this.authService.isAuthenticated$();
           if (isAuthenticated) {

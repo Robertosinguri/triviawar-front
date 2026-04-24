@@ -85,22 +85,36 @@
   height: 8px;
   position: relative;
   margin-top: 25px;
-  opacity: 0;
-  background: rgba(40, 42, 54, 0.8);
   border-radius: 4px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  background: rgba(40, 42, 54, 0.8);
   overflow: hidden;
-  animation:
-    fade-in 0.8s ease-out 1s forwards,
-    container-pulse 2s ease-in-out 1.8s infinite;
+  // Usar visibility + opacity separados para evitar conflicto entre
+  // fade-in (forwards) y container-pulse (infinite)
+  opacity: 0;
+  animation: fade-in 0.8s ease-out 1s forwards;
+}
+
+// Wrapper independiente para el pulse, sin tocar la opacidad del loader
+.loader::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 4px;
+  animation: container-pulse 2s ease-in-out 1.8s infinite;
+  pointer-events: none;
 }
 
 .loader-fill {
+  position: absolute;
+  top: 0;
+  left: 0;
   height: 100%;
   width: 0%;
   background: linear-gradient(90deg, $primary-yellow, $primary-aqua, $primary-pink);
   border-radius: 4px;
-  transition: width 35ms linear; /* suave pero reactivo a cada tick del intervalo */
+  transition: width 35ms linear;
+  display: block;
 }
 
 // === ANIMACIONES ===
