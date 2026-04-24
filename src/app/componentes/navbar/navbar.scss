@@ -256,8 +256,7 @@
   left: 0;
   width: 100vw;
   height: 100vh;
-  background: rgba(0, 0, 0, 0.6);
-  backdrop-filter: blur(4px);
+  background: transparent; // Transparente en desktop
   z-index: 1999;
   display: none;
   opacity: 0;
@@ -266,6 +265,11 @@
   &.active {
     display: block;
     opacity: 1;
+  }
+
+  @include mobile-only {
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(8px); // Desenfoque solo en móvil
   }
 }
 
@@ -278,7 +282,7 @@
   width: 300px;
   background: rgba(15, 15, 30, 0.98); // Un poco más oscuro y sólido
   border-left: 2px solid $primary-aqua;
-  z-index: 999;
+  z-index: 2000;
   transform: translateX(100%);
   transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   box-shadow: -10px 0 30px rgba(0, 0, 0, 0.5);
@@ -297,27 +301,31 @@
     position: relative;
 
     .close-card-btn {
-      position: absolute;
-      top: 6px;
-      right: 10px;
-      background: transparent;
-      border: none;
-      color: $primary-pink;
-      text-shadow: 0 0 8px rgba(255, 80, 140, 0.4);
-      font-size: 1.4rem;
-      cursor: pointer;
-      z-index: 10;
-      width: 24px;
-      height: 24px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: all 0.3s ease;
+      display: none; // Oculto en escritorio
       
-      &:hover {
-        color: white;
-        text-shadow: 0 0 12px rgba(255, 80, 140, 0.8);
-        transform: rotate(90deg);
+      @include mobile-only {
+        display: flex;
+        position: absolute;
+        top: 6px;
+        right: 10px;
+        background: transparent;
+        border: none;
+        color: $primary-pink;
+        text-shadow: 0 0 8px rgba(255, 80, 140, 0.4);
+        font-size: 1.4rem;
+        cursor: pointer;
+        z-index: 10;
+        width: 24px;
+        height: 24px;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.3s ease;
+        
+        &:hover {
+          color: white;
+          text-shadow: 0 0 12px rgba(255, 80, 140, 0.8);
+          transform: rotate(90deg);
+        }
       }
     }
 
@@ -351,38 +359,27 @@
   border-top: 1px solid rgba(1, 186, 154, 0.3);
 
   .sidebar-logout-btn {
-    // Propiedades base primero
     width: 100%;
-    background: linear-gradient(45deg, $primary-aqua, #00d4aa);
+    background: transparent;
     border: none;
-    color: white;
-    border-radius: 8px;
+    color: $primary-pink;
+    text-shadow: 0 0 10px rgba(255, 80, 140, 0.5);
     font-family: $font-red-hat;
-    font-weight: 600;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-size: 0.8rem;
+    padding: 0.75rem;
     cursor: pointer;
     transition: all 0.3s ease;
     display: flex;
     align-items: center;
     justify-content: center;
-
-    // Mixins después de propiedades base
-    @include touch-friendly;
-
-    // Reglas anidadas después
+    
     &:hover {
-      background: linear-gradient(45deg, #00d4aa, $primary-aqua);
-      transform: translateY(-2px);
-      box-shadow: 0 4px 12px rgba(1, 186, 154, 0.4);
-    }
-
-    &:active {
-      transform: translateY(0);
-    }
-
-    .logout-text {
-      font-size: 0.9rem;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
+      color: white;
+      text-shadow: 0 0 15px rgba(255, 80, 140, 0.8);
+      transform: scale(1.05);
     }
   }
 }
