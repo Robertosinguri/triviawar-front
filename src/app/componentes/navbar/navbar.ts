@@ -5,6 +5,7 @@ import { FirebaseAuthService } from '../../servicios/auth/firebase-auth.service'
 import { SocketService } from '../../servicios/websocket/socket.service';
 import { ChatStateService } from '../../servicios/chat-state.service';
 import { Subscription } from 'rxjs';
+import { AudioService } from '../../servicios/audio/audio.service';
 
 
 @Component({
@@ -20,6 +21,7 @@ export class NavbarComponent implements OnInit, OnDestroy {
   private socketService = inject(SocketService);
   private chatStateService = inject(ChatStateService);
   private cdr = inject(ChangeDetectorRef);
+  private audioService = inject(AudioService);
   private statsSub?: Subscription;
   // private estadisticasService = inject(EstadisticasService);
 
@@ -181,8 +183,11 @@ export class NavbarComponent implements OnInit, OnDestroy {
       // Limpiar TODO el estado del chat proactivamente antes de salir
       this.chatStateService.clearAllChatState();
       
-      await this.authService.logout();
+      // Detener audio y desconectar socket al salir
+      this.audioService.stopAll();
       this.socketService.disconnect();
+      
+      await this.authService.logout();
       this.router.navigate(['/login']);
     } catch (error) {
       console.error('❌ Error en logout:', error);

@@ -5,6 +5,7 @@ import { FirebaseAuthService } from '../../servicios/auth/firebase-auth.service'
 import { SocketService } from '../../servicios/websocket/socket.service';
 import { ChatStateService } from '../../servicios/chat-state.service';
 import { EstadisticasService, EstadisticasUsuario } from '../../servicios/estadisticas/estadisticas.service';
+import { AudioService } from '../../servicios/audio/audio.service';
 
 @Component({
   selector: 'app-navbar-mobile',
@@ -27,6 +28,7 @@ export class NavbarMobileComponent implements OnInit {
 
   private socketService = inject(SocketService);
   private chatStateService = inject(ChatStateService);
+  private audioService = inject(AudioService);
 
   constructor(
     private router: Router,
@@ -113,8 +115,9 @@ export class NavbarMobileComponent implements OnInit {
       // Limpiar estado del chat antes de hacer logout
       this.chatStateService.clearAllChatState();
       
-      // Desconectar socket y prevenir reconexión automática
+      // Desconectar socket y detener audio al salir
       this.socketService.disconnect();
+      this.audioService.stopAll();
       
       await this.authService.logout();
       this.router.navigate(['/login']);
