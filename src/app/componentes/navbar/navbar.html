@@ -46,26 +46,32 @@
 
   <div class="profile-dropdown" [class.open]="showStats">
     <div class="stats-panel">
-      <div class="user-info-section">
-        <div class="user-name-display">
-          <span class="player-name">{{getUserName()}}</span>
+      <button class="close-card-btn" (click)="toggleStats()">×</button>
+      
+      <div class="stats-profile-header">
+        <div class="user-info-section">
+          <div class="user-name-display">
+            <span class="player-name">{{getUserName()}}</span>
+          </div>
+          <div class="user-email">
+            <span class="email-text">{{getUserEmail()}}</span>
+          </div>
         </div>
-        <div class="user-email">
-          <span class="email-text">{{getUserEmail()}}</span>
-        </div>
-      </div>
 
-      <div class="avatar-section">
-        <div class="current-avatar">
-          @if (hasAvatar()) {
-          <img [src]="getUserAvatar()" alt="Avatar actual" class="current-avatar-img" (error)="onAvatarError($event)">
-          } @else {
-          <div class="no-avatar">Sin avatar</div>
-          }
+        <div class="avatar-section">
+          <div class="current-avatar-wrapper" (click)="abrirSelectorAvatar()">
+            <div class="current-avatar">
+              @if (hasAvatar()) {
+              <img [src]="getUserAvatar()" alt="Avatar actual" class="current-avatar-img" (error)="onAvatarError($event)">
+              } @else {
+              <div class="no-avatar">Sin avatar</div>
+              }
+            </div>
+            <div class="edit-avatar-badge" title="Cambiar Avatar">
+              ✏️
+            </div>
+          </div>
         </div>
-        <button class="change-avatar-btn" (click)="abrirSelectorAvatar()">
-          {{hasAvatar() ? 'Cambiar Avatar' : 'Seleccionar Avatar'}}
-        </button>
       </div>
 
       <div class="stats-info">
@@ -100,7 +106,7 @@
       <!-- Botón logout después del ranking -->
       <div class="logout-section">
         <button class="sidebar-logout-btn" (click)="logout()">
-          <span class="logout-text">Cerrar Sesión</span>
+          Cerrar Sesión
         </button>
       </div>
     </div>

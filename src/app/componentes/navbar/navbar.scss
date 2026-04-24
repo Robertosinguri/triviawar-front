@@ -252,17 +252,20 @@
 
 .stats-overlay {
   position: fixed;
-  top: 80px;
+  top: 0;
   left: 0;
   width: 100vw;
-  height: calc(100vh - 80px);
-  background: transparent; // Eliminado el color oscuro
-  backdrop-filter: none; // Eliminado el desenfoque
-  z-index: 998;
-  display: none; // No ocupa espacio si no está activo
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(4px);
+  z-index: 1999;
+  display: none;
+  opacity: 0;
+  transition: opacity 0.3s ease;
 
   &.active {
     display: block;
+    opacity: 1;
   }
 }
 
@@ -270,7 +273,8 @@
   position: fixed;
   top: 80px;
   right: 0;
-  height: calc(100vh - 80px);
+  bottom: 0;
+  height: auto;
   width: 300px;
   background: rgba(15, 15, 30, 0.98); // Un poco más oscuro y sólido
   border-left: 2px solid $primary-aqua;
@@ -290,6 +294,32 @@
     height: 100%;
     display: flex;
     flex-direction: column;
+    position: relative;
+
+    .close-card-btn {
+      position: absolute;
+      top: 6px;
+      right: 10px;
+      background: transparent;
+      border: none;
+      color: $primary-pink;
+      text-shadow: 0 0 8px rgba(255, 80, 140, 0.4);
+      font-size: 1.4rem;
+      cursor: pointer;
+      z-index: 10;
+      width: 24px;
+      height: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.3s ease;
+      
+      &:hover {
+        color: white;
+        text-shadow: 0 0 12px rgba(255, 80, 140, 0.8);
+        transform: rotate(90deg);
+      }
+    }
 
     h4 {
       color: $primary-yellow;
@@ -301,6 +331,16 @@
       margin-bottom: 1rem;
     }
   }
+}
+
+.stats-profile-header {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem; // Un poco más de aire, pero manteniendo la cercanía
+  margin-bottom: 1.5rem;
+  padding-bottom: 1.2rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 // Sección logout en sidebar
@@ -348,32 +388,36 @@
 
 // Estilos del sidebar
 .user-info-section {
-  text-align: center;
-  margin-bottom: 1rem;
-  padding-bottom: 1rem;
-  border-bottom: 1px solid rgba(0, 255, 255, 0.3);
+  text-align: right; // Alineado hacia el avatar
+  flex: 0 1 auto; // No ocupa todo el espacio, solo lo que necesita
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 2px;
 
   .user-name-display {
-    margin-bottom: 0.5rem;
+    margin-bottom: 0;
 
     .player-name {
-      font-size: 1.1rem;
+      font-size: 1.4rem; // Más grande y proporcional
       font-weight: 700;
       color: $primary-yellow;
       font-family: $font-red-hat;
-      text-shadow: 0 0 10px rgba(230, 189, 0, 0.5);
+      text-shadow: 0 0 10px rgba(230, 189, 0, 0.4);
       display: block;
       text-transform: uppercase;
       letter-spacing: 0.5px;
+      line-height: 1.1;
     }
   }
 
   .user-email {
     .email-text {
-      font-size: 0.8rem;
-      color: rgba(255, 255, 255, 0.6);
+      font-size: 0.85rem; // Un poco más legible
+      color: rgba(255, 255, 255, 0.4);
       font-family: $font-victor-mono;
-      font-style: italic;
+      word-break: break-all;
+      opacity: 0.8;
     }
   }
 }
@@ -381,50 +425,59 @@
 // Estilos para la sección de avatar
 .avatar-section {
   text-align: center;
-  margin-bottom: 1.5rem;
-  padding-bottom: 1rem;
-  border-bottom: 1px solid rgba(0, 255, 255, 0.3);
+  display: flex;
+  justify-content: center;
+  align-items: center;
 
-  .current-avatar {
-    margin-bottom: 1rem;
-
-    .current-avatar-img {
-      width: 80px;
-      height: 80px;
-      border-radius: 50%;
-      border: 2px solid $primary-aqua;
-      object-fit: cover;
-    }
-
-    .no-avatar {
-      width: 80px;
-      height: 80px;
-      border-radius: 50%;
-      border: 2px dashed rgba(255, 255, 255, 0.3);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin: 0 auto;
-      font-size: 0.8rem;
-      color: rgba(255, 255, 255, 0.5);
-    }
-  }
-
-  .change-avatar-btn {
-    padding: 0.5rem 1rem;
-    background: transparent;
-    border: 1px solid $primary-aqua;
-    color: $primary-aqua;
-    border-radius: 5px;
+  .current-avatar-wrapper {
+    position: relative;
+    display: inline-block;
     cursor: pointer;
-    transition: all 0.3s ease;
-    font-family: $font-red-hat;
-    font-size: 0.8rem;
+    transition: transform 0.3s ease;
 
     &:hover {
-      background: $primary-aqua;
-      color: #1a1a2e;
-      box-shadow: 0 0 10px rgba(1, 186, 154, 0.4);
+      transform: scale(1.05);
+      
+      .edit-avatar-badge {
+        background: $primary-pink;
+        transform: scale(1.1);
+      }
+    }
+
+    .current-avatar {
+      margin-bottom: 0;
+
+      .current-avatar-img {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        border: 2px solid $primary-aqua;
+        object-fit: cover;
+      }
+
+      .no-avatar {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        border: 2px dashed rgba(255, 255, 255, 0.3);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto;
+        font-size: 0.8rem;
+        color: rgba(255, 255, 255, 0.5);
+      }
+    }
+
+    .edit-avatar-badge {
+      position: absolute;
+      top: -2px;
+      right: -2px;
+      background: transparent;
+      font-size: 1rem;
+      transition: all 0.3s ease;
+      z-index: 2;
+      filter: drop-shadow(0 2px 4px rgba(0,0,0,0.6));
     }
   }
 }
@@ -523,32 +576,113 @@
 
 .profile-dropdown {
   @include mobile-only {
+    top: 50%;
+    left: 50%;
+    right: auto;
+    bottom: auto;
+    transform: translate(-50%, -60%) scale(0.9);
+    width: min(340px, 92vw);
+    height: auto;
+    max-height: 85vh;
+    background: rgba(15, 15, 30, 0.85);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 24px;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.8);
+    opacity: 0;
+    visibility: hidden;
+    z-index: 2000;
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    overflow: visible;
+
     &.open {
-      width: min(280px, 80vw);
+      opacity: 1;
+      visibility: visible;
+      transform: translate(-50%, -50%) scale(1);
     }
 
     .stats-panel {
-      width: min(280px, 80vw);
-      padding: 1rem;
+      width: 100%;
+      height: auto;
+      padding: 2rem 1.5rem 1.5rem;
+      overflow-y: auto;
+      max-height: 85vh;
+
+      .stats-profile-header {
+        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        margin-bottom: 1.5rem;
+        padding-bottom: 1rem;
+        align-items: center;
+      }
+
+      .stats-profile-header {
+        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        margin-bottom: 1.5rem;
+        padding-bottom: 1rem;
+        align-items: center;
+        gap: 1.2rem; // Ajuste para móvil
+      }
+
+      .user-info-section {
+        gap: 0;
+        .player-name { font-size: 1.4rem; }
+        .email-text { font-size: 0.8rem; }
+      }
+      
+      .avatar-section {
+        .current-avatar {
+          .current-avatar-img, .no-avatar {
+            width: 75px;
+            height: 75px;
+          }
+        }
+        .edit-avatar-badge {
+          font-size: 1rem;
+          top: -2px;
+          right: -2px;
+        }
+      }
 
       .stat-item {
-        margin-bottom: 1rem;
-
-        .stat-label,
-        .stat-value {
-          font-size: 1rem;
-        }
+        margin-bottom: 0.6rem;
+        .stat-label, .stat-value { font-size: 0.9rem; }
       }
     }
 
     .logout-section {
-      padding: 0.75rem;
+      margin-top: 1rem;
+      padding: 0;
+      border-top: none;
+      display: flex;
+      justify-content: center;
 
       .sidebar-logout-btn {
-        padding: 0.75rem 1rem;
+        width: auto;
+        height: auto;
+        min-width: unset;
+        background: transparent;
+        border: none;
+        color: $primary-pink;
+        padding: 0.5rem;
+        border-radius: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-family: $font-red-hat;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        font-size: 0.8rem;
+        text-shadow: 0 0 10px rgba(255, 80, 140, 0.5);
+        transition: all 0.3s ease;
+        cursor: pointer;
 
-        .logout-text {
-          font-size: 0.8rem;
+        &:hover, &:active {
+          color: white;
+          text-shadow: 0 0 15px rgba(255, 80, 140, 0.8),
+                       0 0 25px rgba(255, 80, 140, 0.5);
+          transform: scale(1.05);
+          background: transparent;
         }
       }
     }
