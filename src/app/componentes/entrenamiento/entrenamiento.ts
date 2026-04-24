@@ -65,7 +65,7 @@ export class EntrenamientoComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
-    // 🔊 Detener la música del dashboard si está sonando
+    //  Detener la música del dashboard si está sonando
     this.audioService.detenerMusicaDashboard();
     // Iniciar música de ambiente del entrenamiento
     this.audioService.playFondo();
@@ -128,7 +128,7 @@ export class EntrenamientoComponent implements OnInit, OnDestroy {
       );
 
       if (response && response.success) {
-        // 🔊 Detener música de entrenamiento antes de entrar a la arena
+        //  Detener música de entrenamiento antes de entrar a la arena
         this.audioService.stopFondo();
         
         this.router.navigate(['/arena'], {

@@ -65,7 +65,7 @@ export class ResultadosComponent implements OnInit {
     private estadisticasService: EstadisticasService,
     private authService: FirebaseAuthService,
     private cdr: ChangeDetectorRef,
-    private audioService: AudioService // 🔊 Inyectar AudioService
+    private audioService: AudioService //  Inyectar AudioService
   ) { }
 
   async ngOnInit() {
@@ -230,7 +230,7 @@ export class ResultadosComponent implements OnInit {
   }
 
   volverAlDashboard() {
-    this.audioService.play('click'); // 🔊 Sonido de click al volver
+    this.audioService.play('click'); //  Sonido de click al volver
     this.router.navigate(['/dashboard']);
   }
 

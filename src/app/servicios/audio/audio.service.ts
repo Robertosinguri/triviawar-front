@@ -35,7 +35,7 @@ export class AudioService {
       const apiBaseUrl = environment.apiUrl.replace(/\/$/, ''); // Remover trailing slash si existe
       const audioUrl = `${apiBaseUrl}/audio/${filename}`;
       
-      console.log(`🎵 Ruta de audio API para ${filename}: ${audioUrl}`);
+      console.log(`Ruta de audio API para ${filename}: ${audioUrl}`);
       return audioUrl;
     };
     
@@ -44,7 +44,7 @@ export class AudioService {
       correcto: this.crearAudio(getAudioPath('correcto.wav'), 1),
       incorrecto: this.crearAudio(getAudioPath('incorrecto.wav'), 1),
       click: this.crearAudio(getAudioPath('click.wav'), 0.8),
-      resultados: this.crearAudio(getAudioPath('resultados.mp3'), 0.7),
+      resultados: this.crearAudio(getAudioPath('resultados.mp3'), 0.5),
 
       // Música de fondo
       fondo: this.crearAudio(getAudioPath('fondo.mp3'), 0.3, true),
@@ -52,7 +52,7 @@ export class AudioService {
       dashboard: this.crearAudio(getAudioPath('fondo-dashboard.mp3'), 0.25, true)
     };
     
-    console.log('🎵 AudioService cargado con rutas de API. Rutas de audio:');
+    console.log('AudioService cargado con rutas de API. Rutas de audio:');
     Object.keys(this.sonidos).forEach(key => {
       console.log(`  ${key}: ${this.sonidos[key].src}`);
     });
@@ -198,7 +198,7 @@ export class AudioService {
         .then(() => {
           this.fondoSonando = nombre;
           this.aplicarFadeIn(pista, volumenObjetivo, 3000);
-          console.log(`🎵 Sonando con Fade In: ${nombre}`);
+          console.log(` Sonando con Fade In: ${nombre}`);
         })
         .catch(err => {
           console.warn('Esperando interacción del usuario para iniciar música:', err);

@@ -66,7 +66,7 @@ export class ConfigurarSalaComponent implements OnInit, OnDestroy {
     this.esHost = this.router.url.includes('crear');
     console.log('🔍 [DEBUG] ConfigurarSala - esHost:', this.esHost, 'URL:', this.router.url);
 
-    // 🔊 Si es modo crear sala, reproducir música específica
+    // Si es modo crear sala, reproducir música específica
     if (this.esHost) {
       this.audioService.playFondo();
     } else {
@@ -131,7 +131,7 @@ export class ConfigurarSalaComponent implements OnInit, OnDestroy {
 
   ngOnDestroy() {
     this.subs.unsubscribe();
-    // 🔊 Detener música de crear sala al salir del componente
+    //  Detener música de crear sala al salir del componente
     if (this.esHost) {
       
     }
@@ -174,7 +174,7 @@ export class ConfigurarSalaComponent implements OnInit, OnDestroy {
   async crearSala() {
     this.audioService.play('click'); // Sonido click
     
-    // 🔊 Detener la música de crear sala al hacer clic en "Iniciar Sala"
+    //  Detener la música de crear sala al hacer clic en "Iniciar Sala"
     
     
     if (!this.esConfiguracionValida() || this.isLoading) return;
@@ -224,7 +224,7 @@ export class ConfigurarSalaComponent implements OnInit, OnDestroy {
 
   volver() {
     this.audioService.play('click');
-    // 🔊 Detener música de crear sala al volver
+    //  Detener música de crear sala al volver
     if (this.esHost) {
       this.audioService.stopFondo();
     }

@@ -32,7 +32,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit() {
-    // 🔊 Iniciar música de fondo del dashboard
+    //  Iniciar música de fondo del dashboard
     this.audioService.iniciarMusicaDashboard();
     this.cargarRankingMinimalista();
     this.cargarSalasPublicas();
@@ -47,7 +47,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
     if (this.intervaloSalas) {
       clearInterval(this.intervaloSalas);
     }
-    // ⚠️ NO detener la música aquí para que continúe en ranking/about
+    //  NO detener la música aquí para que continúe en ranking/about
   }
 
   private cargarRankingMinimalista(): void {
@@ -76,7 +76,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
   crearSala() {
     this.audioService.play('click');
-    // 🔊 Detener música del dashboard al crear sala
+    //  Detener música del dashboard al crear sala
     this.audioService.detenerMusicaDashboard();
     this.router.navigate(['/crear-sala']);
   }
@@ -91,7 +91,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
     const salaAUnirse = codigo || this.codigoSala.trim().toUpperCase();
     if (salaAUnirse) {
       this.audioService.play('click');
-      // 🔊 Detener música del dashboard al unirse a sala
+      // Detener música del dashboard al unirse a sala
       this.audioService.detenerMusicaDashboard();
       // Vamos DIRECTO al lobby
       this.router.navigate(['/lobby'], { 
@@ -102,7 +102,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
   iniciarEntrenamiento() {
     this.audioService.play('click');
-    // 🔊 Detener música del dashboard al iniciar entrenamiento
+    // Detener música del dashboard al iniciar entrenamiento
     this.audioService.detenerMusicaDashboard();
     this.router.navigate(['/entrenamiento']);
   }

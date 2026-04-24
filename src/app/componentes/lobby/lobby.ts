@@ -63,14 +63,14 @@ export class LobbyComponent implements OnInit, OnDestroy {
       return;
     }
 
-    // 🔊 INICIAR música de lobby SOLO si no hay música sonando
+    // INICIAR música de lobby SOLO si no hay música sonando
     // Caso 1: Vienes de configurar-sala → ya hay música (no se inicia nueva)
     // Caso 2: Vienes directo del dashboard → NO hay música (se inicia)
     if (!this.audioService.isHayMusicaSonando()) {
-      console.log('🎵 No hay música sonando, iniciando música de lobby');
+      console.log(' No hay música sonando, iniciando música de lobby');
       this.audioService.playFondo();
     } else {
-      console.log('🎵 Ya hay música sonando, continuando en lobby');
+      console.log('Ya hay música sonando, continuando en lobby');
     }
 
     // Conectar y unirse
@@ -122,7 +122,7 @@ export class LobbyComponent implements OnInit, OnDestroy {
           if (this.cuentaRegresiva <= 0) {
             clearInterval(timer);
             
-            // 🔊 Iniciar música de arena
+            // Iniciar música de arena
             this.audioService.playArena();
             
             this.router.navigate(['/arena'], {
@@ -217,7 +217,7 @@ export class LobbyComponent implements OnInit, OnDestroy {
 
   ngOnDestroy() {
     this.subs.unsubscribe();
-    // ⚠️ NO detenemos música aquí porque puede ser que estemos yendo a Arena
+    // NO detenemos música aquí porque puede ser que estemos yendo a Arena
     // La música se detiene en onGameStarted()
   }
 }
