@@ -45,10 +45,13 @@
   min-height: 0;
   
   @include mobile-only {
-    overflow-y: auto !important; // Scroll solo aquí
+    overflow-y: auto !important; 
     padding: 1rem;
+    padding-bottom: calc(35vh + 2rem); 
     flex: 1 !important;
     min-height: 0;
+    width: 100% !important;
+    max-width: 100% !important;
   }
 }
 
@@ -314,12 +317,18 @@
   }
 
   @include mobile-only {
+    position: fixed;
+    bottom: 0;
+    left: 0;
     width: 100%;
     z-index: 1000;
     padding: 0;
-    height: 20vh !important;
-    flex-shrink: 0 !important;
-    margin-top: 0;
+    height: 35vh !important;
+    margin: 0;
+    background: rgba(15, 15, 30, 0.95);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    box-shadow: 0 -5px 25px rgba(0, 0, 0, 0.5);
   }
 }
 

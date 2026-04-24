@@ -30,8 +30,9 @@ export class ChatStateService {
   // Estado de conexión del socket
   isConnected = signal(false);
   
-  // Identidad actualmente sincronizada en el socket (para evitar re-joins innecesarios)
+  // Identidad y sala actualmente sincronizadas en el socket
   activeSessionUser = signal<string | null>(null);
+  activeSessionRoom = signal<string | null | undefined>(undefined); // undefined significa "no inicializado"
   
   // === COMPUTED SIGNALS ===
   
@@ -126,7 +127,8 @@ export class ChatStateService {
     this.showEmojiPicker.set(false);
     this.isMobileExpanded.set(false);
     this.unreadCount.set(0);
-    this.activeSessionUser.set(null); // Resetear sesión al limpiar todo
+    this.activeSessionUser.set(null); 
+    this.activeSessionRoom.set(undefined); // Resetear sala al limpiar todo
     
     console.log('✅ [ChatState] Estado del chat completamente limpiado');
   }

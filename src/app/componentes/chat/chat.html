@@ -7,7 +7,7 @@
   <div class="mobile-toggle-bar" (click)="toggleMobileChat()">
     <div class="toggle-indicator"></div>
     <span class="toggle-title">
-      {{ modeSignal() === 'global' ? 'Chat Global' : 'Chat de Sala' }}
+      Chat Global
     </span>
     @if (unreadCount() > 0 && !isMobileExpanded()) {
       <span class="unread-badge">{{ unreadCount() }}</span>
@@ -19,7 +19,7 @@
     <!-- Cabecera con Pestañas -->
     <div class="chat-header">
       <button class="tab-btn global-tab active">
-        {{ modeSignal() === 'global' ? 'Conectados' : 'Sala' }}
+        Conectados
       </button>
     </div>
 

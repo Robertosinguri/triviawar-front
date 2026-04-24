@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, inject, ViewChild, ElementRef, HostListener, signal, Input } from '@angular/core';
+import { Component, OnInit, OnDestroy, OnChanges, SimpleChanges, inject, ViewChild, ElementRef, HostListener, signal, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Subscription } from 'rxjs';
@@ -116,17 +116,11 @@ export class ChatComponent implements OnInit, OnDestroy {
     const username = this.username();
     const currentSessionUser = this.chatState.activeSessionUser();
 
-    // Solo unirse si no estamos ya en la sesión
+    // Solo unirse si el usuario es distinto (cambio de login) o si no hay sesión activa
     if (username && username !== currentSessionUser) {
-      console.log(`🤝 Auto-uniéndose al chat como: ${username}, modo: ${this.mode}, sala: ${this.roomId || 'global'}`);
+      console.log(`🤝 Uniéndose al Chat Global Permanente como: ${username}`);
       
-      // Limpiar historial del chat anterior si hay cambio de usuario
-      if (currentSessionUser && currentSessionUser !== 'Invitado') {
-        console.log(`🔄 Cambio de usuario detectado: ${currentSessionUser} -> ${username}. Limpiando chat.`);
-        this.chatState.clearAllChatState();
-      }
-      
-      this.chatService.joinChat(username, this.roomId);
+      this.chatService.joinChat(username, null); // Siempre Global
       this.chatState.activeSessionUser.set(username);
     }
   }
@@ -188,7 +182,7 @@ export class ChatComponent implements OnInit, OnDestroy {
     this.isSending = true;
     
     try {
-      this.chatService.sendMessage(text, username, this.roomId);
+      this.chatService.sendMessage(text, username, null); // Siempre al canal global
       this.publicMessage.set('');
       
       // Incrementar contador de no leídos si el chat está colapsado en móvil
