@@ -738,10 +738,38 @@ input {
   }
 
   .emoji-picker-popup {
-    grid-template-columns: repeat(6, 1fr);
-    width: 90vw;
-    left: 5vw;
-    bottom: 70px;
+    display: flex !important;
+    flex-direction: row !important;
+    width: 100%;
+    left: 0;
+    right: 0;
+    bottom: 100%; // Justo encima del input
+    background: rgba(15, 15, 30, 0.98);
+    backdrop-filter: blur(15px);
+    border: none;
+    border-top: 1px solid $primary-aqua;
+    padding: 0.5rem 1rem;
+    overflow-x: auto !important;
+    white-space: nowrap;
+    border-radius: 0;
+    gap: 1rem;
+    box-shadow: 0 -5px 15px rgba(0, 0, 0, 0.3);
+
+    &::after { display: none; } // Quitar flecha
+
+    .emoji-item {
+      font-size: 1.8rem;
+      min-width: 44px;
+      height: 44px;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    // Ocultar scrollbar
+    scrollbar-width: none;
+    &::-webkit-scrollbar { display: none; }
   }
 
   .private-group-members {

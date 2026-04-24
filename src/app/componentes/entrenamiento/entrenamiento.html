@@ -11,7 +11,6 @@
           <div>
             <div class="input-group">
               <label>Selecciona tu temática</label>
-              <p class="help-text">Máximo 3 palabras para preguntas precisas de IA</p>
               <input type="text" placeholder="Ej: alta cocina, machine learning, rolling stones..."
                 [(ngModel)]="configuracion.tematica" (input)="validarTematica($event)" class="tematica-input"
                 [class.error]="tematicaInvalida" maxlength="50">
@@ -72,20 +71,6 @@
               </button>
             </div>
 
-            <div class="ai-status-section">
-              <h3>POWERED BY</h3>
-              <div class="ai-engines-list">
-                @for (motor of motoresIA; track motor.nombre) {
-                <div class="ai-engine-card">
-                  <span class="engine-icon">{{motor.icono}}</span>
-                  <div class="engine-info">
-                    <span class="engine-name">{{motor.nombre}}</span>
-                    <span class="engine-status" [style.color]="motor.color">{{motor.estado}}</span>
-                  </div>
-                </div>
-                }
-              </div>
-            </div>
           </div>
         </div>
       </main>

@@ -130,7 +130,9 @@
 }
 
 .ranking-content {
-  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: calc(100vh - 120px); // Altura mínima para estabilizar el layout
   padding: 2rem;
   max-width: 1200px;
   margin: 0 auto;
@@ -171,6 +173,9 @@
 
 .ranking-table-container {
   width: 100%;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
 }
 
 .ranking-table {
@@ -338,6 +343,8 @@
 // Formato lista móvil (oculto por defecto)
 .mobile-ranking {
   display: none;
+  flex-direction: column;
+  flex: 1;
   
   .mobile-ranking-list {
     list-style: none;
@@ -454,9 +461,11 @@
 
 // Paginación compartida
 .mobile-pagination, .desktop-pagination {
-  margin-top: 2rem;
+  margin-top: auto; // EMPUJA AL FINAL: Actúa como imán al pie de página
+  padding-top: 2rem;
+  padding-bottom: 1rem;
   text-align: center;
-  display: block; // Asegurar que sea visible si la condición se cumple
+  display: block;
   width: 100%;
   clear: both;
   
@@ -591,6 +600,6 @@
 
   // Mostrar formato lista móvil
   .mobile-ranking {
-    display: block;
+    display: flex;
   }
 }

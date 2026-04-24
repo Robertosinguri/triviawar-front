@@ -121,7 +121,9 @@ export class EntrenamientoComponent implements OnInit, OnDestroy {
       const response = await firstValueFrom(
         this.http.post<any>(`${environment.apiUrl}/games/generate-questions`, {
           tematicas: [this.configuracion.tematica],
-          dificultad: this.configuracion.dificultad
+          dificultad: this.configuracion.dificultad,
+          count: 5, // Forzamos 5 preguntas para entrenamiento
+          isEntrenamiento: true
         })
       );
 

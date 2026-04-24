@@ -253,31 +253,36 @@ export class ArenaComponent implements OnInit, OnDestroy {
     if (this.esUltimaPregunta()) {
       this.finalizarArena();
     } else {
-      const preguntasPorRonda = this.tematicas.length || 1;
-      // Si completamos la ronda (múltiplo exacto)
-      if ((this.preguntaActual + 1) % preguntasPorRonda === 0) {
-        this.mostrarIntermedio = true;
-        this.rondaActual++;
-        this.limpiarTimer();
-        this.cuentaRegresivaIntermedio = 5;
+      // 🎮 LÓGICA DE RONDAS: Solo para multijugador, en entrenamiento es ráfaga continua
+      if (this.modo !== 'entrenamiento') {
+        const preguntasPorRonda = this.tematicas.length || 1;
+        // Si completamos la ronda (múltiplo exacto)
+        if ((this.preguntaActual + 1) % preguntasPorRonda === 0) {
+          this.mostrarIntermedio = true;
+          this.rondaActual++;
+          this.limpiarTimer();
+          this.cuentaRegresivaIntermedio = 5;
 
-        const intervalTimer = setInterval(() => {
-          this.cuentaRegresivaIntermedio--;
-          this.cdr.detectChanges();
-          if (this.cuentaRegresivaIntermedio <= 0) {
-            clearInterval(intervalTimer);
-            this.mostrarIntermedio = false;
-            this.preguntaActual++;
-            this.cargarPreguntaActual();
-            this.iniciarTimer();
+          const intervalTimer = setInterval(() => {
+            this.cuentaRegresivaIntermedio--;
             this.cdr.detectChanges();
-          }
-        }, 1000);
-      } else {
-        this.preguntaActual++;
-        this.cargarPreguntaActual();
-        this.iniciarTimer();
+            if (this.cuentaRegresivaIntermedio <= 0) {
+              clearInterval(intervalTimer);
+              this.mostrarIntermedio = false;
+              this.preguntaActual++;
+              this.cargarPreguntaActual();
+              this.iniciarTimer();
+              this.cdr.detectChanges();
+            }
+          }, 1000);
+          return; // Salir para esperar el timer del intermedio
+        }
       }
+
+      // Continuar a la siguiente pregunta (flujo normal o entrenamiento)
+      this.preguntaActual++;
+      this.cargarPreguntaActual();
+      this.iniciarTimer();
     }
   }
 
