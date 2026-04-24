@@ -7,7 +7,7 @@ import { FirebaseAuthService } from '../../servicios/auth/firebase-auth.service'
 import { environment } from '../../../environments/environment';
 import { HttpClient } from '@angular/common/http';
 import { firstValueFrom } from 'rxjs';
-import { AudioService } from '../../servicios/audio/audio.service'; // 🔊 Importado
+import { AudioService } from '../../servicios/audio/audio.service';
 
 interface ConfiguracionEntrenamiento {
   tematica: string;
@@ -44,7 +44,7 @@ export class EntrenamientoComponent implements OnInit, OnDestroy {
     private router: Router,
     private authService: FirebaseAuthService,
     private http: HttpClient,
-    private audioService: AudioService // Inyectado
+    private audioService: AudioService
   ) { 
     // Inicialización con Proxy para capturar cambios en la UI y disparar sonidos
     const dataInicial: ConfiguracionEntrenamiento = {
@@ -54,7 +54,7 @@ export class EntrenamientoComponent implements OnInit, OnDestroy {
 
     this.configuracion = new Proxy(dataInicial, {
       set: (target, prop, value) => {
-        //  Sonar click si cambia la dificultad en el radio button/select
+        // Sonar click si cambia la dificultad en el radio button/select
         if (prop === 'dificultad' && value !== target.dificultad && value !== '') {
           this.audioService.play('click');
         }
@@ -65,13 +65,17 @@ export class EntrenamientoComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
-    // Iniciar música de ambiente al entrar a la configuración
+    // 🔊 Detener la música del dashboard si está sonando
+    this.audioService.detenerMusicaDashboard();
+    // Iniciar música de ambiente del entrenamiento
     this.audioService.playFondo();
   }
 
   ngOnDestroy() {
-    // Detener música al salir del componente
+    // Detener música de entrenamiento al salir del componente
     this.audioService.stopFondo();
+    // No reiniciar la música del dashboard automáticamente
+    // El componente dashboard/ranking/about se encargará de reiniciarla cuando sea necesario
   }
 
   seleccionarSugerencia(sugerencia: string) {
@@ -122,7 +126,7 @@ export class EntrenamientoComponent implements OnInit, OnDestroy {
       );
 
       if (response && response.success) {
-        // 🔊 Detener música de menú antes de entrar a la arena
+        // 🔊 Detener música de entrenamiento antes de entrar a la arena
         this.audioService.stopFondo();
         
         this.router.navigate(['/arena'], {
@@ -145,11 +149,9 @@ export class EntrenamientoComponent implements OnInit, OnDestroy {
           }
         });
       } else {
-        
         alert('No se pudieron generar preguntas. Intenta con otra temática.');
       }
     } catch (error) {
-      
       console.error('Error al iniciar entrenamiento:', error);
       alert('Error de conexión con el servidor.');
     } finally {

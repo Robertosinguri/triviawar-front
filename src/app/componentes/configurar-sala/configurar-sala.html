@@ -1,4 +1,3 @@
-
 <div class="config-container">
   <app-navbar>
     <div class="config-layout">
@@ -29,7 +28,7 @@
                       [style.background]="configuracion.jugadores === num ? '#01BA9A' : 'rgba(255,255,255,0.1)'"
                       [style.color]="configuracion.jugadores === num ? 'white' : '#ccc'"
                       style="border: 1px solid #01BA9A; padding: 10px 15px; border-radius: 5px; cursor: pointer; transition: all 0.2s;"
-                      (click)="configuracion.jugadores = num">
+                      (click)="actualizarJugadores(num)">
                       {{num}} Jugadores
                     </button>
                     }
@@ -70,6 +69,8 @@
               </button>
               }
             </div>
+
+            
 
             <!-- Panel de información si existe sala -->
             @if (infoSalaExistente) {
