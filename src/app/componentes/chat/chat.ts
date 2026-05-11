@@ -66,6 +66,12 @@ export class ChatComponent implements OnInit, OnDestroy {
       this.chatService.onMessage().subscribe((msg: ChatMessage) => {
         console.log('📩 Mensaje recibido:', msg.text, 'de:', msg.username);
         this.chatState.addMessage(msg);
+        
+        // Incrementar notificaciones si el chat está cerrado, el mensaje no es propio y no es del sistema
+        if (!this.isMobileExpanded() && msg.username !== this.username() && !msg.isSystem) {
+          this.unreadCount.update(count => count + 1);
+        }
+        
         this.scrollToBottom();
       })
     );

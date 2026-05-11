@@ -1,19 +1,17 @@
+<!-- Botón Flotante para Móviles (FAB) -->
+<button class="mobile-chat-fab" (click)="toggleMobileChat()">
+  <svg class="fab-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+  </svg>
+  @if (unreadCount() > 0 && !isMobileExpanded()) {
+    <span class="fab-badge">{{ unreadCount() }}</span>
+  }
+</button>
+
 <div class="chat-container" 
      [class.global-mode]="modeSignal() === 'global'" 
      [class.room-mode]="modeSignal() === 'room'"
      [class.expanded]="isMobileExpanded()">
-  
-  <!-- BARRA DE TOGGLE MÓVIL (Sutil) -->
-  <div class="mobile-toggle-bar" (click)="toggleMobileChat()">
-    <div class="toggle-indicator"></div>
-    <span class="toggle-title">
-      Chat Global
-    </span>
-    @if (unreadCount() > 0 && !isMobileExpanded()) {
-      <span class="unread-badge">{{ unreadCount() }}</span>
-    }
-    <button class="expand-icon">{{ isMobileExpanded() ? '↓' : '↑' }}</button>
-  </div>
 
   <div class="chat-main-content">
     <!-- Cabecera con Pestañas -->
@@ -21,6 +19,7 @@
       <button class="tab-btn global-tab active">
         Conectados
       </button>
+      <button class="mobile-close-btn" (click)="toggleMobileChat()">✖</button>
     </div>
 
     <div class="messages-viewport" #scrollMe>

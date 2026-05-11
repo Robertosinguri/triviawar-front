@@ -47,7 +47,7 @@
   @include mobile-only {
     overflow-y: auto !important; 
     padding: 1rem;
-    padding-bottom: calc(35vh + 2rem); 
+    padding-bottom: 90px; 
     flex: 1 !important;
     min-height: 0;
     width: 100% !important;
@@ -317,18 +317,12 @@
   }
 
   @include mobile-only {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    z-index: 1000;
+    position: static;
+    width: 0;
+    height: 0 !important;
     padding: 0;
-    height: 35vh !important;
     margin: 0;
-    background: rgba(15, 15, 30, 0.95);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    box-shadow: 0 -5px 25px rgba(0, 0, 0, 0.5);
+    overflow: visible;
   }
 }
 

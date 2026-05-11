@@ -48,7 +48,7 @@
   @include mobile-only {
     overflow-y: auto !important; 
     padding: 1rem;
-    padding-bottom: calc(35vh + 2rem); // Espacio para el chat fijo
+    padding-bottom: 90px; // Espacio suficiente para que el FAB no tape contenido
     flex: 1 !important;
     min-height: 0;
   }
@@ -75,16 +75,12 @@
   }
 
   @include mobile-only {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    z-index: 1000;
+    position: static;
+    width: 0;
+    height: 0 !important;
     padding: 0;
-    height: 35vh !important;
-    background: rgba(15, 15, 30, 0.95);
-    backdrop-filter: blur(20px);
     margin: 0;
+    overflow: visible;
   }
 }
 
