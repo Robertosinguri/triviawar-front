@@ -1,6 +1,7 @@
 import { Component, signal } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { BackgroundComponent } from './componentes/background/background';
+import { ControlComponent } from './componentes/control/control';
 
 /**
  * Componente raíz de la aplicación MVPP Web
@@ -10,7 +11,7 @@ import { BackgroundComponent } from './componentes/background/background';
 @Component({
   selector: 'app-root',
   standalone: true, 
-  imports: [RouterOutlet, BackgroundComponent],
+  imports: [RouterOutlet, BackgroundComponent, ControlComponent],
   templateUrl: './app.html',
   styleUrl: './app.scss'
 })

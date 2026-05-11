@@ -31,23 +31,38 @@ export class DashboardComponent implements OnInit, OnDestroy {
     private audioService: AudioService
   ) {}
 
-  ngOnInit() {
-    //  Iniciar música de fondo del dashboard
+ngOnInit() {
+  console.log('=== DASHBOARD INIT ===');
+  
+  this.audioService.iniciarAutoPlay();
+  
+  setTimeout(() => {
+    console.log('Intentando iniciar musica dashboard');
     this.audioService.iniciarMusicaDashboard();
-    this.cargarRankingMinimalista();
-    this.cargarSalasPublicas();
     
-    // Polling de salas cada 10 segundos
-    this.intervaloSalas = setInterval(() => {
-      this.cargarSalasPublicas();
-    }, 10000);
-  }
+    // Verificar estado después de intentar iniciar
+    setTimeout(() => {
+      console.log('Verificacion post inicio:');
+      console.log('musicaDashboardActiva:', (this.audioService as any).musicaDashboardActiva);
+      console.log('fondoSonando:', (this.audioService as any).fondoSonando);
+      console.log('musicaActiva:', this.audioService.isMusicaActiva());
+      console.log('audioActivo:', this.audioService.isAudioActivo());
+    }, 1000);
+  }, 500);
+  
+  this.cargarRankingMinimalista();
+  this.cargarSalasPublicas();
+  
+  this.intervaloSalas = setInterval(() => {
+    this.cargarSalasPublicas();
+  }, 10000);
+}
 
   ngOnDestroy() {
     if (this.intervaloSalas) {
       clearInterval(this.intervaloSalas);
     }
-    //  NO detener la música aquí para que continúe en ranking/about
+    // NO detener la música aquí para que continúe en ranking/about
   }
 
   private cargarRankingMinimalista(): void {
@@ -76,8 +91,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
   crearSala() {
     this.audioService.play('click');
-    //  Detener música del dashboard al crear sala
-    this.audioService.detenerMusicaDashboard();
+    // NO detener la música del dashboard
     this.router.navigate(['/crear-sala']);
   }
 
@@ -91,9 +105,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
     const salaAUnirse = codigo || this.codigoSala.trim().toUpperCase();
     if (salaAUnirse) {
       this.audioService.play('click');
-      // Detener música del dashboard al unirse a sala
-      this.audioService.detenerMusicaDashboard();
-      // Vamos DIRECTO al lobby
+      // NO detener la música del dashboard
       this.router.navigate(['/lobby'], { 
         queryParams: { codigo: salaAUnirse, host: 'false' } 
       });
@@ -102,8 +114,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
   iniciarEntrenamiento() {
     this.audioService.play('click');
-    // Detener música del dashboard al iniciar entrenamiento
-    this.audioService.detenerMusicaDashboard();
+    // NO detener la música del dashboard
     this.router.navigate(['/entrenamiento']);
   }
 }

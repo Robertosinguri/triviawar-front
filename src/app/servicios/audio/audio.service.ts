@@ -8,73 +8,55 @@ export class AudioService {
 
   private sonidos: { [key: string]: HTMLAudioElement } = {};
   private audioActivo: boolean = true;
+  private musicaActiva: boolean = true;
+  private volumenEfectos: number = 0.6;
+  private volumenMusica: number = 0.25;
   private fondoSonando: string | null = null;
   private fadeInterval: any = null;
   private usuarioInteractuo: boolean = false;
-  
-  // Controla si la música del dashboard debe estar sonando globalmente
   private musicaDashboardActiva: boolean = false;
+  private autoPlayDesbloqueado: boolean = false;
 
   constructor() {
+    this.cargarPreferencias();
     this.cargarSonidos();
     this.configurarInteraccionUsuario();
   }
 
   private configurarInteraccionUsuario() {
-    // Marcar que el usuario ha interactuado cuando hace clic en cualquier parte
     document.addEventListener('click', () => {
       this.usuarioInteractuo = true;
-    }, { once: true }); // Solo necesitamos el primer clic
+    }, { once: true });
   }
 
   private cargarSonidos() {
-    // Estrategia robusta para rutas de audio que funcione en cualquier entorno
-    // Ahora usa las rutas de API del backend
     const getAudioPath = (filename: string): string => {
-      // Usar la URL base de la API desde environment
-      const apiBaseUrl = environment.apiUrl.replace(/\/$/, ''); // Remover trailing slash si existe
+      const apiBaseUrl = environment.apiUrl.replace(/\/$/, '');
       const audioUrl = `${apiBaseUrl}/audio/${filename}`;
-      
       console.log(`Ruta de audio API para ${filename}: ${audioUrl}`);
       return audioUrl;
     };
     
     this.sonidos = {
-      // Efectos cortos - Archivos servidos por API del backend
-      correcto: this.crearAudio(getAudioPath('correcto.wav'), 1),
-      incorrecto: this.crearAudio(getAudioPath('incorrecto.wav'), 1),
-      click: this.crearAudio(getAudioPath('click.wav'), 0.8),
-      resultados: this.crearAudio(getAudioPath('resultados.mp3'), 0.5),
-
-      // Música de fondo
-      fondo: this.crearAudio(getAudioPath('fondo.mp3'), 0.3, true),
-      arena: this.crearAudio(getAudioPath('fondo-arena.mp3'), 0.25, true),
-      dashboard: this.crearAudio(getAudioPath('fondo-dashboard.mp3'), 0.25, true)
+      correcto: this.crearAudio(getAudioPath('correcto.wav'), this.volumenEfectos),
+      incorrecto: this.crearAudio(getAudioPath('incorrecto.wav'), this.volumenEfectos),
+      click: this.crearAudio(getAudioPath('click.wav'), this.volumenEfectos),
+      resultados: this.crearAudio(getAudioPath('resultados.mp3'), this.volumenEfectos),
+      fondo: this.crearAudio(getAudioPath('fondo.mp3'), this.volumenMusica, true),
+      arena: this.crearAudio(getAudioPath('fondo-arena.mp3'), this.volumenMusica, true),
+      dashboard: this.crearAudio(getAudioPath('fondo-dashboard.mp3'), this.volumenMusica, true)
     };
     
-    console.log('AudioService cargado con rutas de API. Rutas de audio:');
-    Object.keys(this.sonidos).forEach(key => {
-      console.log(`  ${key}: ${this.sonidos[key].src}`);
-    });
+    console.log('AudioService cargado');
   }
 
-  /**
-   * Crea y configura el objeto de audio con ajustes para producción
-   */
   private crearAudio(src: string, volumen: number = 1, loop: boolean = false): HTMLAudioElement {
     const audio = new Audio();
-    
-    // 2. Preload en 'auto' fuerza al navegador a intentar la descarga de inmediato
     audio.preload = 'auto';
-    
-    // 3. Asignamos los parámetros básicos
     audio.src = src;
     audio.volume = volumen;
     audio.loop = loop;
-
-    // Ejecutamos load() para que aparezca en la pestaña Network de inmediato
     audio.load();
-    
     return audio;
   }
 
@@ -99,12 +81,15 @@ export class AudioService {
     }, intervaloTiempo);
   }
 
+  // ==================== METODOS PUBLICOS ====================
+
   play(nombre: string) {
     if (!this.audioActivo) return;
     const sonido = this.sonidos[nombre];
     if (sonido) {
-      sonido.pause(); 
-      sonido.currentTime = 0; 
+      sonido.volume = this.volumenEfectos;
+      sonido.pause();
+      sonido.currentTime = 0;
       sonido.play().catch(err => console.warn(`Error en efecto [${nombre}]:`, err));
     }
   }
@@ -130,116 +115,266 @@ export class AudioService {
     });
   }
 
-  /**
-   * Verifica si hay alguna música de fondo sonando actualmente
-   */
-  isHayMusicaSonando(): boolean {
-    return this.fondoSonando !== null;
-  }
+  // ==================== MUSICA DE FONDO ====================
 
-  /**
-   * Inicia la música de fondo del dashboard
-   * Esta música continuará sonando entre componentes (dashboard, ranking, about)
-   */
-  iniciarMusicaDashboard() {
-    if (!this.musicaDashboardActiva && this.audioActivo) {
-      this.musicaDashboardActiva = true;
-      this.reproducirMusicaLarga('dashboard', 0.25);
-    }
+ iniciarMusicaDashboard() {
+  console.log('iniciarMusicaDashboard llamado');
+  console.log('musicaDashboardActiva antes:', this.musicaDashboardActiva);
+  console.log('musicaActiva antes:', this.musicaActiva);
+  
+  // Forzar que musicaActiva sea true al iniciar música
+  if (!this.musicaActiva) {
+    this.musicaActiva = true;
   }
+  
+  if (!this.musicaDashboardActiva && this.audioActivo && this.musicaActiva) {
+    this.musicaDashboardActiva = true;
+    this.reproducirMusicaLarga('dashboard', this.volumenMusica);
+  }
+}
+  
 
-  /**
-   * Detiene la música de fondo del dashboard
-   * Útil cuando se navega a componentes como entrenamiento o crear sala
-   */
   detenerMusicaDashboard() {
     this.musicaDashboardActiva = false;
     this.stop('dashboard');
   }
 
-  /**
-   * Reproduce música de fondo del entrenamiento
-   * Automáticamente detiene la música del dashboard
-   */
   playFondo() {
     this.detenerMusicaDashboard();
-    this.reproducirMusicaLarga('fondo', 0.3);
-  }
-
-  /**
-   * Reproduce música de fondo de la arena
-   * Automáticamente detiene la música del dashboard
-   */
-  playArena() {
-    this.detenerMusicaDashboard();
-    this.reproducirMusicaLarga('arena', 0.25);
-  }
-
-  /**
-   * Reproduce la música del dashboard (uso directo)
-   * @deprecated Usar iniciarMusicaDashboard() en su lugar
-   */
-  playFondoDashboard() {
-    this.reproducirMusicaLarga('dashboard', 0.25);
-  }
-
-  private reproducirMusicaLarga(nombre: string, volumenObjetivo: number) {
-    if (!this.audioActivo) return;
-    if (this.fondoSonando === nombre) return;
-
-    if (this.fondoSonando) {
-      this.stop(this.fondoSonando);
-    }
-
-    const pista = this.sonidos[nombre];
-    if (pista) {
-      pista.volume = 0;
-      pista.play()
-        .then(() => {
-          this.fondoSonando = nombre;
-          this.aplicarFadeIn(pista, volumenObjetivo, 3000);
-          console.log(` Sonando con Fade In: ${nombre}`);
-        })
-        .catch(err => {
-          console.warn('Esperando interacción del usuario para iniciar música:', err);
-          // Intentar de nuevo después de que el usuario interactúe
-          if (!this.usuarioInteractuo) {
-            const intentarDeNuevo = () => {
-              this.usuarioInteractuo = true;
-              this.reproducirMusicaLarga(nombre, volumenObjetivo);
-              document.removeEventListener('click', intentarDeNuevo);
-            };
-            document.addEventListener('click', intentarDeNuevo, { once: true });
-          }
-        });
-    }
+    this.reproducirMusicaLarga('fondo', this.volumenMusica);
   }
 
   stopFondo() {
     this.stop('fondo');
   }
 
+  playArena() {
+    this.detenerMusicaDashboard();
+    this.reproducirMusicaLarga('arena', this.volumenMusica);
+  }
+
   stopArena() {
     this.stop('arena');
   }
-
-  stopFondoDashboard() {
-    this.musicaDashboardActiva = false;
-    this.stop('dashboard');
+// audio.service.ts - Modificar reproducirMusicaLarga
+private reproducirMusicaLarga(nombre: string, volumenObjetivo: number) {
+  console.log('reproducirMusicaLarga llamado para:', nombre);
+  console.log('audioActivo:', this.audioActivo);
+  console.log('musicaActiva:', this.musicaActiva);
+  
+  if (!this.audioActivo) return;
+  
+  // Forzar que musicaActiva sea true si estamos reproduciendo música
+  if (!this.musicaActiva) {
+    console.log('Forzando musicaActiva a true');
+    this.musicaActiva = true;
   }
+  
+  if (this.fondoSonando === nombre) return;
+
+  if (this.fondoSonando) {
+    this.stop(this.fondoSonando);
+  }
+
+  const pista = this.sonidos[nombre];
+  if (pista) {
+    pista.volume = 0;
+    pista.play()
+      .then(() => {
+        this.fondoSonando = nombre;
+        this.aplicarFadeIn(pista, volumenObjetivo, 3000);
+        console.log(`Sonando con Fade In: ${nombre}`);
+      })
+      .catch(err => {
+        console.warn('Esperando interacción del usuario para iniciar música:', err);
+        if (!this.usuarioInteractuo) {
+          const intentarDeNuevo = () => {
+            this.usuarioInteractuo = true;
+            this.reproducirMusicaLarga(nombre, volumenObjetivo);
+            document.removeEventListener('click', intentarDeNuevo);
+          };
+          document.addEventListener('click', intentarDeNuevo, { once: true });
+        }
+      });
+  }
+}
+  isHayMusicaSonando(): boolean {
+    return this.fondoSonando !== null;
+  }
+
+  reanudarMusicaContexto() {
+    if (!this.musicaActiva) return;
+    if (!this.audioActivo) return;
+    
+    const rutaActual = window.location.pathname;
+    console.log('Reanudando musica para ruta:', rutaActual);
+    
+    if (rutaActual === '/dashboard' || rutaActual === '/ranking' || rutaActual === '/about') {
+      this.musicaDashboardActiva = true;
+      this.reproducirMusicaLarga('dashboard', this.volumenMusica);
+    } else if (rutaActual === '/entrenamiento') {
+      this.reproducirMusicaLarga('fondo', this.volumenMusica);
+    } else if (rutaActual === '/arena') {
+      this.reproducirMusicaLarga('arena', this.volumenMusica);
+    } else if (rutaActual === '/crear-sala' || rutaActual === '/unirse-sala') {
+      this.reproducirMusicaLarga('fondo', this.volumenMusica);
+    } else if (rutaActual === '/lobby') {
+      this.reproducirMusicaLarga('fondo', this.volumenMusica);
+    }
+  }
+
+  // ==================== CONTROL DE AUDIO ====================
+
+  getVolumenEfectos(): number {
+    return this.volumenEfectos;
+  }
+
+  getVolumenMusica(): number {
+    return this.volumenMusica;
+  }
+
+  isAudioActivo(): boolean {
+    return this.audioActivo;
+  }
+
+  isMusicaActiva(): boolean {
+    return this.musicaActiva;
+  }
+
+  setVolumenEfectos(volumen: number) {
+    this.volumenEfectos = Math.max(0, Math.min(1, volumen));
+    this.guardarPreferencias();
+    
+    const efectos = ['correcto', 'incorrecto', 'click', 'resultados'];
+    efectos.forEach(nombre => {
+      const sonido = this.sonidos[nombre];
+      if (sonido) {
+        sonido.volume = this.volumenEfectos;
+      }
+    });
+  }
+
+  setVolumenMusica(volumen: number) {
+    this.volumenMusica = Math.max(0, Math.min(1, volumen));
+    this.guardarPreferencias();
+    
+    if (this.fondoSonando) {
+      const pista = this.sonidos[this.fondoSonando];
+      if (pista) {
+        pista.volume = this.volumenMusica;
+      }
+    }
+  }
+
+  toggleEfectos() {
+    this.audioActivo = !this.audioActivo;
+    this.guardarPreferencias();
+  }
+
+ // audio.service.ts - Versión simplificada de toggleMusica
+toggleMusica() {
+  console.log('=== TOGGLE MUSICA SIMPLIFICADO ===');
+  console.log('musicaActiva ANTES:', this.musicaActiva);
+  console.log('fondoSonando ANTES:', this.fondoSonando);
+  
+  this.musicaActiva = !this.musicaActiva;
+  this.guardarPreferencias();
+  
+  if (!this.musicaActiva) {
+    // Silenciar: pausar toda la música
+    if (this.fondoSonando) {
+      const pista = this.sonidos[this.fondoSonando];
+      if (pista) {
+        pista.pause();
+        console.log('Musica pausada');
+      }
+    }
+  } else {
+    // Reactivar: reanudar la música que estaba sonando
+    if (this.fondoSonando) {
+      const pista = this.sonidos[this.fondoSonando];
+      if (pista && pista.paused) {
+        pista.volume = this.volumenMusica;
+        pista.play().then(() => {
+          console.log('Musica reanudada:', this.fondoSonando);
+        }).catch(err => {
+          console.warn('Error al reanudar:', err);
+          this.reanudarMusicaContexto();
+        });
+      }
+    } else {
+      this.reanudarMusicaContexto();
+    }
+  }
+  
+  console.log('musicaActiva DESPUES:', this.musicaActiva);
+}
 
   toggleAudio() {
     this.audioActivo = !this.audioActivo;
     if (!this.audioActivo) {
       this.stopAll();
-      this.musicaDashboardActiva = false;
     } else if (this.musicaDashboardActiva) {
-      // Si se reactiva el audio y dashboard debería sonar, lo reiniciamos
-      this.iniciarMusicaDashboard();
+      this.reanudarMusicaContexto();
+    }
+    this.guardarPreferencias();
+  }
+
+  // ==================== AUTOPLAY ====================
+
+  iniciarAutoPlay() {
+    if (this.autoPlayDesbloqueado) return;
+    
+    const AudioContext = window.AudioContext || (window as any).webkitAudioContext;
+    if (AudioContext) {
+      const context = new AudioContext();
+      const gain = context.createGain();
+      gain.gain.value = 0;
+      gain.connect(context.destination);
+      
+      const buffer = context.createBuffer(1, 1, 22050);
+      const source = context.createBufferSource();
+      source.buffer = buffer;
+      source.connect(gain);
+      source.start(0);
+      
+      context.resume().then(() => {
+        console.log('Audio desbloqueado exitosamente');
+        this.autoPlayDesbloqueado = true;
+        this.reanudarMusicaContexto();
+      }).catch(err => {
+        console.warn('No se pudo desbloquear audio:', err);
+      });
     }
   }
 
-  isAudioActivo(): boolean {
-    return this.audioActivo;
+  // ==================== PERSISTENCIA ====================
+
+  private guardarPreferencias() {
+    const preferencias = {
+      audioActivo: this.audioActivo,
+      musicaActiva: this.musicaActiva,
+      volumenEfectos: this.volumenEfectos,
+      volumenMusica: this.volumenMusica,
+      musicaDashboardActiva: this.musicaDashboardActiva
+    };
+    localStorage.setItem('audio_preferencias', JSON.stringify(preferencias));
+  }
+
+  private cargarPreferencias() {
+    const guardado = localStorage.getItem('audio_preferencias');
+    if (guardado) {
+      try {
+        const preferencias = JSON.parse(guardado);
+        this.audioActivo = preferencias.audioActivo ?? true;
+        this.musicaActiva = preferencias.musicaActiva ?? true;
+        this.volumenEfectos = preferencias.volumenEfectos ?? 0.6;
+        this.volumenMusica = preferencias.volumenMusica ?? 0.25;
+        this.musicaDashboardActiva = preferencias.musicaDashboardActiva ?? false;
+        console.log('Preferencias cargadas');
+      } catch (e) {
+        console.error('Error cargando preferencias:', e);
+      }
+    }
   }
 }

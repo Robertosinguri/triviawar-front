@@ -1,0 +1,58 @@
+<div class="control-container">
+  <button class="control-btn" (click)="togglePanel()" [title]="showPanel ? 'Cerrar controles' : 'Abrir controles'">
+    🔊
+  </button>
+
+  @if (showPanel) {
+  <div class="control-panel">
+    <div class="control-panel-header">
+      <span>Controles de Audio</span>
+      <button class="close-btn" (click)="closePanel()">✕</button>
+    </div>
+    
+    <div class="control-item">
+      <div class="control-row">
+        <span class="control-icon">🔊</span>
+        <span class="control-label">Efectos</span>
+        <button class="mute-btn" (click)="toggleEfectos()">
+          {{ efectosActivos ? 'Silenciar' : 'Activar' }}
+        </button>
+      </div>
+      <div class="slider-row">
+        <input 
+          type="range" 
+          [value]="volumenEfectos"
+          (input)="cambiarVolumenEfectos($event)"
+          min="0" 
+          max="1" 
+          step="0.01"
+          class="volume-slider"
+        />
+        <span class="volume-value">{{ (volumenEfectos * 100).toFixed(0) }}%</span>
+      </div>
+    </div>
+
+    <div class="control-item">
+      <div class="control-row">
+        <span class="control-icon">🎵</span>
+        <span class="control-label">Musica</span>
+        <button class="mute-btn" (click)="toggleMusica()">
+          {{ musicaActiva ? 'Silenciar' : 'Activar' }}
+        </button>
+      </div>
+      <div class="slider-row">
+        <input 
+          type="range" 
+          [value]="volumenMusica"
+          (input)="cambiarVolumenMusica($event)"
+          min="0" 
+          max="1" 
+          step="0.01"
+          class="volume-slider"
+        />
+        <span class="volume-value">{{ (volumenMusica * 100).toFixed(0) }}%</span>
+      </div>
+    </div>
+  </div>
+  }
+</div>
