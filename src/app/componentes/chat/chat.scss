@@ -698,7 +698,8 @@ input {
     bottom: 90px;
     right: 15px;
     width: calc(100vw - 30px);
-    height: 65vh !important;
+    height: 65dvh !important;
+    max-height: calc(100dvh - 110px) !important;
     background: rgba(20, 20, 35, 0.95);
     backdrop-filter: blur(15px);
     -webkit-backdrop-filter: blur(15px);
@@ -737,23 +738,7 @@ input {
   }
 
   .mobile-close-btn {
-    background: rgba(255, 255, 255, 0.1);
-    border: none;
-    color: white;
-    width: 28px;
-    height: 28px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 14px;
-    cursor: pointer;
-    transition: all 0.2s;
-
-    &:active {
-      background: rgba(255, 255, 255, 0.2);
-      transform: scale(0.9);
-    }
+    display: none;
   }
 
   .tab-btn {
