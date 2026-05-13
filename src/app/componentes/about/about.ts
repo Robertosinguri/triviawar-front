@@ -21,12 +21,6 @@ export class AboutComponent {
     this.showImageModal = false;
   }
 
-  abrirPresentacion(): void {
-    // Usamos la URL absoluta para evitar que Angular Router intercepte la navegación
-    const url = `${window.location.origin}/presentacion/index.html`;
-    window.open(url, '_blank', 'noopener,noreferrer');
-  }
-
 
 }
 
