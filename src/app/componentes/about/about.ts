@@ -22,8 +22,9 @@ export class AboutComponent {
   }
 
   abrirPresentacion(): void {
-    window.open('/assets/presentacion/index.html', '_blank', 'noopener,noreferrer');
+    window.open('/presentacion/index.html', '_blank', 'noopener,noreferrer');
   }
+
 }
 
 
