@@ -1,179 +1,352 @@
+@use '../../theme/variables.scss' as *;
+@use 'sass:color';
+
 .control-container {
   position: fixed;
   bottom: 20px;
   right: 20px;
   z-index: 9999;
   display: block;
+}
 
-  .control-btn {
-    background: rgba(1, 186, 154, 0.2);
-    backdrop-filter: blur(8px);
-    border: 1px solid #01BA9A;
-    border-radius: 50%;
-    width: 48px;
-    height: 48px;
+// Botón FAB principal - ícono fijo, el brillo indica el estado
+.mobile-audio-fab {
+  position: relative;
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, color.adjust(#01BA9A, $lightness: 10%), #01BA9A);
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  padding: 0;
+  
+  .audio-icon-svg {
+    width: 28px;
+    height: 28px;
+    color: white;
+    stroke: white;
+  }
+
+  // Estado activo (música sonando) - con brillo
+  &.active {
+    box-shadow: 0 0 15px rgba(1, 186, 154, 0.8), 0 0 30px rgba(1, 186, 154, 0.5), 0 5px 20px rgba(0, 0, 0, 0.6);
+  }
+  
+  // Estado inactivo (música muteada) - sin brillo
+  &:not(.active) {
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+    opacity: 0.85;
+  }
+
+  &:hover {
+    transform: scale(1.1);
+    box-shadow: 0 0 20px rgba(1, 186, 154, 1), 0 0 35px rgba(1, 186, 154, 0.7), 0 5px 25px rgba(0, 0, 0, 0.8);
+  }
+
+  &:active {
+    transform: scale(0.9);
+  }
+}
+
+.control-panel {
+  position: absolute;
+  bottom: 70px;
+  right: 0;
+  width: 280px;
+  background: rgba(20, 20, 35, 0.95);
+  backdrop-filter: blur(15px);
+  -webkit-backdrop-filter: blur(15px);
+  border: 1px solid rgba(1, 186, 154, 0.3);
+  border-radius: 15px;
+  padding: 1rem;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.7);
+  animation: fadeInUp 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  transform-origin: bottom right;
+
+  .control-panel-header {
     display: flex;
+    justify-content: space-between;
     align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    font-size: 1.3rem;
-    transition: all 0.2s;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+    margin-bottom: 1rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid rgba(1, 186, 154, 0.2);
 
-    &:hover {
-      background: rgba(1, 186, 154, 0.4);
-      transform: scale(1.05);
+    span {
+      font-weight: bold;
+      color: #e6bd00;
+      font-size: 0.9rem;
+      letter-spacing: 0.5px;
+    }
+
+    .close-btn {
+      background: rgba(255, 80, 140, 0.2);
+      border: none;
+      border-radius: 50%;
+      width: 28px;
+      height: 28px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+
+      svg {
+        stroke: #ff508c;
+        width: 16px;
+        height: 16px;
+      }
+
+      &:hover {
+        background: rgba(255, 80, 140, 0.4);
+        
+        svg {
+          stroke: white;
+        }
+      }
+    }
+  }
+
+  .control-item {
+    margin-bottom: 1.2rem;
+
+    .control-row {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      margin-bottom: 0.5rem;
+
+      .control-icon {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 28px;
+        
+        svg {
+          stroke: #01BA9A;
+          width: 20px;
+          height: 20px;
+        }
+      }
+
+      .control-label {
+        flex: 1;
+        font-size: 0.8rem;
+        color: rgba(255, 255, 255, 0.8);
+        font-weight: 500;
+      }
+
+      // Botón mute - ícono fijo de mute, brillo indica estado
+      .mute-btn {
+        background: rgba(1, 186, 154, 0.2);
+        border: 1px solid #01BA9A;
+        border-radius: 50%;
+        width: 32px;
+        height: 32px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s ease;
+        padding: 0;
+
+        svg {
+          stroke: #01BA9A;
+          width: 18px;
+          height: 18px;
+          transition: all 0.2s ease;
+        }
+
+        // Estado activo: el botón brilla
+        &.active {
+          background: rgba(1, 186, 154, 0.5);
+          box-shadow: 0 0 12px rgba(1, 186, 154, 0.8);
+          border-color: rgba(1, 186, 154, 0.8);
+          
+          svg {
+            stroke: white;
+          }
+        }
+
+        &:hover {
+          background: rgba(1, 186, 154, 0.4);
+          transform: scale(1.1);
+          
+          svg {
+            stroke: white;
+          }
+        }
+
+        &:active {
+          transform: scale(0.95);
+        }
+      }
+    }
+
+    .slider-row {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+
+      .volume-slider {
+        flex: 1;
+        height: 5px;
+        -webkit-appearance: none;
+        background: rgba(1, 186, 154, 0.2);
+        border-radius: 5px;
+        outline: none;
+        cursor: pointer;
+
+        &::-webkit-slider-thumb {
+          -webkit-appearance: none;
+          width: 10px;
+          height: 20px;
+          border-radius: 3px;
+          background: #01BA9A;
+          cursor: pointer;
+          border: none;
+          box-shadow: 0 0 8px rgba(1, 186, 154, 0.6);
+          transition: all 0.2s ease;
+          
+          &:hover {
+            transform: scaleX(1.2);
+            box-shadow: 0 0 12px rgba(1, 186, 154, 0.9);
+          }
+        }
+
+        &:hover {
+          background: rgba(1, 186, 154, 0.3);
+        }
+        
+        &::-moz-range-thumb {
+          width: 10px;
+          height: 20px;
+          border-radius: 3px;
+          background: #01BA9A;
+          cursor: pointer;
+          border: none;
+          box-shadow: 0 0 8px rgba(1, 186, 154, 0.6);
+        }
+        
+        &::-moz-range-track {
+          height: 5px;
+          background: rgba(1, 186, 154, 0.2);
+          border-radius: 5px;
+        }
+      }
+
+      .volume-value {
+        font-size: 0.7rem;
+        color: rgba(255, 255, 255, 0.5);
+        min-width: 38px;
+        text-align: right;
+        font-family: monospace;
+      }
+    }
+  }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(15px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+// ============================================================
+// ESCRITORIO - botón abajo a la derecha
+// ============================================================
+@media (min-width: 769px) {
+  .control-container {
+    bottom: 20px;
+    right: 20px;
+  }
+}
+
+// ============================================================
+// MÓVIL - botón ARRIBA del chat
+// ============================================================
+@media (max-width: 768px) {
+  .control-container {
+    bottom: 100px;
+    right: 20px;
+    z-index: 9990;
+  }
+
+  .mobile-audio-fab {
+    width: 60px;
+    height: 60px;
+    
+    .audio-icon-svg {
+      width: 28px;
+      height: 28px;
     }
   }
 
   .control-panel {
-    position: absolute;
-    bottom: 55px;
+    bottom: 70px;
     right: 0;
     width: 280px;
-    background: linear-gradient(135deg, #1a1a2e, #16213e);
-    border: 1px solid #01BA9A;
-    border-radius: 12px;
-    padding: 1rem;
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
-    backdrop-filter: blur(10px);
-    animation: fadeIn 0.2s ease;
-
-    .control-panel-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 1rem;
-      padding-bottom: 0.5rem;
-      border-bottom: 1px solid rgba(1, 186, 154, 0.3);
-
-      span {
-        font-weight: bold;
-        color: #e6bd00;
-        font-size: 0.9rem;
-      }
-
-      .close-btn {
-        background: none;
-        border: none;
-        color: #ff508c;
-        font-size: 1.2rem;
-        cursor: pointer;
-        line-height: 1;
-
-        &:hover {
-          color: white;
-        }
-      }
-    }
-
-    .control-item {
-      margin-bottom: 1rem;
-
-      .control-row {
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-        margin-bottom: 0.5rem;
-
-        .control-icon {
-          font-size: 0.9rem;
-        }
-
-        .control-label {
-          flex: 1;
-          font-size: 0.8rem;
-          color: white;
-        }
-
-        .mute-btn {
-          background: rgba(1, 186, 154, 0.2);
-          border: 1px solid #01BA9A;
-          border-radius: 15px;
-          padding: 0.2rem 0.6rem;
-          cursor: pointer;
-          font-size: 0.65rem;
-          color: #01BA9A;
-          transition: all 0.2s;
-
-          &:hover {
-            background: rgba(1, 186, 154, 0.4);
-            color: white;
-          }
-        }
-      }
-
-      .slider-row {
-        display: flex;
-        align-items: center;
-        gap: 0.8rem;
-
-        .volume-slider {
-          flex: 1;
-          height: 4px;
-          -webkit-appearance: none;
-          background: #01BA9A;
-          border-radius: 2px;
-          outline: none;
-          cursor: pointer;
-
-          &::-webkit-slider-thumb {
-            -webkit-appearance: none;
-            width: 12px;
-            height: 12px;
-            border-radius: 50%;
-            background: white;
-            cursor: pointer;
-            border: 1px solid #01BA9A;
-          }
-        }
-
-        .volume-value {
-          font-size: 0.65rem;
-          color: rgba(255, 255, 255, 0.5);
-          min-width: 35px;
-          text-align: right;
-        }
-      }
-    }
+  }
+  
+  body:has(.chat-container.expanded) .control-container {
+    display: none;
   }
 }
 
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-// Ajustes para móvil
-@media (max-width: 768px) {
-  .control-container {
-    bottom: 80px;  // Subir el botón para no tapar el chat
-    right: 10px;
-
-    .control-btn {
-      width: 40px;
-      height: 40px;
-      font-size: 1.1rem;
-    }
-
-    .control-panel {
-      width: 260px;
-      bottom: 48px;
-      right: 0;
-    }
-  }
-}
-
-// Ajuste específico para pantallas muy pequeñas
+// ============================================================
+// PANTALLAS MUY PEQUEÑAS
+// ============================================================
 @media (max-width: 480px) {
   .control-container {
+    bottom: 95px;
+    right: 15px;
+  }
+
+  .mobile-audio-fab {
+    width: 60px;
+    height: 60px;
+    
+    .audio-icon-svg {
+      width: 28px;
+      height: 28px;
+    }
+  }
+
+  .control-panel {
     bottom: 70px;
-    right: 8px;
+    width: 270px;
+    padding: 0.8rem;
+  }
+}
+
+// Orientación landscape
+@media (max-width: 768px) and (orientation: landscape) {
+  .control-container {
+    bottom: 20px;
+    right: 20px;
+  }
+
+  .mobile-audio-fab {
+    width: 50px;
+    height: 50px;
+    
+    .audio-icon-svg {
+      width: 24px;
+      height: 24px;
+    }
+  }
+
+  .control-panel {
+    bottom: 60px;
+    max-height: 70vh;
+    overflow-y: auto;
   }
 }

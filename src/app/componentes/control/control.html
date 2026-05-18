@@ -1,21 +1,42 @@
 <div class="control-container">
-  <button class="control-btn" (click)="togglePanel()" [title]="showPanel ? 'Cerrar controles' : 'Abrir controles'">
-    🔊
+  <!-- Botón FAB principal - ícono fijo (no cambia) -->
+  <button class="mobile-audio-fab" [class.active]="musicaActiva" (click)="togglePanel()">
+    <svg class="audio-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M3 18v-6a9 9 0 0 1 18 0v6"></path>
+      <path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3z"></path>
+      <path d="M3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"></path>
+    </svg>
   </button>
 
   @if (showPanel) {
   <div class="control-panel">
     <div class="control-panel-header">
       <span>Controles de Audio</span>
-      <button class="close-btn" (click)="closePanel()">✕</button>
+      <button class="close-btn" (click)="closePanel()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="18" y1="6" x2="6" y2="18"></line>
+          <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+      </button>
     </div>
     
+    <!-- Control de EFECTOS -->
     <div class="control-item">
       <div class="control-row">
-        <span class="control-icon">🔊</span>
+        <span class="control-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M11 5L6 9H2v6h4l5 4V5z"></path>
+            <path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path>
+            <path d="M19.07 4.93a10 10 0 0 1 0 14.14"></path>
+          </svg>
+        </span>
         <span class="control-label">Efectos</span>
-        <button class="mute-btn" (click)="toggleEfectos()">
-          {{ efectosActivos ? 'Silenciar' : 'Activar' }}
+        <button class="mute-btn" [class.active]="efectosActivos" (click)="toggleEfectos()" title="Silenciar efectos">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+            <line x1="23" y1="9" x2="17" y2="15"></line>
+            <line x1="17" y1="9" x2="23" y2="15"></line>
+          </svg>
         </button>
       </div>
       <div class="slider-row">
@@ -32,12 +53,23 @@
       </div>
     </div>
 
+    <!-- Control de MUSICA -->
     <div class="control-item">
       <div class="control-row">
-        <span class="control-icon">🎵</span>
+        <span class="control-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M9 18V5l12-2v13"></path>
+            <circle cx="6" cy="18" r="3"></circle>
+            <circle cx="18" cy="16" r="3"></circle>
+          </svg>
+        </span>
         <span class="control-label">Musica</span>
-        <button class="mute-btn" (click)="toggleMusica()">
-          {{ musicaActiva ? 'Silenciar' : 'Activar' }}
+        <button class="mute-btn" [class.active]="musicaActiva" (click)="toggleMusica()" title="Silenciar musica">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+            <line x1="23" y1="9" x2="17" y2="15"></line>
+            <line x1="17" y1="9" x2="23" y2="15"></line>
+          </svg>
         </button>
       </div>
       <div class="slider-row">

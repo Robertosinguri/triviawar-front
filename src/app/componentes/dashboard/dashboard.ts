@@ -31,24 +31,22 @@ export class DashboardComponent implements OnInit, OnDestroy {
     private audioService: AudioService
   ) {}
 
-ngOnInit() {
+ ngOnInit() {
   console.log('=== DASHBOARD INIT ===');
   
-  this.audioService.iniciarAutoPlay();
+  // NO forzar activación de audio o música aquí
+  // Solo intentar reanudar si debía sonar antes de navegar
+  const musicaReanudada = this.audioService.reanudarMusicaDashboardSiDebia();
   
-  setTimeout(() => {
-    console.log('Intentando iniciar musica dashboard');
-    this.audioService.iniciarMusicaDashboard();
-    
-    // Verificar estado después de intentar iniciar
-    setTimeout(() => {
-      console.log('Verificacion post inicio:');
-      console.log('musicaDashboardActiva:', (this.audioService as any).musicaDashboardActiva);
-      console.log('fondoSonando:', (this.audioService as any).fondoSonando);
-      console.log('musicaActiva:', this.audioService.isMusicaActiva());
-      console.log('audioActivo:', this.audioService.isAudioActivo());
-    }, 1000);
-  }, 500);
+  if (!musicaReanudada) {
+    // Solo iniciar música si no hay ninguna sonando
+    if (!this.audioService.isHayMusicaSonando()) {
+      setTimeout(() => {
+        this.audioService.iniciarAutoPlay();
+        this.audioService.iniciarMusicaDashboard();
+      }, 500);
+    }
+  }
   
   this.cargarRankingMinimalista();
   this.cargarSalasPublicas();
@@ -57,12 +55,11 @@ ngOnInit() {
     this.cargarSalasPublicas();
   }, 10000);
 }
-
+  
   ngOnDestroy() {
     if (this.intervaloSalas) {
       clearInterval(this.intervaloSalas);
     }
-    // NO detener la música aquí para que continúe en ranking/about
   }
 
   private cargarRankingMinimalista(): void {
@@ -91,7 +88,6 @@ ngOnInit() {
 
   crearSala() {
     this.audioService.play('click');
-    // NO detener la música del dashboard
     this.router.navigate(['/crear-sala']);
   }
 
@@ -105,7 +101,6 @@ ngOnInit() {
     const salaAUnirse = codigo || this.codigoSala.trim().toUpperCase();
     if (salaAUnirse) {
       this.audioService.play('click');
-      // NO detener la música del dashboard
       this.router.navigate(['/lobby'], { 
         queryParams: { codigo: salaAUnirse, host: 'false' } 
       });
@@ -114,7 +109,6 @@ ngOnInit() {
 
   iniciarEntrenamiento() {
     this.audioService.play('click');
-    // NO detener la música del dashboard
     this.router.navigate(['/entrenamiento']);
   }
 }

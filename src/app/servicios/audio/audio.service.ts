@@ -16,6 +16,9 @@ export class AudioService {
   private usuarioInteractuo: boolean = false;
   private musicaDashboardActiva: boolean = false;
   private autoPlayDesbloqueado: boolean = false;
+  
+  // Nueva propiedad para guardar el estado antes de navegar
+  private musicaDebiaSonarAntesDeNavegar: boolean = false;
 
   constructor() {
     this.cargarPreferencias();
@@ -117,26 +120,45 @@ export class AudioService {
 
   // ==================== MUSICA DE FONDO ====================
 
- iniciarMusicaDashboard() {
-  console.log('iniciarMusicaDashboard llamado');
-  console.log('musicaDashboardActiva antes:', this.musicaDashboardActiva);
-  console.log('musicaActiva antes:', this.musicaActiva);
-  
-  // Forzar que musicaActiva sea true al iniciar música
-  if (!this.musicaActiva) {
-    this.musicaActiva = true;
+  iniciarMusicaDashboard() {
+    console.log('iniciarMusicaDashboard llamado');
+    console.log('musicaDashboardActiva antes:', this.musicaDashboardActiva);
+    console.log('musicaActiva antes:', this.musicaActiva);
+    
+    if (!this.musicaActiva) {
+      this.musicaActiva = true;
+    }
+    
+    if (!this.musicaDashboardActiva && this.audioActivo && this.musicaActiva) {
+      this.musicaDashboardActiva = true;
+      this.reproducirMusicaLarga('dashboard', this.volumenMusica);
+    }
   }
-  
-  if (!this.musicaDashboardActiva && this.audioActivo && this.musicaActiva) {
-    this.musicaDashboardActiva = true;
-    this.reproducirMusicaLarga('dashboard', this.volumenMusica);
-  }
-}
-  
 
   detenerMusicaDashboard() {
+    // Guardar que la música debería sonar antes de detenerla
+    this.musicaDebiaSonarAntesDeNavegar = this.musicaDashboardActiva;
     this.musicaDashboardActiva = false;
     this.stop('dashboard');
+    console.log('Musica dashboard detenida, estado guardado:', this.musicaDebiaSonarAntesDeNavegar);
+  }
+
+  // Guardar estado antes de navegar (para componentes que no tienen música propia)
+  guardarEstadoMusicaAntesDeNavegar() {
+    this.musicaDebiaSonarAntesDeNavegar = this.musicaActiva && this.musicaDashboardActiva;
+    console.log('Estado de musica guardado antes de navegar:', this.musicaDebiaSonarAntesDeNavegar);
+  }
+
+  // Reanudar música si debía sonar (al volver al dashboard)
+  reanudarMusicaDashboardSiDebia() {
+    if (this.musicaDebiaSonarAntesDeNavegar && this.audioActivo && this.musicaActiva) {
+      console.log('Reanudando musica dashboard porque debia sonar');
+      this.musicaDashboardActiva = true;
+      this.reproducirMusicaLarga('dashboard', this.volumenMusica);
+      this.musicaDebiaSonarAntesDeNavegar = false;
+      return true;
+    }
+    return false;
   }
 
   playFondo() {
@@ -156,48 +178,48 @@ export class AudioService {
   stopArena() {
     this.stop('arena');
   }
-// audio.service.ts - Modificar reproducirMusicaLarga
-private reproducirMusicaLarga(nombre: string, volumenObjetivo: number) {
-  console.log('reproducirMusicaLarga llamado para:', nombre);
-  console.log('audioActivo:', this.audioActivo);
-  console.log('musicaActiva:', this.musicaActiva);
-  
-  if (!this.audioActivo) return;
-  
-  // Forzar que musicaActiva sea true si estamos reproduciendo música
-  if (!this.musicaActiva) {
-    console.log('Forzando musicaActiva a true');
-    this.musicaActiva = true;
-  }
-  
-  if (this.fondoSonando === nombre) return;
 
-  if (this.fondoSonando) {
-    this.stop(this.fondoSonando);
+  private reproducirMusicaLarga(nombre: string, volumenObjetivo: number) {
+    console.log('reproducirMusicaLarga llamado para:', nombre);
+    console.log('audioActivo:', this.audioActivo);
+    console.log('musicaActiva:', this.musicaActiva);
+    
+    if (!this.audioActivo) return;
+    
+    if (!this.musicaActiva) {
+      console.log('Forzando musicaActiva a true');
+      this.musicaActiva = true;
+    }
+    
+    if (this.fondoSonando === nombre) return;
+
+    if (this.fondoSonando) {
+      this.stop(this.fondoSonando);
+    }
+
+    const pista = this.sonidos[nombre];
+    if (pista) {
+      pista.volume = 0;
+      pista.play()
+        .then(() => {
+          this.fondoSonando = nombre;
+          this.aplicarFadeIn(pista, volumenObjetivo, 3000);
+          console.log(`Sonando con Fade In: ${nombre}`);
+        })
+        .catch(err => {
+          console.warn('Esperando interacción del usuario para iniciar música:', err);
+          if (!this.usuarioInteractuo) {
+            const intentarDeNuevo = () => {
+              this.usuarioInteractuo = true;
+              this.reproducirMusicaLarga(nombre, volumenObjetivo);
+              document.removeEventListener('click', intentarDeNuevo);
+            };
+            document.addEventListener('click', intentarDeNuevo, { once: true });
+          }
+        });
+    }
   }
 
-  const pista = this.sonidos[nombre];
-  if (pista) {
-    pista.volume = 0;
-    pista.play()
-      .then(() => {
-        this.fondoSonando = nombre;
-        this.aplicarFadeIn(pista, volumenObjetivo, 3000);
-        console.log(`Sonando con Fade In: ${nombre}`);
-      })
-      .catch(err => {
-        console.warn('Esperando interacción del usuario para iniciar música:', err);
-        if (!this.usuarioInteractuo) {
-          const intentarDeNuevo = () => {
-            this.usuarioInteractuo = true;
-            this.reproducirMusicaLarga(nombre, volumenObjetivo);
-            document.removeEventListener('click', intentarDeNuevo);
-          };
-          document.addEventListener('click', intentarDeNuevo, { once: true });
-        }
-      });
-  }
-}
   isHayMusicaSonando(): boolean {
     return this.fondoSonando !== null;
   }
@@ -265,32 +287,32 @@ private reproducirMusicaLarga(nombre: string, volumenObjetivo: number) {
       }
     }
   }
+   
+    // audio.service.ts - Métodos toggle corregidos
 
-  toggleEfectos() {
-    this.audioActivo = !this.audioActivo;
-    this.guardarPreferencias();
-  }
+toggleEfectos() {
+  this.audioActivo = !this.audioActivo;
+  console.log('Toggle efectos - nuevo estado:', this.audioActivo);
+  this.guardarPreferencias();
+}
 
- // audio.service.ts - Versión simplificada de toggleMusica
 toggleMusica() {
-  console.log('=== TOGGLE MUSICA SIMPLIFICADO ===');
+  console.log('=== TOGGLE MUSICA ===');
   console.log('musicaActiva ANTES:', this.musicaActiva);
-  console.log('fondoSonando ANTES:', this.fondoSonando);
   
   this.musicaActiva = !this.musicaActiva;
-  this.guardarPreferencias();
   
   if (!this.musicaActiva) {
     // Silenciar: pausar toda la música
     if (this.fondoSonando) {
       const pista = this.sonidos[this.fondoSonando];
-      if (pista) {
+      if (pista && !pista.paused) {
         pista.pause();
         console.log('Musica pausada');
       }
     }
   } else {
-    // Reactivar: reanudar la música que estaba sonando
+    // Reactivar: reanudar música
     if (this.fondoSonando) {
       const pista = this.sonidos[this.fondoSonando];
       if (pista && pista.paused) {
@@ -298,7 +320,7 @@ toggleMusica() {
         pista.play().then(() => {
           console.log('Musica reanudada:', this.fondoSonando);
         }).catch(err => {
-          console.warn('Error al reanudar:', err);
+          console.warn('Error al reanudar musica:', err);
           this.reanudarMusicaContexto();
         });
       }
@@ -308,8 +330,10 @@ toggleMusica() {
   }
   
   console.log('musicaActiva DESPUES:', this.musicaActiva);
+  this.guardarPreferencias();
 }
 
+ 
   toggleAudio() {
     this.audioActivo = !this.audioActivo;
     if (!this.audioActivo) {
@@ -349,32 +373,72 @@ toggleMusica() {
   }
 
   // ==================== PERSISTENCIA ====================
+// audio.service.ts - Métodos corregidos
 
-  private guardarPreferencias() {
-    const preferencias = {
-      audioActivo: this.audioActivo,
-      musicaActiva: this.musicaActiva,
-      volumenEfectos: this.volumenEfectos,
-      volumenMusica: this.volumenMusica,
-      musicaDashboardActiva: this.musicaDashboardActiva
-    };
-    localStorage.setItem('audio_preferencias', JSON.stringify(preferencias));
-  }
-
-  private cargarPreferencias() {
-    const guardado = localStorage.getItem('audio_preferencias');
-    if (guardado) {
-      try {
-        const preferencias = JSON.parse(guardado);
-        this.audioActivo = preferencias.audioActivo ?? true;
-        this.musicaActiva = preferencias.musicaActiva ?? true;
-        this.volumenEfectos = preferencias.volumenEfectos ?? 0.6;
-        this.volumenMusica = preferencias.volumenMusica ?? 0.25;
-        this.musicaDashboardActiva = preferencias.musicaDashboardActiva ?? false;
-        console.log('Preferencias cargadas');
-      } catch (e) {
-        console.error('Error cargando preferencias:', e);
-      }
+private cargarPreferencias() {
+  const guardado = localStorage.getItem('audio_preferencias');
+  if (guardado) {
+    try {
+      const preferencias = JSON.parse(guardado);
+      
+      // Validar y corregir valores antes de aplicarlos
+      this.audioActivo = preferencias.audioActivo === undefined ? true : preferencias.audioActivo;
+      this.musicaActiva = preferencias.musicaActiva === undefined ? true : preferencias.musicaActiva;
+      this.volumenEfectos = this.validarVolumen(preferencias.volumenEfectos, 0.7);
+      this.volumenMusica = this.validarVolumen(preferencias.volumenMusica, 0.35);
+      this.musicaDashboardActiva = preferencias.musicaDashboardActiva === undefined ? false : preferencias.musicaDashboardActiva;
+      this.musicaDebiaSonarAntesDeNavegar = preferencias.musicaDebiaSonarAntesDeNavegar === undefined ? false : preferencias.musicaDebiaSonarAntesDeNavegar;
+      
+      console.log('Preferencias cargadas y validadas:', {
+        audioActivo: this.audioActivo,
+        musicaActiva: this.musicaActiva,
+        volumenEfectos: this.volumenEfectos,
+        volumenMusica: this.volumenMusica
+      });
+      
+      // Si algún valor estaba corrupto, guardar los valores corregidos
+      this.guardarPreferencias();
+      
+    } catch (e) {
+      console.error('Error cargando preferencias, usando valores por defecto:', e);
+      this.resetearPreferencias();
     }
+  } else {
+    console.log('No hay preferencias guardadas, usando valores por defecto');
+    this.resetearPreferencias();
   }
+}
+
+private validarVolumen(volumen: any, valorPorDefecto: number): number {
+  if (volumen === undefined || volumen === null || isNaN(volumen)) {
+    return valorPorDefecto;
+  }
+  // Asegurar que esté entre 0 y 1
+  return Math.max(0, Math.min(1, volumen));
+}
+
+private resetearPreferencias() {
+  this.audioActivo = true;
+  this.musicaActiva = true;
+  this.volumenEfectos = 0.7;
+  this.volumenMusica = 0.35;
+  this.musicaDashboardActiva = false;
+  this.musicaDebiaSonarAntesDeNavegar = false;
+  this.guardarPreferencias();
+  console.log('Preferencias reseteadas a valores por defecto');
+}
+
+private guardarPreferencias() {
+  // Solo guardar si los valores son válidos
+  const preferencias = {
+    audioActivo: this.audioActivo === true,
+    musicaActiva: this.musicaActiva === true,
+    volumenEfectos: this.validarVolumen(this.volumenEfectos, 0.7),
+    volumenMusica: this.validarVolumen(this.volumenMusica, 0.35),
+    musicaDashboardActiva: this.musicaDashboardActiva === true,
+    musicaDebiaSonarAntesDeNavegar: this.musicaDebiaSonarAntesDeNavegar === true
+  };
+  localStorage.setItem('audio_preferencias', JSON.stringify(preferencias));
+  console.log('Preferencias guardadas correctamente:', preferencias);
+}
 }

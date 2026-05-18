@@ -64,10 +64,8 @@ export class LobbyComponent implements OnInit, OnDestroy {
     }
 
     // INICIAR música de lobby SOLO si no hay música sonando
-    // Caso 1: Vienes de configurar-sala → ya hay música (no se inicia nueva)
-    // Caso 2: Vienes directo del dashboard → NO hay música (se inicia)
     if (!this.audioService.isHayMusicaSonando()) {
-      console.log(' No hay música sonando, iniciando música de lobby');
+      console.log('No hay música sonando, iniciando música de lobby');
       this.audioService.playFondo();
     } else {
       console.log('Ya hay música sonando, continuando en lobby');
@@ -108,9 +106,9 @@ export class LobbyComponent implements OnInit, OnDestroy {
     // Escuchar inicio de juego
     this.subs.add(
       this.socketService.onGameStarted().subscribe((gameData) => {
-        console.log('🚀 Juego listo! Iniciando cuenta regresiva...');
+        console.log('Juego listo! Iniciando cuenta regresiva...');
         
-        // 🔊 DETENER la música de lobby/crear-sala
+        // DETENER la música de lobby
         this.audioService.stopFondo();
         
         this.cuentaRegresiva = 3;
@@ -139,7 +137,7 @@ export class LobbyComponent implements OnInit, OnDestroy {
       this.socketService.onError().subscribe((err: any) => {
         console.error('Socket error:', err);
         if (err && err.message && err.message.includes('tema ya fue elegido')) {
-          alert('Esa temática ya fue elegida por otro jugador. ¡Elige otra!');
+          alert('Esa temática ya fue elegida por otro jugador. Elige otra!');
           this.estaListo = false;
           this.socketService.updateConfig(this.codigoSala, this.currentUser.id, {
             tematica: '',
@@ -163,7 +161,8 @@ export class LobbyComponent implements OnInit, OnDestroy {
       this.audioService.play('click');
       this.socketService.leaveRoom(this.codigoSala, this.currentUser.id);
     }
-    // Detener música de lobby al salir
+    // Guardar estado antes de salir para que el dashboard sepa que debe reanudar
+    this.audioService.guardarEstadoMusicaAntesDeNavegar();
     this.audioService.stopFondo();
     this.router.navigate(['/dashboard']);
   }

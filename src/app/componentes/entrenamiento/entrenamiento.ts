@@ -46,7 +46,6 @@ export class EntrenamientoComponent implements OnInit, OnDestroy {
     private http: HttpClient,
     private audioService: AudioService
   ) { 
-    // Inicialización con Proxy para capturar cambios en la UI y disparar sonidos
     const dataInicial: ConfiguracionEntrenamiento = {
       tematica: '',
       dificultad: ''
@@ -54,7 +53,6 @@ export class EntrenamientoComponent implements OnInit, OnDestroy {
 
     this.configuracion = new Proxy(dataInicial, {
       set: (target, prop, value) => {
-        // Sonar click si cambia la dificultad en el radio button/select
         if (prop === 'dificultad' && value !== target.dificultad && value !== '') {
           this.audioService.play('click');
         }
@@ -65,22 +63,19 @@ export class EntrenamientoComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
-    //  Detener la música del dashboard si está sonando
     this.audioService.detenerMusicaDashboard();
-    // Iniciar música de ambiente del entrenamiento
     this.audioService.playFondo();
   }
 
   ngOnDestroy() {
-    // Detener música de entrenamiento al salir del componente
+    // Guardar estado antes de salir para que el dashboard sepa que debe reanudar
+    this.audioService.guardarEstadoMusicaAntesDeNavegar();
     this.audioService.stopFondo();
-    // No reiniciar la música del dashboard automáticamente
-    // El componente dashboard/ranking/about se encargará de reiniciarla cuando sea necesario
   }
 
   seleccionarSugerencia(sugerencia: string) {
     this.configuracion.tematica = sugerencia;
-    this.audioService.play('click'); // Feedback al tocar 
+    this.audioService.play('click');
   }
 
   validarTematica(event: any) {
@@ -110,25 +105,24 @@ export class EntrenamientoComponent implements OnInit, OnDestroy {
   }
 
   async iniciarEntrenamiento() {
-    this.audioService.play('click'); // Click al presionar el botón de inicio
+    this.audioService.play('click');
 
     if (!this.esConfiguracionValida()) return;
 
     this.cargando = true;
 
     try {
-      console.log('🤖 Generando preguntas de entrenamiento...');
+      console.log('Generando preguntas de entrenamiento...');
       const response = await firstValueFrom(
         this.http.post<any>(`${environment.apiUrl}/games/generate-questions`, {
           tematicas: [this.configuracion.tematica],
           dificultad: this.configuracion.dificultad,
-          count: 5, // Forzamos 5 preguntas para entrenamiento
+          count: 5,
           isEntrenamiento: true
         })
       );
 
       if (response && response.success) {
-        //  Detener música de entrenamiento antes de entrar a la arena
         this.audioService.stopFondo();
         
         this.router.navigate(['/arena'], {

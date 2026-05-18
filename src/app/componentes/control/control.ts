@@ -9,8 +9,8 @@ import { AudioService } from '../../servicios/audio/audio.service';
   selector: 'app-control',
   standalone: true,
   imports: [CommonModule, FormsModule],
-  templateUrl: './control.html',
-  styleUrls: ['./control.scss']
+  templateUrl: './control.html',  // Tu archivo se llama control.html
+  styleUrls: ['./control.scss']    // Tu archivo se llama control.scss
 })
 export class ControlComponent implements OnInit, OnDestroy {
   showPanel: boolean = false;
@@ -28,6 +28,7 @@ export class ControlComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit() {
+    console.log('ControlComponent iniciado');
     this.actualizarEstado();
     
     this.routerSubscription = this.router.events.pipe(
@@ -39,16 +40,21 @@ export class ControlComponent implements OnInit, OnDestroy {
     });
   }
 
-  // control.component.ts - Modificar actualizarEstado
-actualizarEstado() {
-  // Usar setTimeout para evitar ExpressionChangedAfterItHasBeenCheckedError
-  setTimeout(() => {
-    this.volumenEfectos = this.audioService.getVolumenEfectos();
-    this.volumenMusica = this.audioService.getVolumenMusica();
-    this.efectosActivos = this.audioService.isAudioActivo();
-    this.musicaActiva = this.audioService.isMusicaActiva();
-  }, 0);
-}
+  actualizarEstado() {
+    setTimeout(() => {
+      this.volumenEfectos = this.audioService.getVolumenEfectos();
+      this.volumenMusica = this.audioService.getVolumenMusica();
+      this.efectosActivos = this.audioService.isAudioActivo();
+      this.musicaActiva = this.audioService.isMusicaActiva();
+      
+      console.log('Estado actualizado:', {
+        efectosActivos: this.efectosActivos,
+        musicaActiva: this.musicaActiva,
+        volumenEfectos: this.volumenEfectos,
+        volumenMusica: this.volumenMusica
+      });
+    }, 100);
+  }
 
   ngOnDestroy() {
     if (this.routerSubscription) {
@@ -58,36 +64,42 @@ actualizarEstado() {
 
   togglePanel() {
     this.showPanel = !this.showPanel;
+    console.log('Panel toggled:', this.showPanel);
   }
 
   closePanel() {
     this.showPanel = false;
+    console.log('Panel cerrado');
   }
 
   cambiarVolumenEfectos(event: any) {
     this.volumenEfectos = event.target.value;
     this.audioService.setVolumenEfectos(this.volumenEfectos);
+    console.log('Volumen efectos cambiado:', this.volumenEfectos);
   }
 
   cambiarVolumenMusica(event: any) {
     this.volumenMusica = event.target.value;
     this.audioService.setVolumenMusica(this.volumenMusica);
+    console.log('Volumen musica cambiado:', this.volumenMusica);
   }
 
   toggleEfectos() {
+    console.log('Toggle efectos - estado actual:', this.efectosActivos);
     this.audioService.toggleEfectos();
     setTimeout(() => {
       this.efectosActivos = this.audioService.isAudioActivo();
-    }, 50);
+      console.log('Toggle efectos - nuevo estado:', this.efectosActivos);
+    }, 100);
   }
 
   toggleMusica() {
-      console.log('=== TOGGLE MUSICA ===');
-  console.log('Estado actual musicaActiva ANTES:', this.musicaActiva);
+    console.log('Toggle musica - estado actual:', this.musicaActiva);
     this.audioService.toggleMusica();
     setTimeout(() => {
       this.musicaActiva = this.audioService.isMusicaActiva();
       this.volumenMusica = this.audioService.getVolumenMusica();
+      console.log('Toggle musica - nuevo estado:', this.musicaActiva);
     }, 100);
   }
 }

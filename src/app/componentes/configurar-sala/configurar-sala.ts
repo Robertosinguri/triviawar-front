@@ -1,4 +1,3 @@
-
 import { Component, OnInit, OnDestroy, ChangeDetectorRef, inject } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
 import { FormsModule } from '@angular/forms';
@@ -66,11 +65,17 @@ export class ConfigurarSalaComponent implements OnInit, OnDestroy {
     this.esHost = this.router.url.includes('crear');
     console.log('🔍 [DEBUG] ConfigurarSala - esHost:', this.esHost, 'URL:', this.router.url);
 
-    // Si es modo crear sala, reproducir música específica
+    // Detener la música del dashboard y guardar estado para reanudar después
     if (this.esHost) {
-      this.audioService.playFondo();
+      // Guardar estado antes de detener
+      this.audioService.guardarEstadoMusicaAntesDeNavegar();
+      this.audioService.detenerMusicaDashboard();
+      
+      // Iniciar música de fondo para crear sala (opcional)
+      // this.audioService.playFondoCrearSala();
     } else {
-      // Si es modo unirse, detener música del dashboard
+      // Si es modo unirse, también detener música del dashboard
+      this.audioService.guardarEstadoMusicaAntesDeNavegar();
       this.audioService.detenerMusicaDashboard();
     }
 
@@ -131,10 +136,7 @@ export class ConfigurarSalaComponent implements OnInit, OnDestroy {
 
   ngOnDestroy() {
     this.subs.unsubscribe();
-    //  Detener música de crear sala al salir del componente
-    if (this.esHost) {
-      
-    }
+    // No detener música aquí - la música del dashboard se reanudará al volver
   }
 
   tematicaInvalida: boolean = false;
@@ -172,10 +174,7 @@ export class ConfigurarSalaComponent implements OnInit, OnDestroy {
   }
 
   async crearSala() {
-    this.audioService.play('click'); // Sonido click
-    
-    //  Detener la música de crear sala al hacer clic en "Iniciar Sala"
-    
+    this.audioService.play('click');
     
     if (!this.esConfiguracionValida() || this.isLoading) return;
     this.isLoading = true;
@@ -224,10 +223,7 @@ export class ConfigurarSalaComponent implements OnInit, OnDestroy {
 
   volver() {
     this.audioService.play('click');
-    //  Detener música de crear sala al volver
-    if (this.esHost) {
-      this.audioService.stopFondo();
-    }
+    // Al volver, el dashboard se encargará de reanudar la música
     this.router.navigate(['/dashboard']);
   }
 

@@ -78,12 +78,12 @@ export class ArenaComponent implements OnInit, OnDestroy {
     this.iniciarArena();
   }
 
-  ngOnDestroy() {
-    this.limpiarTimer();
-    // No desconectar WebSocket - puede ser usado por otros componentes
-    // this.webSocketService.disconnect();
-    this.audioService.stopArena(); // Agregado
-  }
+ ngOnDestroy() {
+  this.limpiarTimer();
+  // Guardar estado antes de salir (por si acaso)
+  this.audioService.guardarEstadoMusicaAntesDeNavegar();
+  this.audioService.stopArena();
+}
 
   private async cargarUsuario() {
     try {
@@ -396,10 +396,15 @@ export class ArenaComponent implements OnInit, OnDestroy {
     }
   }
 
-  salirArena() {
-    this.audioService.play('click'); // Agregado
-    this.router.navigate(['/dashboard']);
-  }
+  // En arena.component.ts, modificar el método salirArena
+
+salirArena() {
+  this.audioService.play('click');
+  // Guardar estado antes de salir para que el dashboard sepa que debe reanudar
+  this.audioService.guardarEstadoMusicaAntesDeNavegar();
+  this.audioService.stopArena();
+  this.router.navigate(['/dashboard']);
+}
 
   private mostrarPantallaEspera(jugadoresTerminados: number, totalJugadores: number) {
     this.estadoJuego = 'finalizado';
