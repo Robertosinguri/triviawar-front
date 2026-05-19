@@ -11,15 +11,17 @@ import { NavbarComponent } from '../navbar/navbar';
 })
 
 export class AboutComponent {
-  showImageModal: boolean = false; // Inicializa en false
+  showImageModal: boolean = false;
 
   openImageModal(): void {
     this.showImageModal = true;
-    console.log('Modal abierto:', this.showImageModal); // 🔍 Debug
   }
 
   closeImageModal(): void {
     this.showImageModal = false;
-    console.log('Modal cerrado:', this.showImageModal); // 🔍 Debug
   }
+
+
 }
+
+
