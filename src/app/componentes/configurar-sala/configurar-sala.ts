@@ -54,41 +54,38 @@ export class ConfigurarSalaComponent implements OnInit, OnDestroy {
   currentUserId: string = '';
 
   async ngOnInit() {
-    const user = this.authService.usuarioActual();
-    if (!user) {
-      this.router.navigate(['/login']);
-      return;
-    }
-    this.currentUserId = user.email || '';
-
-    // Determinar si es host (crear sala) o invitado (unirse)
-    this.esHost = this.router.url.includes('crear');
-    console.log('🔍 [DEBUG] ConfigurarSala - esHost:', this.esHost, 'URL:', this.router.url);
-
-    // Detener la música del dashboard y guardar estado para reanudar después
-    if (this.esHost) {
-      // Guardar estado antes de detener
-      this.audioService.guardarEstadoMusicaAntesDeNavegar();
-      this.audioService.detenerMusicaDashboard();
-      
-      // Iniciar música de fondo para crear sala (opcional)
-      // this.audioService.playFondoCrearSala();
-    } else {
-      // Si es modo unirse, también detener música del dashboard
-      this.audioService.guardarEstadoMusicaAntesDeNavegar();
-      this.audioService.detenerMusicaDashboard();
-    }
-
-    // Conectar socket si no lo está
-    this.socketService.connect();
-
-    if (!this.esHost) {
-      this.codigoSala = this.route.snapshot.queryParams['codigo'] || '';
-    }
-
-    // Escuchar eventos de socket
-    this.escucharSocket();
+  const user = this.authService.usuarioActual();
+  if (!user) {
+    this.router.navigate(['/login']);
+    return;
   }
+  this.currentUserId = user.email || '';
+
+  // Determinar si es host (crear sala) o invitado (unirse)
+  this.esHost = this.router.url.includes('crear');
+  console.log('🔍 [DEBUG] ConfigurarSala - esHost:', this.esHost, 'URL:', this.router.url);
+
+  // IMPORTANTE: Actualizar la ruta en el AudioService
+  this.audioService.actualizarRutaActual('/crear-sala');
+
+  // Si es modo crear sala, reproducir música específica
+  if (this.esHost) {
+    this.audioService.playFondo();
+  } else {
+    // Si es modo unirse, detener música del dashboard
+    this.audioService.detenerMusicaDashboard();
+  }
+
+  // Conectar socket si no lo está
+  this.socketService.connect();
+
+  if (!this.esHost) {
+    this.codigoSala = this.route.snapshot.queryParams['codigo'] || '';
+  }
+
+  // Escuchar eventos de socket
+  this.escucharSocket();
+}
 
   escucharSocket() {
     // Al crear sala
@@ -136,7 +133,10 @@ export class ConfigurarSalaComponent implements OnInit, OnDestroy {
 
   ngOnDestroy() {
     this.subs.unsubscribe();
-    // No detener música aquí - la música del dashboard se reanudará al volver
+    // Detener música de crear sala al salir del componente
+    if (this.esHost) {
+      this.audioService.stopFondo();
+    }
   }
 
   tematicaInvalida: boolean = false;
@@ -222,10 +222,14 @@ export class ConfigurarSalaComponent implements OnInit, OnDestroy {
   }
 
   volver() {
-    this.audioService.play('click');
-    // Al volver, el dashboard se encargará de reanudar la música
-    this.router.navigate(['/dashboard']);
+  this.audioService.play('click');
+  if (this.esHost) {
+    this.audioService.stopFondo();
   }
+  //  Actualizar la ruta antes de navegar
+  this.audioService.actualizarRutaActual('/dashboard');
+  this.router.navigate(['/dashboard']);
+}
 
   copiado = false;
   copiarCodigo() {

@@ -22,7 +22,6 @@ interface ConfiguracionEntrenamiento {
   styleUrls: ['./entrenamiento.scss']
 })
 export class EntrenamientoComponent implements OnInit, OnDestroy {
-  // Objeto de configuración con tipado
   public configuracion: ConfiguracionEntrenamiento;
 
   cargando: boolean = false;
@@ -63,12 +62,14 @@ export class EntrenamientoComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
+    // Actualizar la ruta para el AudioService
+    this.audioService.actualizarRutaActual('/entrenamiento');
     this.audioService.detenerMusicaDashboard();
     this.audioService.playFondo();
   }
 
   ngOnDestroy() {
-    // Guardar estado antes de salir para que el dashboard sepa que debe reanudar
+    console.log('=== ENTRENAMIENTO DESTROY ===');
     this.audioService.guardarEstadoMusicaAntesDeNavegar();
     this.audioService.stopFondo();
   }

@@ -9,8 +9,8 @@ import { AudioService } from '../../servicios/audio/audio.service';
   selector: 'app-control',
   standalone: true,
   imports: [CommonModule, FormsModule],
-  templateUrl: './control.html',  // Tu archivo se llama control.html
-  styleUrls: ['./control.scss']    // Tu archivo se llama control.scss
+  templateUrl: './control.html',
+  styleUrls: ['./control.scss']
 })
 export class ControlComponent implements OnInit, OnDestroy {
   showPanel: boolean = false;
@@ -36,6 +36,7 @@ export class ControlComponent implements OnInit, OnDestroy {
     ).subscribe((event: NavigationEnd) => {
       const hiddenRoutes = ['/', '/login'];
       this.showControl = !hiddenRoutes.includes(event.urlAfterRedirects);
+      
       this.actualizarEstado();
     });
   }
@@ -51,7 +52,8 @@ export class ControlComponent implements OnInit, OnDestroy {
         efectosActivos: this.efectosActivos,
         musicaActiva: this.musicaActiva,
         volumenEfectos: this.volumenEfectos,
-        volumenMusica: this.volumenMusica
+        volumenMusica: this.volumenMusica,
+        rutaActual: this.router.url
       });
     }, 100);
   }
@@ -64,28 +66,28 @@ export class ControlComponent implements OnInit, OnDestroy {
 
   togglePanel() {
     this.showPanel = !this.showPanel;
-    console.log('Panel toggled:', this.showPanel);
+   
   }
 
   closePanel() {
     this.showPanel = false;
-    console.log('Panel cerrado');
+    
   }
 
   cambiarVolumenEfectos(event: any) {
     this.volumenEfectos = event.target.value;
     this.audioService.setVolumenEfectos(this.volumenEfectos);
-    console.log('Volumen efectos cambiado:', this.volumenEfectos);
+    
   }
 
   cambiarVolumenMusica(event: any) {
     this.volumenMusica = event.target.value;
     this.audioService.setVolumenMusica(this.volumenMusica);
-    console.log('Volumen musica cambiado:', this.volumenMusica);
+   
   }
 
   toggleEfectos() {
-    console.log('Toggle efectos - estado actual:', this.efectosActivos);
+    
     this.audioService.toggleEfectos();
     setTimeout(() => {
       this.efectosActivos = this.audioService.isAudioActivo();
@@ -94,7 +96,7 @@ export class ControlComponent implements OnInit, OnDestroy {
   }
 
   toggleMusica() {
-    console.log('Toggle musica - estado actual:', this.musicaActiva);
+   
     this.audioService.toggleMusica();
     setTimeout(() => {
       this.musicaActiva = this.audioService.isMusicaActiva();

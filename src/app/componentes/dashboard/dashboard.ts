@@ -31,18 +31,22 @@ export class DashboardComponent implements OnInit, OnDestroy {
     private audioService: AudioService
   ) {}
 
- ngOnInit() {
-  console.log('=== DASHBOARD INIT ===');
+  // dashboard.component.ts
+ngOnInit() {
+  // Actualizar la ruta para el AudioService
+  this.audioService.actualizarRutaActual('/dashboard');
   
-  // NO forzar activación de audio o música aquí
-  // Solo intentar reanudar si debía sonar antes de navegar
+  // Desbloquear audio del navegador
+  this.audioService.iniciarAutoPlay();
+  
+  // Intentar reanudar música si debía sonar antes de navegar
   const musicaReanudada = this.audioService.reanudarMusicaDashboardSiDebia();
   
   if (!musicaReanudada) {
-    // Solo iniciar música si no hay ninguna sonando
-    if (!this.audioService.isHayMusicaSonando()) {
+    // Solo iniciar música si el usuario NO ha silenciado la música globalmente
+    // y no hay música sonando
+    if (this.audioService.isMusicaActiva() && !this.audioService.isHayMusicaSonando()) {
       setTimeout(() => {
-        this.audioService.iniciarAutoPlay();
         this.audioService.iniciarMusicaDashboard();
       }, 500);
     }
@@ -60,6 +64,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
     if (this.intervaloSalas) {
       clearInterval(this.intervaloSalas);
     }
+    // NO detener la música aquí
   }
 
   private cargarRankingMinimalista(): void {

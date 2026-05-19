@@ -3,9 +3,8 @@ import { Router, ActivatedRoute } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { Observable } from 'rxjs';
 import { FirebaseAuthService } from '../../servicios/auth/firebase-auth.service';
-//import { BackgroundComponent } from '../background/background';
 import { environment } from '../../../environments/environment';
-import { AudioService } from '../../servicios/audio/audio.service'; // 🔊 Agregado
+import { AudioService } from '../../servicios/audio/audio.service';
 
 interface PreguntaArena {
   id: string;
@@ -26,40 +25,32 @@ interface PreguntaArena {
   styleUrls: ['./arena.scss']
 })
 export class ArenaComponent implements OnInit, OnDestroy {
-  // Configuración de la arena
   roomCode: string = '';
   tematicas: string[] = [];
   dificultad: string = 'baby';
-  modo: string = ''; // 'entrenamiento' o vacío para multijugador
+  modo: string = '';
 
-  // Estado del juego
   estadoJuego: 'cargando' | 'jugando' | 'finalizado' = 'cargando';
   preguntas: PreguntaArena[] = [];
   preguntaActual: number = 0;
   totalPreguntas: number = 0;
 
-  // Estado de la pregunta actual
   preguntaActualObj: PreguntaArena | null = null;
   respuestaSeleccionada: number | null = null;
   mostrarRespuesta: boolean = false;
   respuestaCorrecta: boolean = false;
 
-  // Rondas
   rondaActual: number = 1;
   mostrarIntermedio: boolean = false;
   cuentaRegresivaIntermedio: number = 0;
 
-  // Puntaje y tiempo
   puntaje: number = 0;
   correctasCount: number = 0;
   tiempoRestante: number = 30;
   tiempoInicio: number = 0;
   timerInterval: any;
 
-  // Usuario actual
   nombreJugador: string = '';
-
-  // Indicador de IA
   aiUsada: string = '';
   aiIndicator: string = '';
 
@@ -68,22 +59,24 @@ export class ArenaComponent implements OnInit, OnDestroy {
     private route: ActivatedRoute,
     private authService: FirebaseAuthService,
     private cdr: ChangeDetectorRef,
-    private audioService: AudioService // Agregado
+    private audioService: AudioService
   ) { }
 
   async ngOnInit() {
+    // Actualizar la ruta para el AudioService
+    this.audioService.actualizarRutaActual('/arena');
     await this.cargarUsuario();
     this.cargarConfiguracion();
     this.configurarWebSocket();
     this.iniciarArena();
   }
 
- ngOnDestroy() {
-  this.limpiarTimer();
-  // Guardar estado antes de salir (por si acaso)
-  this.audioService.guardarEstadoMusicaAntesDeNavegar();
-  this.audioService.stopArena();
-}
+  ngOnDestroy() {
+   
+    this.limpiarTimer();
+    this.audioService.guardarEstadoMusicaAntesDeNavegar();
+    this.audioService.stopArena();
+  }
 
   private async cargarUsuario() {
     try {
@@ -103,7 +96,6 @@ export class ArenaComponent implements OnInit, OnDestroy {
     if (params['tematicas']) {
       this.tematicas = params['tematicas'].split(',').filter((t: string) => t.trim());
     }
-
   }
 
   private configurarWebSocket() {
@@ -114,7 +106,6 @@ export class ArenaComponent implements OnInit, OnDestroy {
     this.estadoJuego = 'cargando';
     this.tiempoInicio = Date.now();
 
-    // 1. Intentar recuperar datos pasados por el Lobby (Router State)
     const navState = history.state;
     if (navState && navState.gameData && navState.gameData.preguntas) {
       console.log('📦 Datos de juego recibidos desde Lobby');
@@ -122,13 +113,8 @@ export class ArenaComponent implements OnInit, OnDestroy {
       return;
     }
 
-    // 2. Si no hay datos (ej. Refresh), intentar pedir estado actual al backend (TODO: Implementar API getRoom)
-    // Por ahora, mostrar error o redirigir
     console.warn('⚠️ No hay datos de juego en estado. Posible recarga de página.');
-
-    // Opción temporal: Intentar unirse de nuevo al socket y esperar sync (si hubiera esa lógica)
-    // O simplemente redirigir al dashboard para evitar incoherencias
-    this.audioService.play('incorrecto'); //  Agregado
+    this.audioService.play('incorrecto');
     alert('Juego interrumpido por recarga. Vuelve al menú.');
     this.router.navigate(['/dashboard']);
   }
@@ -139,7 +125,6 @@ export class ArenaComponent implements OnInit, OnDestroy {
       this.totalPreguntas = data.preguntas.length;
       this.aiUsada = data.aiInfo?.model || data.aiUsada || 'IA';
 
-      // 🎯 FIX: Cargar dificultad y temáticas desde gameData
       if (data.dificultad) {
         this.dificultad = data.dificultad;
         console.log('✅ Dificultad cargada desde gameData:', this.dificultad);
@@ -161,7 +146,7 @@ export class ArenaComponent implements OnInit, OnDestroy {
 
       this.cargarPreguntaActual();
       this.estadoJuego = 'jugando';
-      this.audioService.playArena(); //  Agregado (con Fade)
+      this.audioService.playArena();
       this.iniciarTimer();
       this.cdr.detectChanges();
     } else {
@@ -178,9 +163,8 @@ export class ArenaComponent implements OnInit, OnDestroy {
     return 'IA';
   }
 
-  // Método legacy eliminado: obtenerPreguntas() ya no debe llamar a generate-questions
   private async obtenerPreguntas() {
-    // Placeholder porsiaca
+    // Placeholder
   }
 
   private cargarPreguntaActual() {
@@ -197,7 +181,7 @@ export class ArenaComponent implements OnInit, OnDestroy {
     this.limpiarTimer();
     this.timerInterval = setInterval(() => {
       this.tiempoRestante--;
-      this.cdr.detectChanges(); // 🔧 Force UI update
+      this.cdr.detectChanges();
 
       if (this.tiempoRestante <= 0) {
         this.tiempoAgotado();
@@ -222,7 +206,7 @@ export class ArenaComponent implements OnInit, OnDestroy {
   seleccionarRespuesta(indice: number) {
     if (!this.mostrarRespuesta) {
       this.respuestaSeleccionada = indice;
-      this.audioService.play('click'); //  Agregado
+      this.audioService.play('click');
     }
   }
 
@@ -240,23 +224,21 @@ export class ArenaComponent implements OnInit, OnDestroy {
         else if (this.preguntaActualObj.dificultad === 'killer') puntosBase = 30;
 
         this.puntaje += puntosBase;
-        this.audioService.play('correcto'); //  Agregado
+        this.audioService.play('correcto');
       } else {
         this.respuestaCorrecta = false;
-        this.audioService.play('incorrecto'); //  Agregado
+        this.audioService.play('incorrecto');
       }
     }
   }
 
   siguientePregunta() {
-    this.audioService.play('click'); //  Agregado
+    this.audioService.play('click');
     if (this.esUltimaPregunta()) {
       this.finalizarArena();
     } else {
-      // 🎮 LÓGICA DE RONDAS: Solo para multijugador, en entrenamiento es ráfaga continua
       if (this.modo !== 'entrenamiento') {
         const preguntasPorRonda = this.tematicas.length || 1;
-        // Si completamos la ronda (múltiplo exacto)
         if ((this.preguntaActual + 1) % preguntasPorRonda === 0) {
           this.mostrarIntermedio = true;
           this.rondaActual++;
@@ -275,11 +257,10 @@ export class ArenaComponent implements OnInit, OnDestroy {
               this.cdr.detectChanges();
             }
           }, 1000);
-          return; // Salir para esperar el timer del intermedio
+          return;
         }
       }
 
-      // Continuar a la siguiente pregunta (flujo normal o entrenamiento)
       this.preguntaActual++;
       this.cargarPreguntaActual();
       this.iniciarTimer();
@@ -292,13 +273,11 @@ export class ArenaComponent implements OnInit, OnDestroy {
 
     try {
       const usuario = this.authService.usuarioActual();
-      // Si no hay sesión, usar ID temporal para que el resultado se guarde y aparezca en el ranking
       const userId = usuario?.uid || usuario?.email || 'anon-' + Date.now();
       const displayName = usuario?.username || usuario?.name || this.nombreJugador || 'Jugador';
 
       const tiempoTotal = Math.floor((Date.now() - this.tiempoInicio) / 1000);
 
-      // Enviar resultado al backend para que se guarde y se refleje en el ranking
       const response = await fetch(`${environment.apiUrl}/games/submit-result`, {
         method: 'POST',
         headers: {
@@ -317,7 +296,6 @@ export class ArenaComponent implements OnInit, OnDestroy {
         })
       });
 
-
       const data = await response.json();
 
       console.log('📥 Respuesta del backend:', data);
@@ -326,22 +304,14 @@ export class ArenaComponent implements OnInit, OnDestroy {
 
       if (data.success) {
         if (data.allPlayersFinished) {
-
-          // Guardar ranking y estadísticas en localStorage para resultados
           const datosCompletos = {
             ranking: data.ranking,
             estadisticasEquipo: data.estadisticasEquipo
           };
 
-          console.log('💾 Guardando en localStorage:', {
-            datosCompletos,
-            ganador: data.ganador
-          });
-
           localStorage.setItem('ranking-partida', JSON.stringify(datosCompletos));
           localStorage.setItem('ganador-partida', JSON.stringify(data.ganador));
 
-          // Navegar a resultados con datos reales
           this.router.navigate(['/resultados'], {
             queryParams: {
               roomCode: this.roomCode,
@@ -354,11 +324,11 @@ export class ArenaComponent implements OnInit, OnDestroy {
           this.mostrarPantallaEspera(data.playersFinished, data.totalPlayers);
         }
       } else {
-        this.audioService.play('incorrecto'); //  Agregado
+        this.audioService.play('incorrecto');
         alert('Error procesando resultados. Intenta de nuevo.');
       }
     } catch (error) {
-      this.audioService.play('incorrecto'); // Agregado
+      this.audioService.play('incorrecto');
       alert('Error de conexión. Verifica tu internet.');
     }
   }
@@ -381,14 +351,13 @@ export class ArenaComponent implements OnInit, OnDestroy {
 
   private mostrarErrorIA(mensaje: string) {
     this.limpiarTimer();
-    this.audioService.play('incorrecto'); // Agregado
+    this.audioService.play('incorrecto');
     this.estadoJuego = 'finalizado';
 
-    // Mostrar mensaje con opción de reintentar
     const reintentar = confirm(`❌ Error: ${mensaje}\n\n¿Quieres intentar recargar las preguntas?`);
 
     if (reintentar) {
-      this.audioService.play('click'); // Agregado
+      this.audioService.play('click');
       this.estadoJuego = 'cargando';
       this.iniciarArena();
     } else {
@@ -396,15 +365,16 @@ export class ArenaComponent implements OnInit, OnDestroy {
     }
   }
 
-  // En arena.component.ts, modificar el método salirArena
-
+ // arena.component.ts - En salirArena y ngOnDestroy
 salirArena() {
   this.audioService.play('click');
-  // Guardar estado antes de salir para que el dashboard sepa que debe reanudar
   this.audioService.guardarEstadoMusicaAntesDeNavegar();
   this.audioService.stopArena();
+  //  Actualizar la ruta antes de navegar
+  this.audioService.actualizarRutaActual('/dashboard');
   this.router.navigate(['/dashboard']);
 }
+
 
   private mostrarPantallaEspera(jugadoresTerminados: number, totalJugadores: number) {
     this.estadoJuego = 'finalizado';
@@ -429,9 +399,8 @@ salirArena() {
       `;
     }
 
-    // Polling optimizado para verificar si todos terminaron
     let pollCount = 0;
-    const maxPolls = 20; // Máximo 1 minuto de polling
+    const maxPolls = 20;
 
     const pollingInterval = setInterval(async () => {
       pollCount++;
@@ -447,7 +416,6 @@ salirArena() {
         const response = await fetch(`${environment.apiUrl}/rooms/${this.roomCode}`);
         const salaData = await response.json();
 
-        // Verificar si la sala tiene resultados finales
         if (salaData.estado === 'finalizada' || salaData.resultadosFinales) {
           clearInterval(pollingInterval);
 
@@ -469,6 +437,6 @@ salirArena() {
       } catch (error) {
         console.log('Error en polling:', error);
       }
-    }, 5000); // Aumentar intervalo a 5s
+    }, 5000);
   }
 }
