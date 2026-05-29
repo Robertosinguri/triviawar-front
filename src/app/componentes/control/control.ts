@@ -88,21 +88,19 @@ export class ControlComponent implements OnInit, OnDestroy {
   }
 
   toggleEfectos() {
-    
     this.audioService.toggleEfectos();
-    setTimeout(() => {
-      this.efectosActivos = this.audioService.isAudioActivo();
-      console.log('Toggle efectos - nuevo estado:', this.efectosActivos);
-    }, 100);
+    this.efectosActivos = this.audioService.isAudioActivo();
+    if (this.efectosActivos) {
+      this.audioService.play('click'); // Feedback sonoro instantáneo
+    }
   }
 
   toggleMusica() {
-   
     this.audioService.toggleMusica();
-    setTimeout(() => {
-      this.musicaActiva = this.audioService.isMusicaActiva();
-      this.volumenMusica = this.audioService.getVolumenMusica();
-      console.log('Toggle musica - nuevo estado:', this.musicaActiva);
-    }, 100);
+    this.musicaActiva = this.audioService.isMusicaActiva();
+    this.volumenMusica = this.audioService.getVolumenMusica();
+    if (this.efectosActivos) {
+      this.audioService.play('click'); // Feedback sonoro instantáneo
+    }
   }
 }

@@ -602,53 +602,56 @@
     .stats-panel {
       width: 100%;
       height: auto;
-      padding: 2rem 1.5rem 1.5rem;
-      overflow-y: auto;
-      max-height: 85vh;
+      padding: 1.1rem 1.2rem 0.8rem;
 
       .stats-profile-header {
         border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-        margin-bottom: 1.5rem;
-        padding-bottom: 1rem;
-        align-items: center;
-      }
-
-      .stats-profile-header {
-        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-        margin-bottom: 1.5rem;
-        padding-bottom: 1.5rem;
+        margin-bottom: 0.8rem;
+        padding-bottom: 0.8rem;
         display: flex;
         flex-direction: column;
         align-items: center;
-        gap: 1.2rem;
+        gap: 0.6rem;
       }
 
       .user-info-section {
         gap: 0;
-        .player-name { font-size: 1.4rem; }
-        .email-text { font-size: 0.8rem; }
+        .player-name { font-size: 1.25rem; }
+        .email-text { font-size: 0.78rem; }
       }
       
       .avatar-section {
         .current-avatar {
           .current-avatar-img, .no-avatar {
-            width: 75px;
-            height: 75px;
+            width: 55px;
+            height: 55px;
           }
         }
         .change-avatar-text {
-          font-size: 0.65rem;
+          font-size: 0.6rem;
+          margin-top: 0.3rem;
         }
       }
 
       .stat-item {
-        margin-bottom: 0.6rem;
-        .stat-label, .stat-value { font-size: 0.9rem; }
+        margin-bottom: 0.4rem;
+        .stat-label, .stat-value { font-size: 0.82rem; }
+      }
+
+      .profile-audio-settings {
+        margin-top: 0.5rem !important;
+        padding: 0.6rem 0.4rem !important;
+        border-top: 1px solid rgba(255, 255, 255, 0.08) !important;
+
+        h4 {
+          margin-bottom: 0.4rem !important;
+          font-size: 0.78rem !important;
+        }
       }
     }
 
     .logout-section {
-      margin-top: 1rem;
+      margin-top: 0.6rem;
       padding: 0;
       border-top: none;
       display: flex;
@@ -661,7 +664,7 @@
         background: transparent;
         border: none;
         color: $primary-pink;
-        padding: 0.5rem;
+        padding: 0.4rem;
         border-radius: 0;
         display: flex;
         align-items: center;
@@ -670,7 +673,7 @@
         font-weight: 700;
         text-transform: uppercase;
         letter-spacing: 1px;
-        font-size: 0.8rem;
+        font-size: 0.75rem;
         text-shadow: 0 0 10px rgba(255, 80, 140, 0.5);
         transition: all 0.3s ease;
         cursor: pointer;
