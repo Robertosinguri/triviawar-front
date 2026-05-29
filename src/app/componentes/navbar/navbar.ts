@@ -6,12 +6,13 @@ import { SocketService } from '../../servicios/websocket/socket.service';
 import { ChatStateService } from '../../servicios/chat-state.service';
 import { Subscription } from 'rxjs';
 import { AudioService } from '../../servicios/audio/audio.service';
+import { ControlComponent } from '../control/control';
 
 
 @Component({
   selector: 'app-navbar',
   standalone: true,
-  imports: [CommonModule, RouterModule, RouterLink, RouterLinkActive],
+  imports: [CommonModule, RouterModule, RouterLink, RouterLinkActive, ControlComponent],
   templateUrl: './navbar.html',
   styleUrls: ['./navbar.scss']
 })

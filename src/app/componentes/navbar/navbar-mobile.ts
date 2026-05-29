@@ -6,11 +6,12 @@ import { SocketService } from '../../servicios/websocket/socket.service';
 import { ChatStateService } from '../../servicios/chat-state.service';
 import { EstadisticasService, EstadisticasUsuario } from '../../servicios/estadisticas/estadisticas.service';
 import { AudioService } from '../../servicios/audio/audio.service';
+import { ControlComponent } from '../control/control';
 
 @Component({
   selector: 'app-navbar-mobile',
   standalone: true,
-  imports: [CommonModule, RouterModule],
+  imports: [CommonModule, RouterModule, ControlComponent],
   templateUrl: './navbar-mobile.html',
   styleUrls: ['./navbar-mobile.scss', './navbar.scss'] // Reutilizar estilos del navbar original
 })

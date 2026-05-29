@@ -351,3 +351,150 @@
     overflow-y: auto;
   }
 }
+
+.control-panel-inline {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 1.1rem; /* Más separación entre la fila de efectos y música */
+  padding: 0.6rem 0 0.3rem 0;
+
+  .control-item-inline {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.6rem;
+    height: 26px; /* Altura de fila reducida dramáticamente de 36px a 26px */
+
+    .toggle-label-btn {
+      background: transparent !important;
+      border: none !important;
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+      cursor: pointer;
+      padding: 2px 4px !important; /* Relleno mínimo para máxima ligereza visual */
+      border-radius: 4px;
+      transition: all 0.2s ease;
+      min-width: 78px;
+      text-align: left;
+      height: 100%;
+      min-height: unset !important; /* Anular min-height global de móvil de 44px */
+
+      .control-icon {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        
+        svg {
+          stroke: rgba(255, 255, 255, 0.35);
+          width: 14px; /* Icono más sutil y compacto */
+          height: 14px;
+          transition: all 0.2s ease;
+        }
+      }
+
+      .control-label {
+        font-size: 0.72rem; /* Tipografía más compacta */
+        color: rgba(255, 255, 255, 0.45);
+        font-weight: 500;
+        transition: all 0.2s ease;
+      }
+
+      &.active {
+        background: rgba(1, 186, 154, 0.08) !important;
+        
+        .control-icon svg {
+          stroke: #01BA9A;
+        }
+        .control-label {
+          color: rgba(255, 255, 255, 0.95);
+        }
+        
+        &:hover {
+          background: rgba(1, 186, 154, 0.15) !important;
+          .control-icon svg {
+            filter: drop-shadow(0 0 3px rgba(1, 186, 154, 0.8));
+          }
+        }
+      }
+
+      &::focus {
+        outline: none !important;
+      }
+
+      &:not(.active) {
+        &:hover {
+          background: rgba(255, 255, 255, 0.05) !important;
+          .control-icon svg {
+            stroke: rgba(255, 255, 255, 0.6);
+          }
+          .control-label {
+            color: rgba(255, 255, 255, 0.7);
+          }
+        }
+      }
+    }
+
+    .slider-wrapper {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      height: 100%;
+
+      .volume-slider {
+        flex: 1;
+        height: 3px !important; /* Slider más fino para que luzca muy elegante */
+        min-height: 3px !important; /* Anular min-height de input global de 44px */
+        border: none !important; /* Anular borde de input global */
+        background: rgba(255, 255, 255, 0.08) !important; /* Anular fondo de input global */
+        padding: 0 !important; /* Anular relleno de input global */
+        box-shadow: none !important;
+        -webkit-appearance: none;
+        appearance: none;  
+        border-radius: 2px;
+        outline: none;
+        cursor: pointer;
+
+        &::-webkit-slider-thumb {
+          -webkit-appearance: none;
+          width: 8px;
+          height: 12px; /* Slider thumb más estilizado */
+          border-radius: 1px;
+          background: #01BA9A;
+          cursor: pointer;
+          border: none;
+          box-shadow: 0 0 4px rgba(1, 186, 154, 0.4);
+          transition: all 0.2s ease;
+        }
+
+        &::-moz-range-thumb {
+          width: 8px;
+          height: 12px;
+          border-radius: 1px;
+          background: #01BA9A;
+          cursor: pointer;
+          border: none;
+        }
+
+        &:disabled {
+          cursor: not-allowed;
+          opacity: 0.3;
+          &::-webkit-slider-thumb {
+            background: rgba(255, 255, 255, 0.3) !important;
+            box-shadow: none !important;
+          }
+        }
+      }
+
+      .volume-value {
+        font-size: 0.68rem;
+        color: rgba(255, 255, 255, 0.3);
+        min-width: 26px;
+        text-align: right;
+        font-family: monospace;
+      }
+    }
+  }
+}

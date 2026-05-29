@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { NavigationEnd, Router } from '@angular/router';
@@ -13,6 +13,7 @@ import { AudioService } from '../../servicios/audio/audio.service';
   styleUrls: ['./control.scss']
 })
 export class ControlComponent implements OnInit, OnDestroy {
+  @Input() inline: boolean = false;
   showPanel: boolean = false;
   showControl: boolean = true;
   private routerSubscription: Subscription = new Subscription();

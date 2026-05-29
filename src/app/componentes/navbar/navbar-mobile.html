@@ -83,6 +83,14 @@
         </div>
       </div>
 
+      <!-- Ajustes de Sonido Integrados -->
+      <div class="profile-audio-settings" style="margin-top: 1rem; padding: 1.25rem 1.5rem; border-top: 1px solid rgba(255,255,255,0.08);">
+        <h4 style="color: #e6bd00; font-size: 0.9rem; letter-spacing: 0.5px; margin-top: 0; margin-bottom: 1rem; display: flex; align-items: center; gap: 8px; font-weight: bold;">
+          🔊 Ajustes de Sonido
+        </h4>
+        <app-control [inline]="true"></app-control>
+      </div>
+
       <div class="logout-section">
         <button class="sidebar-logout-btn" (click)="logout()">
           Cerrar Sesión
