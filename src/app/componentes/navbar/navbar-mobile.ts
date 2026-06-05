@@ -25,9 +25,9 @@ export class NavbarMobileComponent implements OnInit {
   readonly pwaInstallService = inject(PwaInstallService);
 
   availableAvatars = [
-    '01.png', '02.png', '03.png', '04.png', '05.png', '06.png',
-    '07.png', '08.png', '09.png', '10.png', '11.png', '12.png',
-    '13.png', '14.png', '15.png', '16.png', '17.png'
+    '01.webp', '02.webp', '03.webp', '04.webp', '05.webp', '06.webp',
+    '07.webp', '08.webp', '09.webp', '10.webp', '11.webp', '12.webp',
+    '13.webp', '14.webp', '15.webp', '16.webp', '17.webp'
   ];
 
   private socketService = inject(SocketService);

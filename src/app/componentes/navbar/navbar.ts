@@ -40,9 +40,9 @@ export class NavbarComponent implements OnInit, OnDestroy {
   readonly pwaInstallService = inject(PwaInstallService);
 
   availableAvatars = [
-    '01.png', '02.png', '03.png', '04.png', '05.png', '06.png',
-    '07.png', '08.png', '09.png', '10.png', '11.png', '12.png',
-    '13.png', '14.png', '15.png', '16.png', '17.png'
+    '01.webp', '02.webp', '03.webp', '04.webp', '05.webp', '06.webp',
+    '07.webp', '08.webp', '09.webp', '10.webp', '11.webp', '12.webp',
+    '13.webp', '14.webp', '15.webp', '16.webp', '17.webp'
   ];
 
   constructor() {
@@ -79,9 +79,11 @@ export class NavbarComponent implements OnInit, OnDestroy {
 
     if (!avatar) return '';
 
-    // Si es un nombre de archivo local (01.png, 02.png, etc.)
-    if (avatar.match(/^\d+\.png$/)) {
-      return `avatares/${avatar}`; // Sin slash inicial para que Angular lo resuelva correctamente
+    // Si es un nombre de archivo local (01.png, 02.png, 01.webp, etc.)
+    if (avatar.match(/^\d+\.(png|webp)$/)) {
+      // Convertir .png a .webp si es necesario
+      const webpAvatar = avatar.replace(/\.png$/, '.webp');
+      return `avatares/${webpAvatar}`;
     }
 
     // Si ya es una URL completa (http/https)
@@ -108,7 +110,7 @@ export class NavbarComponent implements OnInit, OnDestroy {
 
   onAvatarError(event: any) {
     console.error('Error cargando avatar:', event.target.src);
-    event.target.src = 'avatares/01.png'; // Fallback a avatar por defecto
+    event.target.src = 'avatares/01.webp'; // Fallback a avatar por defecto
   }
 
   abrirSelectorAvatar() {

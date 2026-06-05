@@ -99,7 +99,7 @@ export class Login {
     
     // Usamos el servicio existente para actualizar el perfil
     const success = await this.authService.actualizarAvatar(
-      this.authService.usuarioActual()?.picture || '01.png'
+      this.authService.usuarioActual()?.picture?.replace(/\.png$/, '.webp') || '01.webp'
     );
     
     // Nota: actualizarAvatar ya envía el nombre que está en el signal si lo sincronizamos bien
@@ -109,7 +109,7 @@ export class Login {
     // Vamos a simplificar: actualizarAvatar en el service usa el 'name' que ya está guardado.
     // Tengo que modificar actualizarAvatar para que acepte un nuevo nombre opcional.
     
-    const res = await this.authService.actualizarPerfilCompleto(this.name().trim(), this.authService.usuarioActual()?.picture || '01.png');
+    const res = await this.authService.actualizarPerfilCompleto(this.name().trim(), this.authService.usuarioActual()?.picture?.replace(/\.png$/, '.webp') || '01.webp');
     if (res) {
       this.router.navigate(['/dashboard']);
     }
