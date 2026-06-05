@@ -96,28 +96,62 @@
     margin-top: 2rem;
     padding: 2rem;
     
-    .mvpp-logo {
-        width: 150px;
-        height: auto;
-        margin-bottom: 1rem;
-        border-radius: 10px;
-        box-shadow: 0 5px 20px rgba(1, 186, 154, 0.3);
-        transition: all 0.3s ease;
-        cursor: pointer;
-        
-        &:hover {
-            transform: scale(1.05);
-            box-shadow: 0 8px 30px rgba(1, 186, 154, 0.5);
-        }
-    }
-    
     .mvpp-text {
         color: $primary-aqua;
         font-family: $font-victor-mono;
         font-weight: 600;
         font-size: 1.1rem;
-        margin: 0 0 1rem 0;
+        margin: 0 0 1.5rem 0;
         text-shadow: 0 0 10px rgba(1, 186, 154, 0.4);
+    }
+    
+    .team-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 1.5rem;
+        max-width: 800px;
+        margin: 0 auto;
+    }
+    
+    .team-card {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.5rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        
+        &:hover {
+            transform: translateY(-5px) scale(1.03);
+            
+            .team-thumb {
+                box-shadow: 0 8px 30px rgba(1, 186, 154, 0.6);
+                border-color: $primary-aqua;
+            }
+            
+            .team-label {
+                color: $primary-aqua;
+                text-shadow: 0 0 10px rgba(1, 186, 154, 0.5);
+            }
+        }
+    }
+    
+    .team-thumb {
+        width: 120px;
+        height: 120px;
+        object-fit: cover;
+        border-radius: 50%;
+        border: 3px solid rgba(255, 255, 255, 0.2);
+        box-shadow: 0 5px 20px rgba(1, 186, 154, 0.3);
+        transition: all 0.3s ease;
+    }
+    
+    .team-label {
+        color: rgba(255, 255, 255, 0.7);
+        font-family: $font-red-hat;
+        font-size: 0.9rem;
+        font-weight: 500;
+        transition: all 0.3s ease;
     }
     
     .github-link {
@@ -257,12 +291,39 @@
     }
     
     .mvpp-footer {
-        .mvpp-logo {
-            width: 120px;
-        }
-        
         .mvpp-text {
             font-size: 1rem;
+        }
+        
+        .team-grid {
+            grid-template-columns: 1fr;
+            gap: 1.5rem;
+            max-width: 400px;
+        }
+        
+        .team-card {
+            padding: 0;
+            background: transparent;
+            border: none;
+            border-radius: 0;
+            transition: all 0.3s ease;
+            
+            &:hover {
+                .team-thumb {
+                    box-shadow: 0 8px 30px rgba(1, 186, 154, 0.6);
+                    border-color: $primary-aqua;
+                }
+            }
+        }
+        
+        .team-thumb {
+            width: 100%;
+            height: auto;
+            aspect-ratio: 16 / 10;
+            object-fit: cover;
+            border-radius: 12px;
+            border: 2px solid rgba(255, 255, 255, 0.15);
+            box-shadow: 0 5px 20px rgba(1, 186, 154, 0.3);
         }
         
         .github-link {

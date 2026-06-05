@@ -31,6 +31,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
     private audioService: AudioService
   ) {}
 
+
   // dashboard.component.ts
 ngOnInit() {
   // Actualizar la ruta para el AudioService

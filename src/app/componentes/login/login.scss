@@ -615,37 +615,104 @@
   }
 }
 
-.google-btn {
-  width: 100%;
+// Botones de acción rápida (Google + PWA) en una línea
+.login-quick-actions {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 3rem;
+  margin: 0.5rem 0;
+}
+
+.quick-action-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.quick-action-label {
+  font-family: $font-victor-mono;
+  font-size: 0.7rem;
+  color: rgba(0, 255, 21, 0.7);
+  text-shadow: 0 0 8px rgba(0, 255, 255, 0.3);
+  white-space: nowrap;
+  letter-spacing: 0.3px;
+  text-transform: uppercase;
+}
+
+.icon-btn {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 1rem;
-  padding: 0.8rem;
-  background: white;
-  border: none;
-  border-radius: 10px;
-  color: #333;
-  font-family: $font-red-hat;
-  font-weight: 600;
-  font-size: 1rem;
   cursor: pointer;
   transition: all 0.3s ease;
-  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-
+  border: none;
+  position: relative;
+  
   img {
-    width: 24px;
-    height: 24px;
+    width: 28px;
+    height: 28px;
   }
-
-  &:hover:not(:disabled) {
-    background: #f8f8f8;
-    transform: translateY(-2px);
-    box-shadow: 0 6px 12px rgba(0,0,0,0.15);
-  }
-
+  
   &:disabled {
-    opacity: 0.7;
+    opacity: 0.6;
     cursor: not-allowed;
+    transform: none !important;
   }
-}
+}
+
+.google-icon-btn {
+  background: white;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+  
+  &:hover:not(:disabled) {
+    transform: translateY(-3px) scale(1.05);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.25);
+  }
+  
+  &:active:not(:disabled) {
+    transform: translateY(0) scale(0.98);
+  }
+}
+
+.pwa-icon-btn {
+  background: linear-gradient(135deg, #ffb800, #ffe600);
+  box-shadow: 0 4px 15px rgba(255, 184, 0, 0.4);
+  
+  .pwa-icon {
+    font-size: 1.6rem;
+    line-height: 1;
+  }
+  
+  &:hover:not(:disabled) {
+    transform: translateY(-3px) scale(1.05);
+    box-shadow: 0 8px 25px rgba(255, 184, 0, 0.6);
+  }
+  
+  &:active:not(:disabled) {
+    transform: translateY(0) scale(0.98);
+  }
+}
+
+// Eliminar la sección PWA independiente del login (ahora está integrada con Google)
+.login-pwa-section {
+  display: none;
+}
+
+.login-pwa-message {
+  width: 100%;
+  text-align: center;
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.85);
+  margin-top: 0.75rem;
+  padding: 0.5rem;
+  border-radius: 8px;
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(1, 186, 154, 0.2);
+  font-family: $font-victor-mono;
+  animation: fadeIn 0.3s ease;
+}

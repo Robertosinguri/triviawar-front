@@ -196,10 +196,25 @@
             <span>o continúa con</span>
           </div>
           
-          <button type="button" class="google-btn" (click)="loginConGoogle()" [disabled]="isLoading()">
-            <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google">
-            Google
-          </button>
+          <div class="login-quick-actions">
+            <div class="quick-action-item">
+              <button type="button" class="icon-btn google-icon-btn" (click)="loginConGoogle()" [disabled]="isLoading()" title="Iniciar sesión con Google">
+                <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google">
+              </button>
+              <span class="quick-action-label">Iniciar sesión</span>
+            </div>
+            
+            <div class="quick-action-item">
+              <button type="button" class="icon-btn pwa-icon-btn" (click)="instalarPwa()" title="Instalar aplicación">
+                <span class="pwa-icon">🎮</span>
+              </button>
+              <span class="quick-action-label">Instalar app</span>
+            </div>
+          </div>
+          
+          @if (mensajePwa()) {
+            <div class="login-pwa-message">{{ mensajePwa() }}</div>
+          }
         </div>
       }
       
@@ -233,6 +248,16 @@
       
       <div class="login-hint">
         <small>Autenticación con Firebase</small>
+      </div>
+
+      <!-- Botón PWA siempre visible en login -->
+      <div class="login-pwa-section">
+        <button type="button" class="login-pwa-btn" (click)="instalarPwa()">
+          🎮 Instalar App 
+        </button>
+        @if (mensajePwa()) {
+          <div class="login-pwa-message">{{ mensajePwa() }}</div>
+        }
       </div>
     }
 

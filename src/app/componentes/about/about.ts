@@ -12,13 +12,23 @@ import { NavbarComponent } from '../navbar/navbar';
 
 export class AboutComponent {
   showImageModal: boolean = false;
+  selectedImage: number | null = null;
 
-  openImageModal(): void {
+  teamMembers = [
+    { src: '/avatares/equipo-01.jpeg', alt: 'Miembro del equipo MVPP 1' },
+    { src: '/avatares/equipo-02.jpeg', alt: 'Miembro del equipo MVPP 2' },
+    { src: '/avatares/equipo-03.jpeg', alt: 'Miembro del equipo MVPP 3' },
+    { src: '/avatares/equipo-04.jpeg', alt: 'Miembro del equipo MVPP 4' },
+  ];
+
+  openImageModal(index: number): void {
+    this.selectedImage = index;
     this.showImageModal = true;
   }
 
   closeImageModal(): void {
     this.showImageModal = false;
+    this.selectedImage = null;
   }
 
 

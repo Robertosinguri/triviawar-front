@@ -41,11 +41,17 @@
                     </div>
                 </article>
 
-                <!-- Footer MVPP -->
+                <!-- Footer MVPP - Equipo -->
                 <footer class="mvpp-footer">
-                    <img src="/avatares/mvpp.png" alt="MVPP Team" class="mvpp-logo" (click)="openImageModal()">
                     <p class="mvpp-text">Desarrollado por el equipo MVPP</p>
                     
+                    <div class="team-grid">
+                        @for (member of teamMembers; track member.src; let i = $index) {
+                        <div class="team-card" (click)="openImageModal(i)">
+                            <img [src]="member.src" [alt]="member.alt" class="team-thumb">
+                        </div>
+                        }
+                    </div>
 
                 </footer>
 
@@ -53,10 +59,10 @@
             </section>
 
             <!-- Modal -->
-            @if (showImageModal) {
+            @if (showImageModal && selectedImage !== null) {
             <div class="image-modal" (click)="closeImageModal()">
                 <div class="modal-content" (click)="$event.stopPropagation()">
-                    <img src="/avatares/mvpp.png" alt="MVPP Team" class="modal-image">
+                    <img [src]="teamMembers[selectedImage].src" [alt]="teamMembers[selectedImage].alt" class="modal-image">
                     <button class="close-btn" (click)="closeImageModal()">&times;</button>
                 </div>
             </div>}

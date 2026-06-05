@@ -3,7 +3,7 @@ import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { FirebaseAuthService } from '../../servicios/auth/firebase-auth.service';
-//import { BackgroundComponent } from '../background/background';
+import { PwaInstallService } from '../../servicios/pwa/pwa-install.service';
 
 @Component({
   selector: 'app-login',
@@ -15,6 +15,20 @@ import { FirebaseAuthService } from '../../servicios/auth/firebase-auth.service'
 export class Login {
   private readonly authService = inject(FirebaseAuthService);
   private readonly router = inject(Router);
+  private readonly pwaInstallService = inject(PwaInstallService);
+
+  protected readonly mensajePwa = signal('');
+
+  protected async instalarPwa(): Promise<void> {
+    const mensaje = await this.pwaInstallService.install();
+    this.mensajePwa.set(mensaje);
+    
+    if (mensaje) {
+      setTimeout(() => {
+        this.mensajePwa.set('');
+      }, 5000);
+    }
+  }
 
   protected readonly email = signal('');
   protected readonly name = signal('');
