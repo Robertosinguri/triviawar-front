@@ -108,9 +108,16 @@ export class NavbarComponent implements OnInit, OnDestroy {
     return `avatares/${filename}`;
   }
 
+  private avatarErrorFlag = false;
+
   onAvatarError(event: any) {
+    if (this.avatarErrorFlag) {
+      event.target.src = '';
+      return;
+    }
+    this.avatarErrorFlag = true;
     console.error('Error cargando avatar:', event.target.src);
-    event.target.src = 'avatares/01.webp'; // Fallback a avatar por defecto
+    event.target.src = 'avatares/01.webp';
   }
 
   abrirSelectorAvatar() {

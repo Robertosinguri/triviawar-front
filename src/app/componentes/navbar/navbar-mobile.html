@@ -44,7 +44,7 @@
           <div class="current-avatar-wrapper" (click)="abrirSelectorAvatar()">
             <div class="current-avatar">
               @if (hasAvatar()) {
-              <img [src]="getUserAvatar()" alt="Avatar actual" class="current-avatar-img">
+              <img [src]="getUserAvatar()" alt="Avatar actual" class="current-avatar-img" (error)="onAvatarError($event)">
               } @else {
               <div class="no-avatar">Sin avatar</div>
               }
@@ -133,7 +133,7 @@
     <div class="avatar-grid">
       @for (avatar of availableAvatars; track avatar) {
       <div class="avatar-option" (click)="seleccionarAvatar(avatar)">
-        <img [src]="'/avatares/' + avatar" [alt]="avatar" class="avatar-preview">
+        <img [src]="'/avatares/' + avatar" [alt]="avatar" class="avatar-preview" (error)="onAvatarError($event)">
       </div>
       }
     </div>

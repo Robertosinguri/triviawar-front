@@ -67,8 +67,20 @@ export class NavbarMobileComponent implements OnInit {
     return !!this.getUserAvatar();
   }
 
+  private avatarErrorFlag = false;
+
   abrirSelectorAvatar() {
     this.showAvatarSelector = true;
+  }
+
+  onAvatarError(event: any) {
+    if (this.avatarErrorFlag) {
+      event.target.src = '';
+      return;
+    }
+    this.avatarErrorFlag = true;
+    console.error('Error cargando avatar:', event.target.src);
+    event.target.src = 'avatares/01.webp';
   }
 
   cerrarSelectorAvatar() {
