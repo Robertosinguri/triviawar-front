@@ -36,9 +36,18 @@ export class PwaInstallService {
       && !/Chrome/.test(navigator.userAgent);
     this.isIOS.set(ios);
 
-    // Capturar beforeinstallprompt
+    // Recuperar evento capturado en main.ts (antes de que Angular iniciara)
+    const globalPrompt = (window as any).__pwaDeferredPrompt;
+    if (globalPrompt) {
+      this.deferredPrompt = globalPrompt;
+      this.canInstall.set(true);
+      console.log('📲 PWA: Instalación disponible (recuperado de main.ts)');
+    }
+
+    // Capturar beforeinstallprompt (por si llega después de que Angular inició)
     window.addEventListener('beforeinstallprompt', (e) => {
       e.preventDefault();
+      // Si ya tenemos uno guardado, usar el nuevo
       this.deferredPrompt = e;
       this.canInstall.set(true);
       console.log('📲 PWA: Instalación disponible');
