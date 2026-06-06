@@ -8,6 +8,9 @@ import { EstadisticasService, EstadisticasUsuario } from '../../servicios/estadi
 import { AudioService } from '../../servicios/audio/audio.service';
 import { ControlComponent } from '../control/control';
 import { PwaInstallService } from '../../servicios/pwa/pwa-install.service';
+import { environment } from '../../../environments/environment';
+
+const BASE = environment.mediaUrl || '';
 
 @Component({
   selector: 'app-navbar-mobile',
@@ -64,11 +67,11 @@ export class NavbarMobileComponent implements OnInit {
 
     if (avatar.match(/^\d+\.(png|webp)$/)) {
       const webpAvatar = avatar.replace(/\.png$/, '.webp');
-      return `avatares/${webpAvatar}`;
+      return `${BASE}/avatares/${webpAvatar}`;
     }
     if (avatar.startsWith('http')) return avatar;
-    if (avatar.startsWith('avatares/')) return avatar;
-    return `avatares/${avatar}`;
+    if (avatar.startsWith('avatares/')) return `${BASE}/${avatar}`;
+    return `${BASE}/avatares/${avatar}`;
   }
 
   hasAvatar(): boolean {
@@ -88,7 +91,7 @@ export class NavbarMobileComponent implements OnInit {
     }
     this.avatarErrorFlag = true;
     console.error('Error cargando avatar:', event.target.src);
-    event.target.src = 'avatares/01.webp';
+    event.target.src = `${BASE}/avatares/01.webp`;
   }
 
   cerrarSelectorAvatar() {

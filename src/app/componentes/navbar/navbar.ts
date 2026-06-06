@@ -8,7 +8,9 @@ import { Subscription } from 'rxjs';
 import { AudioService } from '../../servicios/audio/audio.service';
 import { ControlComponent } from '../control/control';
 import { PwaInstallService } from '../../servicios/pwa/pwa-install.service';
+import { environment } from '../../../environments/environment';
 
+const BASE = environment.mediaUrl || '';
 
 @Component({
   selector: 'app-navbar',
@@ -83,7 +85,7 @@ export class NavbarComponent implements OnInit, OnDestroy {
     if (avatar.match(/^\d+\.(png|webp)$/)) {
       // Convertir .png a .webp si es necesario
       const webpAvatar = avatar.replace(/\.png$/, '.webp');
-      return `avatares/${webpAvatar}`;
+      return `${BASE}/avatares/${webpAvatar}`;
     }
 
     // Si ya es una URL completa (http/https)
@@ -93,11 +95,11 @@ export class NavbarComponent implements OnInit, OnDestroy {
 
     // Si ya tiene el prefijo avatares/
     if (avatar.startsWith('avatares/')) {
-      return avatar;
+      return `${BASE}/${avatar}`;
     }
 
     // Fallback: asumir que es un archivo local
-    return `avatares/${avatar}`;
+    return `${BASE}/avatares/${avatar}`;
   }
 
   hasAvatar(): boolean {
@@ -105,7 +107,7 @@ export class NavbarComponent implements OnInit, OnDestroy {
   }
 
   getAvatarPath(filename: string): string {
-    return `avatares/${filename}`;
+    return `${BASE}/avatares/${filename}`;
   }
 
   private avatarErrorFlag = false;
@@ -117,7 +119,7 @@ export class NavbarComponent implements OnInit, OnDestroy {
     }
     this.avatarErrorFlag = true;
     console.error('Error cargando avatar:', event.target.src);
-    event.target.src = 'avatares/01.webp';
+    event.target.src = `${BASE}/avatares/01.webp`;
   }
 
   abrirSelectorAvatar() {
