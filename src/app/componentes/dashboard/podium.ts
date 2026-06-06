@@ -105,14 +105,11 @@ const BASE = environment.mediaUrl || '';
 
     @keyframes jump-1 {
       0%, 100% { transform: translateY(0); }
-      30% { transform: translateY(-8px); }
-      50% { transform: translateY(0); }
-      70% { transform: translateY(-5px); }
+      50% { transform: translateY(-3px); }
     }
     @keyframes jump-2 {
       0%, 100% { transform: translateY(0); }
-      40% { transform: translateY(-6px); }
-      60% { transform: translateY(0); }
+      50% { transform: translateY(-3px); }
     }
     @keyframes jump-3 {
       0%, 100% { transform: translateY(0); }

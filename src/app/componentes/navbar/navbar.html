@@ -59,15 +59,15 @@
         </div>
 
         <div class="avatar-section">
-          <div class="current-avatar-wrapper" (click)="abrirSelectorAvatar()">
-            <div class="current-avatar">
+          <div class="current-avatar-wrapper">
+            <div class="current-avatar" [class.enlarged]="showEnlargedAvatar" (click)="toggleEnlargedAvatar()">
               @if (hasAvatar()) {
               <img [src]="getUserAvatar()" alt="Avatar actual" class="current-avatar-img" (error)="onAvatarError($event)">
               } @else {
               <div class="no-avatar">Sin avatar</div>
               }
             </div>
-            <span class="change-avatar-text">Cambiar Imagen</span>
+            <span class="change-avatar-text" (click)="abrirSelectorAvatar()">Cambiar Imagen</span>
           </div>
         </div>
       </div>

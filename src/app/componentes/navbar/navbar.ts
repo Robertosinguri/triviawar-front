@@ -36,6 +36,7 @@ export class NavbarComponent implements OnInit, OnDestroy {
   estadisticas: any | null = null;
   showMobileMenu = false;
   showAvatarSelector = false;
+  showEnlargedAvatar = false;
 
   availableAvatars = [
     '01.webp', '02.webp', '03.webp', '04.webp', '05.webp', '06.webp',
@@ -116,6 +117,10 @@ export class NavbarComponent implements OnInit, OnDestroy {
     this.avatarErrorFlag = true;
     console.error('Error cargando avatar:', event.target.src);
     event.target.src = `${BASE}/avatares/01.webp`;
+  }
+
+  toggleEnlargedAvatar() {
+    this.showEnlargedAvatar = !this.showEnlargedAvatar;
   }
 
   abrirSelectorAvatar() {
