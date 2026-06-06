@@ -24,6 +24,12 @@ frontend:
     build:
       commands:
         - 'npm run build'
+        - echo '=== Directorios en dist/ ==='
+        - find dist/ -type d | sort
+        - echo '=== Buscando webp ==='
+        - find dist/ -name "*.webp" | sort
+        - echo '=== Contenido de public/avatares ==='
+        - ls -la public/avatares/
   artifacts:
     baseDirectory: dist/frontend/browser
     files:
