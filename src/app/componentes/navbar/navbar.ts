@@ -7,7 +7,6 @@ import { ChatStateService } from '../../servicios/chat-state.service';
 import { Subscription } from 'rxjs';
 import { AudioService } from '../../servicios/audio/audio.service';
 import { ControlComponent } from '../control/control';
-import { PwaInstallService } from '../../servicios/pwa/pwa-install.service';
 import { environment } from '../../../environments/environment';
 
 const BASE = environment.mediaUrl || '';
@@ -37,9 +36,6 @@ export class NavbarComponent implements OnInit, OnDestroy {
   estadisticas: any | null = null;
   showMobileMenu = false;
   showAvatarSelector = false;
-  mensajePwa = '';
-
-  readonly pwaInstallService = inject(PwaInstallService);
 
   availableAvatars = [
     '01.webp', '02.webp', '03.webp', '04.webp', '05.webp', '06.webp',
@@ -190,18 +186,6 @@ export class NavbarComponent implements OnInit, OnDestroy {
   // Emite acción al presionar "Volver" en la barra de contexto de la página
   onBackClick() {
     this.onBack.emit();
-  }
-
-  async instalarPwa() {
-    this.mensajePwa = await this.pwaInstallService.install();
-
-    // Auto-limpiar el mensaje después de 5 segundos
-    if (this.mensajePwa) {
-      setTimeout(() => {
-        this.mensajePwa = '';
-        this.cdr.detectChanges();
-      }, 5000);
-    }
   }
 
   async logout() {

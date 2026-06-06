@@ -109,26 +109,6 @@
         <app-control [inline]="true"></app-control>
       </div>
 
-      <!-- Botón Instalar PWA - Siempre visible -->
-      <div class="pwa-install-section">
-        <button class="pwa-install-btn" (click)="instalarPwa()"
-          [class.installed]="pwaInstallService.isInstalled()"
-          [class.ios]="pwaInstallService.isIOS()">
-          @if (pwaInstallService.isInstalled()) {
-            <span>✅ App Instalada</span>
-          } @else if (pwaInstallService.isIOS()) {
-            <span>📱 Instalar App (iOS)</span>
-          } @else {
-            <span>📲 Instalar App</span>
-          }
-        </button>
-        @if (mensajePwa) {
-        <div class="pwa-install-message" [class.success]="mensajePwa.includes('✅')">
-          {{ mensajePwa }}
-        </div>
-        }
-      </div>
-
       <!-- Botón logout después del ranking -->
       <div class="logout-section">
         <button class="sidebar-logout-btn" (click)="logout()">

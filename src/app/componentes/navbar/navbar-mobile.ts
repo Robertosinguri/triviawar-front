@@ -7,7 +7,6 @@ import { ChatStateService } from '../../servicios/chat-state.service';
 import { EstadisticasService, EstadisticasUsuario } from '../../servicios/estadisticas/estadisticas.service';
 import { AudioService } from '../../servicios/audio/audio.service';
 import { ControlComponent } from '../control/control';
-import { PwaInstallService } from '../../servicios/pwa/pwa-install.service';
 import { environment } from '../../../environments/environment';
 
 const BASE = environment.mediaUrl || '';
@@ -23,9 +22,6 @@ export class NavbarMobileComponent implements OnInit {
   showStats = false;
   estadisticas: EstadisticasUsuario | null = null;
   showAvatarSelector = false;
-  mensajePwa = '';
-
-  readonly pwaInstallService = inject(PwaInstallService);
 
   availableAvatars = [
     '01.webp', '02.webp', '03.webp', '04.webp', '05.webp', '06.webp',
@@ -135,17 +131,6 @@ export class NavbarMobileComponent implements OnInit {
 
   toggleStats() {
     this.showStats = !this.showStats;
-  }
-
-  async instalarPwa() {
-    this.mensajePwa = await this.pwaInstallService.install();
-
-    // Auto-limpiar el mensaje después de 5 segundos
-    if (this.mensajePwa) {
-      setTimeout(() => {
-        this.mensajePwa = '';
-      }, 5000);
-    }
   }
 
   async logout() {
