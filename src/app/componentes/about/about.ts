@@ -15,10 +15,10 @@ export class AboutComponent {
   selectedImage: number | null = null;
 
   teamMembers = [
-    { src: '/avatares/equipo-01.jpeg', alt: 'Miembro del equipo MVPP 1' },
-    { src: '/avatares/equipo-02.jpeg', alt: 'Miembro del equipo MVPP 2' },
-    { src: '/avatares/equipo-03.jpeg', alt: 'Miembro del equipo MVPP 3' },
-    { src: '/avatares/equipo-04.jpeg', alt: 'Miembro del equipo MVPP 4' },
+    { src: '/avatares/equipo-01.webp', alt: 'Miembro del equipo MVPP 1' },
+    { src: '/avatares/equipo-02.webp', alt: 'Miembro del equipo MVPP 2' },
+    { src: '/avatares/equipo-03.webp', alt: 'Miembro del equipo MVPP 3' },
+    { src: '/avatares/equipo-04.webp', alt: 'Miembro del equipo MVPP 4' },
   ];
 
   openImageModal(index: number): void {

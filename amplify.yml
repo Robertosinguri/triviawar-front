@@ -1,0 +1,33 @@
+version: 1
+frontend:
+  phases:
+    preBuild:
+      commands:
+        - 'npm ci --cache .npm --prefer-offline'
+        - mkdir -p src/environments
+        - |
+          echo "export const environment = {
+            production: true,
+            apiUrl: '$API_URL',
+            socketUrl: '$SOCKET_URL',
+            firebase: {
+              apiKey: 'AIzaSyBm5N3nh2GBdMmMSeTaQyruIYkZIZA6T18',
+              authDomain: 'mvpp-65c73.firebaseapp.com',
+              projectId: 'mvpp-65c73',
+              storageBucket: 'mvpp-65c73.firebasestorage.app',
+              messagingSenderId: '8006260485',
+              appId: '1:8006260485:web:8109e8768c2a037861496c',
+              measurementId: 'G-0RPZDXFWJW'
+            }
+          };" > src/environments/environment.prod.ts
+        - cp src/environments/environment.prod.ts src/environments/environment.ts
+    build:
+      commands:
+        - 'npm run build'
+  artifacts:
+    baseDirectory: dist/frontend/browser
+    files:
+      - '**/*'
+  cache:
+    paths:
+      - '.npm/**/*'
