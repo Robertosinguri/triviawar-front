@@ -59,8 +59,16 @@ export class NavbarMobileComponent implements OnInit {
 
   getUserAvatar(): string {
     const user = this.authService.currentUser$();
-    const avatarPath = user?.picture ? `/avatares/${user.picture}` : '';
-    return avatarPath;
+    const avatar = user?.picture;
+    if (!avatar) return '';
+
+    if (avatar.match(/^\d+\.(png|webp)$/)) {
+      const webpAvatar = avatar.replace(/\.png$/, '.webp');
+      return `avatares/${webpAvatar}`;
+    }
+    if (avatar.startsWith('http')) return avatar;
+    if (avatar.startsWith('avatares/')) return avatar;
+    return `avatares/${avatar}`;
   }
 
   hasAvatar(): boolean {
