@@ -27,6 +27,8 @@ frontend:
         - 'npm run build'
   artifacts:
     baseDirectory: dist/frontend/browser
+    files:
+      - '**/*'
   cache:
     paths:
       - '.npm/**/*'
