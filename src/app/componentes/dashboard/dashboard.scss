@@ -682,7 +682,7 @@
   }
 }
 
-.mini-ranking {
+.podium-card {
   display: flex;
   flex-direction: column;
   padding: 1.5rem;
@@ -776,7 +776,7 @@
 }
 
 // Responsive optimizado con nuevos mixins
-.mini-ranking {
+.podium-card {
   @include mobile-only {
     margin-top: 1.5rem;
     padding: 1rem;

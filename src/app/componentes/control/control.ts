@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, Input } from '@angular/core';
+import { Component, OnInit, OnDestroy, Input, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { NavigationEnd, Router } from '@angular/router';
@@ -15,7 +15,7 @@ import { AudioService } from '../../servicios/audio/audio.service';
 export class ControlComponent implements OnInit, OnDestroy {
   @Input() inline: boolean = false;
   showPanel: boolean = false;
-  showControl: boolean = true;
+  showControl: boolean = false;
   private routerSubscription: Subscription = new Subscription();
   
   volumenEfectos: number = 0.6;
@@ -25,38 +25,29 @@ export class ControlComponent implements OnInit, OnDestroy {
 
   constructor(
     private audioService: AudioService,
-    private router: Router
+    private router: Router,
+    private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit() {
-    console.log('ControlComponent iniciado');
+    const hiddenRoutes = ['/', '/login'];
+    this.showControl = !hiddenRoutes.includes(this.router.url);
     this.actualizarEstado();
     
     this.routerSubscription = this.router.events.pipe(
       filter(event => event instanceof NavigationEnd)
     ).subscribe((event: NavigationEnd) => {
-      const hiddenRoutes = ['/', '/login'];
       this.showControl = !hiddenRoutes.includes(event.urlAfterRedirects);
-      
       this.actualizarEstado();
     });
   }
 
   actualizarEstado() {
-    setTimeout(() => {
-      this.volumenEfectos = this.audioService.getVolumenEfectos();
-      this.volumenMusica = this.audioService.getVolumenMusica();
-      this.efectosActivos = this.audioService.isAudioActivo();
-      this.musicaActiva = this.audioService.isMusicaActiva();
-      
-      console.log('Estado actualizado:', {
-        efectosActivos: this.efectosActivos,
-        musicaActiva: this.musicaActiva,
-        volumenEfectos: this.volumenEfectos,
-        volumenMusica: this.volumenMusica,
-        rutaActual: this.router.url
-      });
-    }, 100);
+    this.volumenEfectos = this.audioService.getVolumenEfectos();
+    this.volumenMusica = this.audioService.getVolumenMusica();
+    this.efectosActivos = this.audioService.isAudioActivo();
+    this.musicaActiva = this.audioService.isMusicaActiva();
+    this.cdr.detectChanges();
   }
 
   ngOnDestroy() {

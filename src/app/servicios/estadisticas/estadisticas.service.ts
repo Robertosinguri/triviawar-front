@@ -33,6 +33,7 @@ export interface JugadorRanking {
     puntajeTotal: number;
     partidasJugadas: number;
     promedio: number;
+    picture?: string;
 }
 
 @Injectable({

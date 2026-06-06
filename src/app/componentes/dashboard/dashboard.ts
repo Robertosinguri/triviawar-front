@@ -5,6 +5,7 @@ import { CommonModule } from '@angular/common';
 import { NavbarComponent } from '../navbar/navbar';
 import { EstadisticasService, JugadorRanking } from '../../servicios/estadisticas/estadisticas.service';
 import { ChatComponent } from '../chat/chat';
+import { PodiumComponent } from './podium';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../environments/environment';
 import { AudioService } from '../../servicios/audio/audio.service';
@@ -12,7 +13,7 @@ import { AudioService } from '../../servicios/audio/audio.service';
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [FormsModule, CommonModule, RouterModule, NavbarComponent, ChatComponent],
+  imports: [FormsModule, CommonModule, RouterModule, NavbarComponent, ChatComponent, PodiumComponent],
   templateUrl: './dashboard.html',
   styleUrls: ['./dashboard.scss']
 })

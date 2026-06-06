@@ -46,23 +46,14 @@
             <button class="training-btn" (click)="iniciarEntrenamiento()">Entrenar</button>
           </div>
 
-          <!-- Ranking convertido en el 4to cuadrante -->
-          <div class="option-card mini-ranking">
-            <h3>🏆 Top 3 Jugadores</h3>
-            <ol class="mini-ranking-list">
-              @for (jugador of rankingMinimalista; track jugador.nombre) {
-              <li>
-                <span class="ranking-pos">#{{jugador.posicion}}</span>
-                <span class="ranking-name">{{jugador.nombre}}</span>
-                <span class="ranking-score">{{jugador.puntajeTotal}} pts</span>
-              </li>
-              }
-
-              @if (rankingMinimalista !== null && rankingMinimalista.length === 0) {
-              <li class="no-data">Aún no hay datos.</li>
-              }
-            </ol>
-            <a routerLink="/ranking" class="ver-mas">Ver ranking completo...</a>
+          <!-- Ranking Podium Cyberpunk -->
+          <div class="option-card podium-card">
+            <h3 style="text-align:center; color:#e6bd00; margin-bottom:0.5rem;">🏆 Top 3 Jugadores</h3>
+            @if (rankingMinimalista !== null && rankingMinimalista.length > 0) {
+              <app-podium [top3]="rankingMinimalista.slice(0, 3)"></app-podium>
+            } @else {
+              <p style="text-align:center; color:#888; padding:2rem;">Aún no hay datos.</p>
+            }
           </div>
         </div>
       </main>
