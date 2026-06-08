@@ -18,10 +18,12 @@ export class AboutComponent {
   selectedImage: number | null = null;
 
   teamMembers = [
-    { src: BASE + '/avatares/equipo-01.webp', alt: 'Miembro del equipo MVPP 1' },
-    { src: BASE + '/avatares/equipo-02.webp', alt: 'Miembro del equipo MVPP 2' },
-    { src: BASE + '/avatares/equipo-03.webp', alt: 'Miembro del equipo MVPP 3' },
-    { src: BASE + '/avatares/equipo-04.webp', alt: 'Miembro del equipo MVPP 4' },
+    { src: BASE + '/avatares/anto.webp', alt: 'Miembro del equipo MVPP 1' },
+    { src: BASE + '/avatares/gera.webp', alt: 'Miembro del equipo MVPP 2' },
+    { src: BASE + '/avatares/robert.webp', alt: 'Miembro del equipo MVPP 3' },
+    { src: BASE + '/avatares/jesi.webp', alt: 'Miembro del equipo MVPP 4' },    
+    { src: BASE + '/avatares/ari.webp', alt: 'Miembro del equipo MVPP 5' },
+    { src: BASE + '/avatares/equipo.webp', alt: 'Equipo MVPP' },
   ];
 
   openImageModal(index: number): void {
