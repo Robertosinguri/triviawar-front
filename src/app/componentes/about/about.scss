@@ -1,6 +1,9 @@
 @use '../../theme/variables.scss' as *;
 
-.config-container {
+// ══════════════════════════════════════════════════════════════
+// CONTENEDOR PRINCIPAL – Scroll fluido y fondos oscuros
+// ══════════════════════════════════════════════════════════════
+.about-container {
     @extend %page-container;
     position: relative;
     z-index: 1;
@@ -9,21 +12,19 @@
 .about-main {
     max-width: 1200px;
     margin: 0 auto;
-    padding: 2rem;
+    padding: 2rem 2rem 0;
     flex: 1;
-}
+    animation: fadeIn 0.6s ease-out;
 
-.tab-content {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 2rem;
-    animation: fadeIn 0.3s ease-in-out;
+    > *:not(:last-child) {
+        margin-bottom: 6rem;
+    }
 }
 
 @keyframes fadeIn {
     from {
         opacity: 0;
-        transform: translateY(10px);
+        transform: translateY(20px);
     }
     to {
         opacity: 1;
@@ -31,159 +32,390 @@
     }
 }
 
-.about-card {
-    @extend %content-panel;
-    padding: 2rem;
+// ══════════════════════════════════════════════════════════════
+// TÍTULO DE SECCIÓN COMPARTIDO
+// ══════════════════════════════════════════════════════════════
+.section-title {
+    font-family: $font-victor-mono;
+    font-weight: 700;
+    font-size: 2rem;
+    text-align: center;
+    color: $primary-aqua;
+    text-shadow: 0 0 20px rgba($primary-aqua, 0.4);
+    margin-bottom: 3rem;
+    letter-spacing: 0.05em;
+
+    &::after {
+        content: '';
+        display: block;
+        width: 80px;
+        height: 3px;
+        margin: 1rem auto 0;
+        background: linear-gradient(90deg, transparent, $primary-aqua, transparent);
+        border-radius: 2px;
+    }
+}
+
+// ══════════════════════════════════════════════════════════════
+// SECCIÓN 1: EL ORIGEN – Hero
+// ══════════════════════════════════════════════════════════════
+.hero-section {
+    text-align: center;
+}
+
+.hero-content {
+    margin-bottom: 3.5rem;
+}
+
+.hero-title {
+    font-family: $font-monoton;
+    font-size: 3rem;
+    color: $primary-yellow;
+    text-shadow:
+        0 0 20px rgba($primary-yellow, 0.5),
+        0 0 60px rgba($primary-yellow, 0.2);
+    margin-bottom: 2rem;
+    letter-spacing: 0.08em;
+    line-height: 1.2;
+}
+
+.hero-narrative {
+    font-family: $font-red-hat;
+    font-size: 1.15rem;
+    line-height: 1.8;
+    color: rgba(white, 0.88);
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+// ── Tarjetas de características (Glassmorphism) ──
+.features-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2rem;
+}
+
+.feature-card {
+    background: rgba(255, 255, 255, 0.06);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 20px;
+    padding: 2rem 1.5rem;
+    text-align: center;
     transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+
+    &::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        border-radius: 20px;
+        padding: 1px;
+        background: linear-gradient(
+            135deg,
+            rgba($primary-aqua, 0.3),
+            transparent 40%,
+            transparent 60%,
+            rgba($primary-pink, 0.2)
+        );
+        -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+        -webkit-mask-composite: xor;
+        mask-composite: exclude;
+        pointer-events: none;
+    }
+
+    &:hover {
+        transform: translateY(-8px);
+        border-color: rgba($primary-aqua, 0.4);
+        box-shadow:
+            0 12px 40px rgba($primary-aqua, 0.15),
+            0 0 30px rgba($primary-aqua, 0.05);
+        background: rgba(255, 255, 255, 0.09);
+
+        .feature-icon {
+            transform: scale(1.15);
+        }
+
+        .feature-title {
+            color: $primary-aqua;
+            text-shadow: 0 0 15px rgba($primary-aqua, 0.4);
+        }
+    }
+}
+
+.feature-icon {
+    display: block;
+    font-size: 3rem;
+    margin-bottom: 1.2rem;
+    transition: transform 0.3s ease;
+}
+
+.feature-title {
+    font-family: $font-victor-mono;
+    font-weight: 700;
+    font-size: 1.15rem;
+    color: white;
+    margin-bottom: 0.8rem;
+    transition: all 0.3s ease;
+}
+
+.feature-text {
+    font-family: $font-red-hat;
+    font-size: 0.95rem;
+    line-height: 1.65;
+    color: rgba(white, 0.78);
+}
+
+// ══════════════════════════════════════════════════════════════
+// SECCIÓN 2: REGLAS DE COMBATE – Guía Visual
+// ══════════════════════════════════════════════════════════════
+.guide-section {
+    text-align: center;
+}
+
+.steps-flow {
     display: flex;
     flex-direction: column;
-    background: rgba(255, 255, 255, 0.1);
-    backdrop-filter: blur(20px);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    border-radius: 15px;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-    
+    gap: 1.5rem;
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.step-card {
+    display: flex;
+    align-items: flex-start;
+    gap: 1.5rem;
+    text-align: left;
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 16px;
+    padding: 1.5rem 2rem;
+    transition: all 0.3s ease;
+
     &:hover {
-        transform: translateY(-10px) scale(1.02);
-        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4);
-        border-color: rgba(255, 255, 255, 0.3);
-    }
-}
+        transform: translateX(8px);
+        border-color: rgba($primary-violet, 0.4);
+        box-shadow:
+            0 8px 30px rgba($primary-violet, 0.12),
+            0 0 20px rgba($primary-violet, 0.04);
+        background: rgba(255, 255, 255, 0.08);
 
-.text-card {
-    h2 {
-        font-family: $font-victor-mono;
-        margin-bottom: 1.5rem;
-        text-align: center;
-        font-size: 1.4rem;
-        font-weight: 700;
-        text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
-
-        &#yellow {
-            color: $primary-yellow;
-            text-shadow: 0 0 15px rgba(230, 189, 0, 0.5);
+        .step-number {
+            background: $primary-violet;
+            box-shadow: 0 0 20px rgba($primary-violet, 0.5);
+            color: white;
         }
 
-        &#sky {
-            color: $primary-sky;
-            text-shadow: 0 0 15px rgba(1, 186, 154, 0.5);
-        }
-
-        &#violet {
+        .step-title {
             color: $primary-violet;
-            text-shadow: 0 0 15px rgba(129, 79, 196, 0.5);
-        }
-    }
-
-    p {
-        color: white;
-        opacity: 0.9;
-        margin-bottom: 1rem;
-        text-align: left;
-        font-size: 1rem;
-        line-height: 1.6;
-        font-family: $font-red-hat;
-        
-        &:last-child {
-            margin-bottom: 0;
+            text-shadow: 0 0 12px rgba($primary-violet, 0.3);
         }
     }
 }
 
-.mvpp-footer {
-    grid-column: 1 / -1;
+.step-number {
+    flex-shrink: 0;
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: $font-victor-mono;
+    font-weight: 700;
+    font-size: 1.3rem;
+    background: rgba(white, 0.1);
+    border: 2px solid rgba($primary-violet, 0.4);
+    color: $primary-violet;
+    transition: all 0.3s ease;
+}
+
+.step-content {
+    flex: 1;
+}
+
+.step-title {
+    font-family: $font-victor-mono;
+    font-weight: 700;
+    font-size: 1.1rem;
+    color: white;
+    margin-bottom: 0.5rem;
+    transition: all 0.3s ease;
+}
+
+.step-text {
+    font-family: $font-red-hat;
+    font-size: 0.95rem;
+    line-height: 1.65;
+    color: rgba(white, 0.78);
+}
+
+// ══════════════════════════════════════════════════════════════
+// SECCIÓN 3: EL GREMIO – Equipo
+// ══════════════════════════════════════════════════════════════
+.team-section {
     text-align: center;
-    margin-top: 2rem;
-    padding: 2rem;
-    
-    .mvpp-text {
-        color: $primary-aqua;
-        font-family: $font-victor-mono;
-        font-weight: 600;
-        font-size: 1.1rem;
-        margin: 0 0 1.5rem 0;
-        text-shadow: 0 0 10px rgba(1, 186, 154, 0.4);
-    }
-    
-    .team-grid {
-        display: grid;
-        grid-template-columns: repeat(4, 1fr);
-        gap: 1.5rem;
-        max-width: 800px;
-        margin: 0 auto;
-    }
-    
-    .team-card {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        gap: 0.5rem;
-        cursor: pointer;
-        transition: all 0.3s ease;
-        
-        &:hover {
-            transform: translateY(-5px) scale(1.03);
-            
-            .team-thumb {
-                box-shadow: 0 8px 30px rgba(1, 186, 154, 0.6);
-                border-color: $primary-aqua;
-            }
-            
-            .team-label {
-                color: $primary-aqua;
-                text-shadow: 0 0 10px rgba(1, 186, 154, 0.5);
-            }
-        }
-    }
-    
-    .team-thumb {
-        width: 120px;
-        height: 120px;
-        object-fit: cover;
-        border-radius: 50%;
-        border: 3px solid rgba(255, 255, 255, 0.2);
-        box-shadow: 0 5px 20px rgba(1, 186, 154, 0.3);
-        transition: all 0.3s ease;
-    }
-    
-    .team-label {
-        color: rgba(255, 255, 255, 0.7);
-        font-family: $font-red-hat;
-        font-size: 0.9rem;
-        font-weight: 500;
-        transition: all 0.3s ease;
-    }
-    
-    .github-link {
-        display: inline-flex;
-        align-items: center;
-        gap: 0.5rem;
-        color: $primary-yellow;
-        text-decoration: none;
-        font-family: $font-red-hat;
-        font-weight: 600;
-        padding: 0.75rem 1.5rem;
-        border: 2px solid $primary-yellow;
-        border-radius: 25px;
-        transition: all 0.3s ease;
-        
-        .github-icon {
-            font-size: 1.2rem;
-        }
-        
-        &:hover {
-            background: $primary-yellow;
-            color: $dark-bg;
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(230, 189, 0, 0.4);
-        }
-    }
-    
-
 }
 
+// Grid 3 + 2: 3 cards arriba, 2 cards centradas abajo
+.team-grid {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 1.5rem;
+    max-width: 820px;
+    margin: 0 auto;
 
-// Modal
+    // Forzamos 3 en la primera fila, 2 en la segunda centradas
+    .team-card {
+        flex: 0 0 calc((100% - 3rem) / 3); // 3 columnas con 2 gaps
+        max-width: calc((100% - 3rem) / 3);
+    }
+
+    // Las últimas 2 cards se centran automáticamente con el wrapper
+    .team-card:nth-child(n + 4) {
+        flex: 0 0 calc((100% - 1.5rem) / 2); // 2 columnas con 1 gap
+        max-width: calc((100% - 1.5rem) / 2);
+        max-width: 250px;
+    }
+}
+
+.team-card {
+    background: rgba(255, 255, 255, 0.06);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 20px;
+    padding: 2rem 1.2rem 1.5rem;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+    min-width: 0;
+
+    &::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        border-radius: 20px;
+        padding: 1px;
+        background: linear-gradient(
+            135deg,
+            rgba($primary-aqua, 0.25),
+            transparent 40%,
+            transparent 60%,
+            rgba($primary-pink, 0.15)
+        );
+        -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+        -webkit-mask-composite: xor;
+        mask-composite: exclude;
+        pointer-events: none;
+    }
+
+    &:hover {
+        transform: translateY(-8px);
+        border-color: rgba($primary-aqua, 0.4);
+        box-shadow:
+            0 12px 40px rgba($primary-aqua, 0.15),
+            0 0 30px rgba($primary-aqua, 0.05);
+        background: rgba(255, 255, 255, 0.09);
+
+        .team-img {
+            border-color: $primary-aqua;
+            box-shadow: 0 0 20px rgba($primary-aqua, 0.4);
+            transform: scale(1.05);
+        }
+
+        .team-name {
+            color: $primary-aqua;
+            text-shadow: 0 0 12px rgba($primary-aqua, 0.3);
+        }
+    }
+}
+
+.team-avatar {
+    margin-bottom: 1rem;
+}
+
+.team-img {
+    width: 110px;
+    height: 110px;
+    object-fit: cover;
+    border-radius: 50%;
+    border: 3px solid rgba(white, 0.15);
+    box-shadow: 0 5px 20px rgba($primary-aqua, 0.25);
+    transition: all 0.3s ease;
+}
+
+.team-info {
+    .team-name {
+        font-family: $font-victor-mono;
+        font-weight: 700;
+        font-size: 1.1rem;
+        color: white;
+        margin-bottom: 0.4rem;
+        transition: all 0.3s ease;
+    }
+
+    .team-role {
+        font-family: $font-red-hat;
+        font-size: 0.85rem;
+        line-height: 1.5;
+        color: rgba(white, 0.65);
+    }
+}
+
+// ── Banner inferior del equipo ──
+.team-banner {
+    margin-top: 3rem;
+    display: flex;
+    justify-content: center;
+
+    .banner-img {
+        max-width: 100%;
+        width: 820px;
+        height: auto;
+        border-radius: 20px;
+        border: 1px solid rgba(white, 0.12);
+        box-shadow: 0 10px 40px rgba($primary-aqua, 0.15);
+        object-fit: cover;
+        aspect-ratio: 16 / 9;
+        transition: all 0.3s ease;
+
+        &:hover {
+            border-color: rgba($primary-aqua, 0.4);
+            box-shadow: 0 15px 50px rgba($primary-aqua, 0.25);
+            transform: translateY(-4px);
+        }
+    }
+}
+
+// ══════════════════════════════════════════════════════════════
+// PIE DE PÁGINA
+// ══════════════════════════════════════════════════════════════
+.about-footer {
+    text-align: center;
+    padding: 3rem 1rem 4rem;
+
+    .footer-text {
+        font-family: $font-red-hat;
+        font-size: 0.95rem;
+        line-height: 1.7;
+        color: rgba(white, 0.45);
+        max-width: 750px;
+        margin: 0 auto;
+        font-style: italic;
+    }
+}
+
+// ══════════════════════════════════════════════════════════════
+// MODAL
+// ══════════════════════════════════════════════════════════════
 .image-modal {
     position: fixed;
     inset: 0;
@@ -194,13 +426,7 @@
     justify-content: center;
     z-index: 99999;
     animation: fadeIn 0.3s ease-out;
-    
-    .modal-backdrop {
-        position: absolute;
-        inset: 0;
-        cursor: pointer;
-    }
-    
+
     .modal-content {
         position: relative;
         max-width: 90vw;
@@ -210,7 +436,7 @@
         justify-content: center;
         z-index: 2;
         pointer-events: none;
-        
+
         .modal-image {
             max-width: 100%;
             max-height: 85vh;
@@ -218,10 +444,10 @@
             height: auto;
             object-fit: contain;
             border-radius: 15px;
-            box-shadow: 0 20px 60px rgba(1, 186, 154, 0.4);
+            box-shadow: 0 20px 60px rgba($primary-aqua, 0.4);
             pointer-events: none;
         }
-        
+
         .close-btn {
             position: absolute;
             top: -15px;
@@ -239,10 +465,10 @@
             align-items: center;
             justify-content: center;
             transition: all 0.3s ease;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.5);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
             z-index: 3;
             pointer-events: all;
-            
+
             &:hover {
                 background: $primary-yellow;
                 color: $dark-bg;
@@ -252,98 +478,187 @@
     }
 }
 
-// Responsive Design
-@media (max-width: 1024px) {
-    .tab-content {
-        grid-template-columns: 1fr;
-        gap: 1.5rem;
-    }
-    
+// ══════════════════════════════════════════════════════════════
+// RESPONSIVE – Tablet (≤ 1024px)
+// ══════════════════════════════════════════════════════════════
+@media (max-width: $tablet-large) {
     .about-main {
         max-width: 90%;
+
+        > *:not(:last-child) {
+            margin-bottom: 5rem;
+        }
+    }
+
+    .hero-title {
+        font-size: 2.5rem;
+    }
+
+    .features-grid {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 1.2rem;
+    }
+
+    .team-grid {
+        gap: 1.2rem;
+
+        .team-card {
+            flex: 0 0 calc((100% - 2.4rem) / 3);
+            max-width: calc((100% - 2.4rem) / 3);
+        }
+
+        .team-card:nth-child(n + 4) {
+            flex: 0 0 calc((100% - 1.2rem) / 2);
+            max-width: calc((100% - 1.2rem) / 2);
+            max-width: 220px;
+        }
+    }
+
+    .team-banner .banner-img {
+        width: 100%;
+        max-width: 700px;
     }
 }
 
-@media (max-width: 768px) {
+// ══════════════════════════════════════════════════════════════
+// RESPONSIVE – Móvil (≤ 768px)
+// ══════════════════════════════════════════════════════════════
+@media (max-width: $tablet-small) {
     .about-main {
-        padding: 1rem;
-        overflow-y: auto;
-        -webkit-overflow-scrolling: touch;
+        padding: 1.2rem 1.2rem 0;
+
+        > *:not(:last-child) {
+            margin-bottom: 4rem;
+        }
     }
-    
-    .tab-content {
+
+    .section-title {
+        font-size: 1.4rem;
+        margin-bottom: 2rem;
+
+        &::after {
+            width: 60px;
+        }
+    }
+
+    // ── Hero ──
+    .hero-title {
+        font-size: 1.8rem;
+    }
+
+    .hero-narrative {
+        font-size: 1rem;
+    }
+
+    .features-grid {
+        grid-template-columns: 1fr;
         gap: 1rem;
     }
-    
-    .about-card {
+
+    .feature-card {
+        padding: 1.5rem 1.2rem;
+    }
+
+    // ── Guía ──
+    .step-card {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
         padding: 1.5rem;
-    }
-    
-    .text-card {
-        h2 {
-            font-size: 1.2rem;
-            margin-bottom: 1rem;
-        }
-        
-        p {
-            font-size: 0.95rem;
+
+        &:hover {
+            transform: translateY(-4px);
         }
     }
-    
-    .mvpp-footer {
-        .mvpp-text {
-            font-size: 1rem;
-        }
-        
-        .team-grid {
-            grid-template-columns: 1fr;
-            gap: 1.5rem;
-            max-width: 400px;
-        }
-        
+
+    .step-number {
+        width: 42px;
+        height: 42px;
+        font-size: 1.1rem;
+    }
+
+    .step-title {
+        font-size: 1rem;
+    }
+
+    // ── Equipo ──
+    .team-grid {
+        flex-direction: column;
+        align-items: center;
+        gap: 1rem;
+        max-width: 400px;
+
         .team-card {
-            padding: 0;
-            background: transparent;
-            border: none;
-            border-radius: 0;
-            transition: all 0.3s ease;
-            
-            &:hover {
-                .team-thumb {
-                    box-shadow: 0 8px 30px rgba(1, 186, 154, 0.6);
-                    border-color: $primary-aqua;
-                }
-            }
-        }
-        
-        .team-thumb {
+            flex: 0 0 100%;
+            max-width: 100%;
             width: 100%;
-            height: auto;
-            aspect-ratio: 16 / 10;
-            object-fit: cover;
-            border-radius: 12px;
-            border: 2px solid rgba(255, 255, 255, 0.15);
-            box-shadow: 0 5px 20px rgba(1, 186, 154, 0.3);
         }
-        
-        .github-link {
-            padding: 0.6rem 1.2rem;
-            font-size: 0.9rem;
+
+        .team-card:nth-child(n + 4) {
+            flex: 0 0 100%;
+            max-width: 100%;
+            width: 100%;
         }
     }
-    
+
+    .team-card {
+        padding: 1.5rem 1rem;
+    }
+
+    .team-banner {
+        margin-top: 2rem;
+
+        .banner-img {
+            width: 100%;
+            max-width: 400px;
+            aspect-ratio: 16 / 9;
+        }
+    }
+
+    .team-img {
+        width: 90px;
+        height: 90px;
+    }
+
+    .team-info .team-name {
+        font-size: 1rem;
+    }
+
+    // ── Footer ──
+    .about-footer {
+        padding: 2rem 1rem 3rem;
+
+        .footer-text {
+            font-size: 0.88rem;
+        }
+    }
+
+    // ── Modal ──
     .image-modal {
         .modal-content {
             max-width: 95vw;
-            
+
             .modal-image {
                 max-height: 80vh;
             }
-            
+
             .close-btn {
                 top: 5px;
                 right: 5px;
             }
         }
+    }
+}
+
+// ══════════════════════════════════════════════════════════════
+// RESPONSIVE – Móvil pequeño (≤ 414px)
+// ══════════════════════════════════════════════════════════════
+@media (max-width: $mobile-large) {
+    .hero-title {
+        font-size: 1.4rem;
+    }
+
+    .section-title {
+        font-size: 1.2rem;
     }
 }

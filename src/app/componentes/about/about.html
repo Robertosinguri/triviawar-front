@@ -1,71 +1,160 @@
-<div class="config-container">
+<div class="about-container">
     <app-navbar>
         <main class="about-main">
-            <section class="tab-content">
 
-                <article class="about-card">
-                    <div class="text-card">
-                        <h2 id="yellow">El Origen: Innovación Estudiantil 🎓</h2>
-                        <p>
-                            Trivia War surgió como respuesta a los métodos tradicionales de estudio...
-                        </p>
-                        <p>
-                            El proyecto evolucionó cuando exploramos las capacidades de la inteligencia artificial
-                            generativa...
-                        </p>
-                    </div>
-                </article>
+            <!-- ═══════════════════════════════════════════
+                 SECCIÓN 1: EL ORIGEN (Hero Section)
+                 ═══════════════════════════════════════════ -->
+            <section class="hero-section">
+                <div class="hero-content">
+                    <h1 class="hero-title">BIENVENIDO A LA ARENA</h1>
+                    <p class="hero-narrative">
+                        Trivia War nació con la misión de revolucionar el aprendizaje y facilitar la preparación de exámenes a través de cuestionarios dinámicos e interactivos. Lo que inició como una solución de estudio en las aulas del IFTS n° 11 desarrollada por el equipo MVPP, se transformó en un ecosistema multijugador en tiempo real; una arena competitiva donde medir tus conocimientos y entrenar tu mente bajo presión.
+                    </p>
+                </div>
 
-                <article class="about-card">
-                    <div class="text-card">
-                        <h2 id="violet">La Evolución: Batalla Campal 🔥</h2>
-                        <p>
-                            Tras darnos cuenta de que la competencia era lo divertido...
-                        </p>
-                        <p>
-                            Hoy, Trivia War es la respuesta: un juego multijugador online...
+                <div class="features-grid">
+                    <div class="feature-card">
+                        <span class="feature-icon">🧠</span>
+                        <h3 class="feature-title">Desafíos Implacables</h3>
+                        <p class="feature-text">
+                            Un motor de juego que se adapta a ti. Desde prácticas estratégicas hasta el modo Killer, donde cada segundo cuenta.
                         </p>
                     </div>
-                </article>
-
-                <article class="about-card">
-                    <div class="text-card">
-                        <h2 id="sky">El Futuro: ¡Que Empiece la Guerra! ⚔️</h2>
-                        <p>
-                            Nuestra visión a futuro es que Trivia War sea el caos organizado de conocimiento...
-                        </p>
-                        <p>
-                            El objetivo final es simple: que la diversión y la estrategia sean más importantes que
-                            cualquier libro de texto...
+                    <div class="feature-card">
+                        <span class="feature-icon">⚡</span>
+                        <h3 class="feature-title">Conexión Instantánea</h3>
+                        <p class="feature-text">
+                            Enfrentamientos globales en tiempo real. Sin esperas, sin turnos; pura adrenalina competitiva.
                         </p>
                     </div>
-                </article>
-
-                <!-- Footer MVPP - Equipo -->
-                <footer class="mvpp-footer">
-                    <p class="mvpp-text">Desarrollado por el equipo MVPP</p>
-                    
-                    <div class="team-grid">
-                        @for (member of teamMembers; track member.src; let i = $index) {
-                        <div class="team-card" (click)="openImageModal(i)">
-                            <img [src]="member.src" [alt]="member.alt" class="team-thumb">
-                        </div>
-                        }
+                    <div class="feature-card">
+                        <span class="feature-icon">🛡️</span>
+                        <h3 class="feature-title">Identidad Protegida</h3>
+                        <p class="feature-text">
+                            En esta arena solo habla tu conocimiento. Tu privacidad está resguardada bajo un alias de batalla único.
+                        </p>
                     </div>
-
-                </footer>
-
-
+                </div>
             </section>
 
-            <!-- Modal -->
+            <!-- ═══════════════════════════════════════════
+                 SECCIÓN 2: REGLAS DE COMBATE (Guía Visual)
+                 ═══════════════════════════════════════════ -->
+            <section class="guide-section">
+                <h2 class="section-title">GUÍA DE SUPERVIVENCIA</h2>
+
+                <div class="steps-flow">
+                    <div class="step-card">
+                        <div class="step-number">1</div>
+                        <div class="step-content">
+                            <h3 class="step-title">Elige tu Modalidad</h3>
+                            <p class="step-text">
+                                Practica en el modo individual para afilar tus habilidades o ingresa al Lobby para desafiar a jugadores reales en salas personalizadas.
+                            </p>
+                        </div>
+                    </div>
+                    <div class="step-card">
+                        <div class="step-number">2</div>
+                        <div class="step-content">
+                            <h3 class="step-title">Domina el Tiempo</h3>
+                            <p class="step-text">
+                                No solo importa responder bien, sino ser el más rápido. El tiempo es tu principal recurso (y tu peor enemigo).
+                            </p>
+                        </div>
+                    </div>
+                    <div class="step-card">
+                        <div class="step-number">3</div>
+                        <div class="step-content">
+                            <h3 class="step-title">Escala los Rangos</h3>
+                            <p class="step-text">
+                                Acumula puntos de victoria en cada partida para subir en el Ranking Global y desbloquear nuevos avatares que demuestren tu estatus en la comunidad.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ═══════════════════════════════════════════
+                 SECCIÓN 3: EL GREMIO (El Equipo)
+                 ═══════════════════════════════════════════ -->
+            <section class="team-section">
+                <h2 class="section-title">EL EQUIPO DETRÁS DE LA ARENA</h2>
+
+                <div class="team-grid">
+                    <div class="team-card" (click)="openImageModal(0)">
+                        <div class="team-avatar">
+                            <img [src]="teamMembers[0].src" [alt]="teamMembers[0].alt" class="team-img">
+                        </div>
+                        <div class="team-info">
+                            <h4 class="team-name">Anto</h4>
+                            <p class="team-role">Directora de Operaciones & Diseño de Interfaz</p>
+                        </div>
+                    </div>
+                    <div class="team-card" (click)="openImageModal(1)">
+                        <div class="team-avatar">
+                            <img [src]="teamMembers[1].src" [alt]="teamMembers[1].alt" class="team-img">
+                        </div>
+                        <div class="team-info">
+                            <h4 class="team-name">Gera</h4>
+                            <p class="team-role">Arquitecto de Sistemas & Lógica de Combate</p>
+                        </div>
+                    </div>
+                    <div class="team-card" (click)="openImageModal(2)">
+                        <div class="team-avatar">
+                            <img [src]="teamMembers[2].src" [alt]="teamMembers[2].alt" class="team-img">
+                        </div>
+                        <div class="team-info">
+                            <h4 class="team-name">Robert</h4>
+                            <p class="team-role">Coordinador de Integración & Despliegue de Red</p>
+                        </div>
+                    </div>
+                    <div class="team-card" (click)="openImageModal(3)">
+                        <div class="team-avatar">
+                            <img [src]="teamMembers[3].src" [alt]="teamMembers[3].alt" class="team-img">
+                        </div>
+                        <div class="team-info">
+                            <h4 class="team-name">Jesi</h4>
+                            <p class="team-role">Especialista en Control de Calidad & Tácticas de Simulación</p>
+                        </div>
+                    </div>
+                    <div class="team-card" (click)="openImageModal(3)">
+                        <div class="team-avatar">
+                            <img [src]="teamMembers[3].src" [alt]="teamMembers[3].alt" class="team-img">
+                        </div>
+                        <div class="team-info">
+                            <h4 class="team-name">Ari</h4>
+                            <p class="team-role">Especialista en Control de Calidad & Tácticas de Simulación</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Banner inferior del equipo -->
+                <div class="team-banner">
+                    <img [src]="teamMembers[0].src" alt="Equipo MVPP" class="banner-img">
+                </div>
+            </section>
+
+            <!-- ═══════════════════════════════════════════
+                 PIE DE PÁGINA
+                 ═══════════════════════════════════════════ -->
+            <footer class="about-footer">
+                <p class="footer-text">
+                    Un agradecimiento especial al cuerpo docente del IFTS n° 11 y a cada uno de los beta testers que ayudaron a forjar y equilibrar la arena de Trivia War.
+                </p>
+            </footer>
+
+            <!-- ═══════════════════════════════════════════
+                 MODAL DE IMAGEN
+                 ═══════════════════════════════════════════ -->
             @if (showImageModal && selectedImage !== null) {
             <div class="image-modal" (click)="closeImageModal()">
                 <div class="modal-content" (click)="$event.stopPropagation()">
                     <img [src]="teamMembers[selectedImage].src" [alt]="teamMembers[selectedImage].alt" class="modal-image">
                     <button class="close-btn" (click)="closeImageModal()">&times;</button>
                 </div>
-            </div>}
+            </div>
+            }
 
         </main>
     </app-navbar>
