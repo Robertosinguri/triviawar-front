@@ -41,7 +41,8 @@ export class NavbarComponent implements OnInit, OnDestroy {
   availableAvatars = [
     '01.webp', '02.webp', '03.webp', '04.webp', '05.webp', '06.webp',
     '07.webp', '08.webp', '09.webp', '10.webp', '11.webp', '12.webp',
-    '13.webp', '14.webp', '15.webp', '16.webp', '17.webp'
+    '13.webp', '14.webp', '15.webp', '16.webp', '17.webp', '18.webp',
+    '19.webp', '20.webp', '21.webp', '22.webp', '23.webp', '24.webp'
   ];
 
   constructor() {
