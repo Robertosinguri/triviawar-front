@@ -156,6 +156,7 @@ export class ArenaComponent implements OnInit, OnDestroy {
 
   getShortAiName(): string {
     const model = (this.aiUsada || '').toLowerCase();
+    if (model.includes('gemini')) return 'Gemini';
     if (model.includes('groq')) return 'Groq';
     if (model.includes('cohere')) return 'Cohere';
     if (model.includes('hugging') || (model.includes('llama') && !model.includes('groq'))) return 'Llama';
