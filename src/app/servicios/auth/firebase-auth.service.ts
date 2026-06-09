@@ -63,11 +63,15 @@ export class FirebaseAuthService {
     }
 
     private updateSignalsFromFirebase(user: User) {
+        const current = this.currentUser();
+        // Si el backend ya seteo una picture (login via HTTP), la preservamos.
+        // user.photoURL puede ser null para usuarios Google sin foto de perfil.
+        const picture = user.photoURL || current?.picture || '';
         this.currentUser.set({
-            username: user.email?.split('@')[0] || 'User', // Fallback username
+            username: user.email?.split('@')[0] || 'User',
             email: user.email || '',
             name: user.displayName || '',
-            picture: user.photoURL || '',
+            picture,
             uid: user.uid
         });
         this.isAuthenticated.set(true);
