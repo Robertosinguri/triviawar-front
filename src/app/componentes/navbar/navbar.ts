@@ -7,9 +7,7 @@ import { ChatStateService } from '../../servicios/chat-state.service';
 import { Subscription } from 'rxjs';
 import { AudioService } from '../../servicios/audio/audio.service';
 import { ControlComponent } from '../control/control';
-import { environment } from '../../../environments/environment';
-
-const BASE = environment.mediaUrl || '';
+import { resolveAvatarUrl, previewAvatarUrl } from '../../servicios/avatar-utils';
 
 @Component({
   selector: 'app-navbar',
@@ -75,37 +73,15 @@ export class NavbarComponent implements OnInit, OnDestroy {
 
   getUserAvatar(): string {
     const user = this.authService.usuarioActual();
-    const avatar = user?.picture;
-
-    if (!avatar) return '';
-
-    // Si es un nombre de archivo local (01.png, 02.png, 01.webp, etc.)
-    if (avatar.match(/^\d+\.(png|webp)$/)) {
-      // Convertir .png a .webp si es necesario
-      const webpAvatar = avatar.replace(/\.png$/, '.webp');
-      return `${BASE}/avatares/${webpAvatar}`;
-    }
-
-    // Si ya es una URL completa (http/https)
-    if (avatar.startsWith('http')) {
-      return avatar;
-    }
-
-    // Si ya tiene el prefijo avatares/
-    if (avatar.startsWith('avatares/')) {
-      return `${BASE}/${avatar}`;
-    }
-
-    // Fallback: asumir que es un archivo local
-    return `${BASE}/avatares/${avatar}`;
+    return resolveAvatarUrl(user?.picture);
   }
 
   hasAvatar(): boolean {
-    return !!this.getUserAvatar();
+    return true;
   }
 
   getAvatarPath(filename: string): string {
-    return `${BASE}/avatares/${filename}`;
+    return previewAvatarUrl(filename);
   }
 
   private avatarErrorFlag = false;
@@ -117,7 +93,7 @@ export class NavbarComponent implements OnInit, OnDestroy {
     }
     this.avatarErrorFlag = true;
     console.error('Error cargando avatar:', event.target.src);
-    event.target.src = `${BASE}/avatares/01.webp`;
+    event.target.src = previewAvatarUrl('01.webp');
   }
 
   toggleEnlargedAvatar() {

@@ -15,6 +15,7 @@
           <thead>
             <tr>
               <th>Pos.</th>
+              <th></th>
               <th>Jugador</th>
               <th>Puntaje Total</th>
               <th>Partidas</th>
@@ -25,6 +26,9 @@
             @for (jugador of rankingPaginado; track jugador.posicion) {
             <tr [attr.data-position]="jugador.posicion">
               <td class="posicion">#{{jugador.posicion}}</td>
+              <td class="avatar-cell">
+                <img class="ranking-avatar" [src]="avatarUrl(jugador)" [alt]="jugador.nombre" (error)="onAvatarError($event)">
+              </td>
               <td class="nombre" [attr.data-name]="jugador.nombre" [attr.data-email]="jugador.email">
                 <div class="ranking-name-text">{{jugador.nombre}}</div>
                 <div class="ranking-email-text" style="font-size: 0.85rem; color: rgba(255, 255, 255, 0.7); font-weight: normal; margin-top: 4px;">{{jugador.email || jugador.userId}}</div>
@@ -36,7 +40,7 @@
             } @empty {
             @if (ranking !== null) {
             <tr class="no-data-row">
-              <td colspan="5">
+              <td colspan="6">
                 <div class="no-data-content">
                   <span class="no-data-icon">🏆</span>
                   <p>Aún no hay datos para mostrar el ranking.</p>
@@ -83,14 +87,19 @@
         <ol class="mobile-ranking-list">
           @for (jugador of rankingPaginado; track jugador.posicion) {
           <li [attr.data-position]="jugador.posicion">
-            <div class="mobile-ranking-header">
-              <div class="mobile-ranking-left">
-                <span class="mobile-ranking-pos">#{{jugador.posicion}}</span>
-                <div class="mobile-ranking-name">{{jugador.nombre.split('(')[0].trim()}}</div>
+            <div class="mobile-ranking-row">
+              <img class="ranking-avatar mobile" [src]="avatarUrl(jugador)" [alt]="jugador.nombre" (error)="onAvatarError($event)">
+              <div class="mobile-ranking-info">
+                <div class="mobile-ranking-header">
+                  <div class="mobile-ranking-left">
+                    <span class="mobile-ranking-pos">#{{jugador.posicion}}</span>
+                    <div class="mobile-ranking-name">{{jugador.nombre.split('(')[0].trim()}}</div>
+                  </div>
+                  <span class="mobile-ranking-score">{{jugador.puntajeTotal}} pts</span>
+                </div>
+                <div class="mobile-ranking-email">{{jugador.email || jugador.userId}}</div>
               </div>
-              <span class="mobile-ranking-score">{{jugador.puntajeTotal}} pts</span>
             </div>
-            <div class="mobile-ranking-email">{{jugador.email || jugador.userId}}</div>
           </li>
           } @empty {
           @if (ranking !== null) {

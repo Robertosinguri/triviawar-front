@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { Router} from '@angular/router';
 import { EstadisticasService, JugadorRanking } from '../../servicios/estadisticas/estadisticas.service';
 import { NavbarComponent } from '../navbar/navbar';
+import { resolveAvatarUrl } from '../../servicios/avatar-utils';
 
 
 @Component({
@@ -92,6 +93,15 @@ export class RankingComponent implements OnInit {
 
   volverAlDashboard(): void {
     this.router.navigate(['/dashboard']);
+  }
+
+  avatarUrl(jugador: JugadorRanking): string {
+    return resolveAvatarUrl(jugador.picture);
+  }
+
+  onAvatarError(event: Event) {
+    const img = event.target as HTMLImageElement;
+    img.src = resolveAvatarUrl(null);
   }
 
   trackByPosition(index: number, jugador: JugadorRanking): number {

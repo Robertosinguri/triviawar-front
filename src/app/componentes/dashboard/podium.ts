@@ -2,9 +2,7 @@ import { Component, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { JugadorRanking } from '../../servicios/estadisticas/estadisticas.service';
-import { environment } from '../../../environments/environment';
-
-const BASE = environment.mediaUrl || '';
+import { resolveAvatarUrl } from '../../servicios/avatar-utils';
 
 @Component({
   selector: 'app-podium',
@@ -133,11 +131,11 @@ const BASE = environment.mediaUrl || '';
 export class PodiumComponent {
   @Input() top3: JugadorRanking[] = [];
 
-  podiumBg = `${BASE}/avatares/podio.webp`;
+  podiumBg = resolveAvatarUrl('podio.webp');
 
   onImgError(event: Event) {
     const img = event.target as HTMLImageElement;
-    img.src = `${BASE}/avatares/16.webp`;
+    img.src = resolveAvatarUrl(null);
   }
 
   name(i: number): string {
@@ -148,20 +146,6 @@ export class PodiumComponent {
 
   avatarUrl(i: number): string {
     const p = this.top3[i];
-    const picture = p?.picture;
-
-    // Sin foto o URL externa (Google, etc.) → fallback local para el SVG
-    if (!picture || picture.startsWith('http')) {
-      return `${BASE}/avatares/16.webp`;
-    }
-
-    // Ya tiene prefijo avatares/
-    if (picture.startsWith('avatares/')) {
-      return `${BASE}/${picture}`;
-    }
-
-    // Archivo local — convertir .png a .webp
-    const pic = picture.replace(/\.png$/, '.webp');
-    return `${BASE}/avatares/${pic}`;
+    return resolveAvatarUrl(p?.picture);
   }
 }
