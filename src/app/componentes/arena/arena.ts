@@ -348,20 +348,31 @@ export class ArenaComponent implements OnInit, OnDestroy {
           localStorage.setItem('ranking-partida', JSON.stringify(datosCompletos));
           localStorage.setItem('ganador-partida', JSON.stringify(data.ganador));
 
-          this.mostrarPantallaEspera(data);
+          if (this.modo === 'entrenamiento') {
+            this.router.navigate(['/resultados'], {
+              queryParams: {
+                roomCode: this.roomCode,
+                tema: this.tematicas.join(','),
+                dificultad: this.dificultad,
+                modo: this.modo
+              }
+            });
+          } else {
+            this.mostrarPantallaEspera(data);
 
-          setTimeout(() => {
-            if (this.mostrandoEspera) {
-              this.router.navigate(['/resultados'], {
-                queryParams: {
-                  roomCode: this.roomCode,
-                  tema: this.tematicas.join(','),
-                  dificultad: this.dificultad,
-                  modo: this.modo
-                }
-              });
-            }
-          }, 2500);
+            setTimeout(() => {
+              if (this.mostrandoEspera) {
+                this.router.navigate(['/resultados'], {
+                  queryParams: {
+                    roomCode: this.roomCode,
+                    tema: this.tematicas.join(','),
+                    dificultad: this.dificultad,
+                    modo: this.modo
+                  }
+                });
+              }
+            }, 2500);
+          }
         } else {
           this.mostrarPantallaEspera(data);
         }

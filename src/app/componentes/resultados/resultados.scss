@@ -323,7 +323,7 @@
 // Cuadrante 4: Ranking Global
 .ranking-global-cuadrante {
   h3 {
-    color: $primary-violet;
+    color: $primary-yellow;
   }
 
   .ranking-global-list {
@@ -341,13 +341,13 @@
       font-size: 0.9rem;
 
       &.mi-posicion {
-        background: rgba(129, 79, 196, 0.2);
-        border: 1px solid $primary-violet;
+        background: rgba(230, 189, 0, 0.2);
+        border: 1px solid $primary-yellow;
 
         .posicion-global,
         .nombre-global,
         .puntos-global {
-          color: $primary-violet;
+          color: $primary-yellow;
           font-weight: bold;
         }
       }
@@ -366,7 +366,7 @@
 
       .puntos-global {
         font-family: $font-victor-mono;
-        color: $primary-violet;
+        color: $primary-yellow;
         font-size: 0.8rem;
       }
     }
