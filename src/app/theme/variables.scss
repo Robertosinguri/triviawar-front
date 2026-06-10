@@ -113,16 +113,19 @@ $desktop: 1200px;       // Desktop
 %page-container {
   position: relative;
   height: 100vh;
-  height: 100dvh; // Dynamic viewport height para móviles
+  height: 100dvh;
   overflow-y: auto;
   background: transparent;
   color: $dark-text;
   font-family: $font-red-hat;
+  padding-bottom: env(safe-area-inset-bottom, 0px);
   
   @include mobile-only {
     height: 100vh;
     height: 100dvh;
     overflow-x: hidden;
+    padding-left: env(safe-area-inset-left, 0px);
+    padding-right: env(safe-area-inset-right, 0px);
   }
 }
 

@@ -86,6 +86,11 @@
     color: rgba(white, 0.88);
     max-width: 900px;
     margin: 0 auto;
+    background: rgba(255, 255, 255, 0.06);
+    backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 16px;
+    padding: 1.5rem 2rem;
 }
 
 // ── Tarjetas de características (Glassmorphism) ──
@@ -548,6 +553,7 @@
 
     .hero-narrative {
         font-size: 1rem;
+        padding: 1rem 1.25rem;
     }
 
     .features-grid {

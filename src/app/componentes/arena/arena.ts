@@ -1,8 +1,10 @@
 import { Component, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
 import { CommonModule } from '@angular/common';
-import { Observable } from 'rxjs';
+import { Subscription } from 'rxjs';
 import { FirebaseAuthService } from '../../servicios/auth/firebase-auth.service';
+import { SocketService } from '../../servicios/websocket/socket.service';
+import { resolveAvatarUrl } from '../../servicios/avatar-utils';
 import { environment } from '../../../environments/environment';
 import { AudioService } from '../../servicios/audio/audio.service';
 
@@ -17,6 +19,14 @@ interface PreguntaArena {
   aiIndicator?: string;
 }
 
+interface JugadorEspera {
+  id: string;
+  nombre: string;
+  esHost: boolean;
+  terminado: boolean;
+  picture?: string | null;
+}
+
 @Component({
   selector: 'app-arena',
   standalone: true,
@@ -25,6 +35,8 @@ interface PreguntaArena {
   styleUrls: ['./arena.scss']
 })
 export class ArenaComponent implements OnInit, OnDestroy {
+  private subs: Subscription = new Subscription();
+
   roomCode: string = '';
   tematicas: string[] = [];
   dificultad: string = 'baby';
@@ -54,10 +66,17 @@ export class ArenaComponent implements OnInit, OnDestroy {
   aiUsada: string = '';
   aiIndicator: string = '';
 
+  jugadoresEspera: JugadorEspera[] = [];
+  mostrandoEspera: boolean = false;
+  totalJugadoresSala: number = 0;
+  private pollingEspera: any = null;
+  private navegandoAResultados: boolean = false;
+
   constructor(
     private router: Router,
     private route: ActivatedRoute,
     private authService: FirebaseAuthService,
+    private socketService: SocketService,
     private cdr: ChangeDetectorRef,
     private audioService: AudioService
   ) { }
@@ -72,8 +91,12 @@ export class ArenaComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
-   
+    this.subs.unsubscribe();
     this.limpiarTimer();
+    if (this.pollingEspera) {
+      clearInterval(this.pollingEspera);
+      this.pollingEspera = null;
+    }
     this.audioService.guardarEstadoMusicaAntesDeNavegar();
     this.audioService.stopArena();
   }
@@ -99,7 +122,19 @@ export class ArenaComponent implements OnInit, OnDestroy {
   }
 
   private configurarWebSocket() {
-    // WebSocket removido - usar solo HTTP
+    this.socketService.connect();
+
+    this.subs.add(
+      this.socketService.onRankingUpdate().subscribe((data: any) => {
+        if (data && data.roomPlayers) {
+          this.jugadoresEspera = data.roomPlayers;
+          if (data.ranking && data.ranking.length >= this.totalJugadoresSala) {
+            this.totalJugadoresSala = data.ranking.length > this.totalJugadoresSala ? data.ranking.length : this.totalJugadoresSala;
+          }
+          this.cdr.detectChanges();
+        }
+      })
+    );
   }
 
   private async iniciarArena() {
@@ -279,31 +314,31 @@ export class ArenaComponent implements OnInit, OnDestroy {
 
       const tiempoTotal = Math.floor((Date.now() - this.tiempoInicio) / 1000);
 
+      const resultPayload = {
+        roomCode: this.roomCode,
+        userId,
+        username: displayName,
+        puntaje: this.puntaje,
+        respuestasCorrectas: this.correctasCount,
+        totalPreguntas: this.totalPreguntas,
+        tiempoTotal,
+        tematica: this.tematicas.join(','),
+        dificultad: this.dificultad
+      };
+
       const response = await fetch(`${environment.apiUrl}/games/submit-result`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          roomCode: this.roomCode,
-          userId,
-          username: displayName,
-          puntaje: this.puntaje,
-          respuestasCorrectas: this.correctasCount,
-          totalPreguntas: this.totalPreguntas,
-          tiempoTotal,
-          tematica: this.tematicas.join(','),
-          dificultad: this.dificultad
-        })
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(resultPayload)
       });
 
       const data = await response.json();
 
       console.log('📥 Respuesta del backend:', data);
-      console.log('🎯 Ranking recibido:', data.ranking);
-      console.log('👑 Ganador recibido:', data.ganador);
 
       if (data.success) {
+        this.socketService.notifyProgress(this.roomCode);
+
         if (data.allPlayersFinished) {
           const datosCompletos = {
             ranking: data.ranking,
@@ -313,16 +348,22 @@ export class ArenaComponent implements OnInit, OnDestroy {
           localStorage.setItem('ranking-partida', JSON.stringify(datosCompletos));
           localStorage.setItem('ganador-partida', JSON.stringify(data.ganador));
 
-          this.router.navigate(['/resultados'], {
-            queryParams: {
-              roomCode: this.roomCode,
-              tema: this.tematicas.join(','),
-              dificultad: this.dificultad,
-              modo: this.modo
+          this.mostrarPantallaEspera(data);
+
+          setTimeout(() => {
+            if (this.mostrandoEspera) {
+              this.router.navigate(['/resultados'], {
+                queryParams: {
+                  roomCode: this.roomCode,
+                  tema: this.tematicas.join(','),
+                  dificultad: this.dificultad,
+                  modo: this.modo
+                }
+              });
             }
-          });
+          }, 2500);
         } else {
-          this.mostrarPantallaEspera(data.playersFinished, data.totalPlayers);
+          this.mostrarPantallaEspera(data);
         }
       } else {
         this.audioService.play('incorrecto');
@@ -350,6 +391,20 @@ export class ArenaComponent implements OnInit, OnDestroy {
     return this.tematicas.join(' vs ');
   }
 
+  get jugadoresPendientes(): number {
+    return this.totalJugadoresSala - this.jugadoresEspera.filter(j => j.terminado).length;
+  }
+
+  get jugadoresFinalizados(): JugadorEspera[] {
+    return this.jugadoresEspera.filter(j => j.terminado);
+  }
+
+  avatarUrl(jugador: JugadorEspera): string | null {
+    if (!jugador.picture) return null;
+    if (jugador.picture.startsWith('http')) return jugador.picture;
+    return resolveAvatarUrl(jugador.picture);
+  }
+
   private mostrarErrorIA(mensaje: string) {
     this.limpiarTimer();
     this.audioService.play('incorrecto');
@@ -368,46 +423,46 @@ export class ArenaComponent implements OnInit, OnDestroy {
 
  // arena.component.ts - En salirArena y ngOnDestroy
 salirArena() {
+  if (!confirm('⚠️ ¿Salir de la arena? Perderás el progreso de esta partida.')) return;
   this.audioService.play('click');
   this.audioService.guardarEstadoMusicaAntesDeNavegar();
   this.audioService.stopArena();
-  //  Actualizar la ruta antes de navegar
   this.audioService.actualizarRutaActual('/dashboard');
   this.router.navigate(['/dashboard']);
 }
 
 
-  private mostrarPantallaEspera(jugadoresTerminados: number, totalJugadores: number) {
+  private mostrarPantallaEspera(data: any) {
     this.estadoJuego = 'finalizado';
+    this.mostrandoEspera = true;
+    this.totalJugadoresSala = data.totalPlayers || data.roomPlayers?.length || 0;
 
-    const arenaContainer = document.querySelector('.arena-container');
-    if (arenaContainer) {
-      arenaContainer.innerHTML = `
-        <div class="waiting-screen">
-          <h2>🏁 ¡Partida Terminada!</h2>
-          <div class="waiting-message">
-            <p>Has completado tu cuestionario.</p>
-            <p>Esperando a que terminen los demás jugadores...</p>
-            <div class="progress-info">
-              <span class="progress-text">Jugadores terminados: ${jugadoresTerminados}/${totalJugadores}</span>
-              <div class="progress-bar">
-                <div class="progress-fill" style="width: ${(jugadoresTerminados / totalJugadores) * 100}%"></div>
-              </div>
-            </div>
-            <div class="loading-spinner"></div>
-          </div>
-        </div>
-      `;
+    if (data.roomPlayers && data.roomPlayers.length > 0) {
+      this.jugadoresEspera = data.roomPlayers;
+    } else {
+      this.jugadoresEspera = [{
+        id: data.userId || 'yo',
+        nombre: this.nombreJugador,
+        esHost: false,
+        terminado: true
+      }];
+    }
+
+    this.cdr.detectChanges();
+
+    if (this.pollingEspera) {
+      clearInterval(this.pollingEspera);
     }
 
     let pollCount = 0;
-    const maxPolls = 20;
+    const maxPolls = 40;
 
-    const pollingInterval = setInterval(async () => {
+    this.pollingEspera = setInterval(async () => {
       pollCount++;
 
       if (pollCount > maxPolls) {
-        clearInterval(pollingInterval);
+        clearInterval(this.pollingEspera);
+        this.pollingEspera = null;
         console.log('⚠️ Polling timeout, navegando a dashboard');
         this.router.navigate(['/dashboard']);
         return;
@@ -415,25 +470,56 @@ salirArena() {
 
       try {
         const response = await fetch(`${environment.apiUrl}/rooms/${this.roomCode}`);
+
+        if (response.status === 404) {
+          clearInterval(this.pollingEspera);
+          this.pollingEspera = null;
+          console.log('🗑️ Sala eliminada, navegando a dashboard');
+          this.router.navigate(['/dashboard']);
+          return;
+        }
+
         const salaData = await response.json();
 
+        if (salaData.jugadores && this.jugadoresEspera.length > 0) {
+          const idsEnSala = salaData.jugadores.map((j: any) => j.id);
+          const antes = this.jugadoresEspera.length;
+          this.jugadoresEspera = this.jugadoresEspera.filter(j => idsEnSala.includes(j.id));
+          if (this.jugadoresEspera.length !== antes) {
+            this.totalJugadoresSala = salaData.jugadores.length;
+            this.cdr.detectChanges();
+          }
+        }
+
         if (salaData.estado === 'finalizada' || salaData.resultadosFinales) {
-          clearInterval(pollingInterval);
+          clearInterval(this.pollingEspera);
+          this.pollingEspera = null;
 
-          const datosCompletos = {
-            ranking: salaData.resultadosFinales?.ranking || [],
-            estadisticasEquipo: salaData.resultadosFinales?.estadisticasEquipo || null
-          };
-          localStorage.setItem('ranking-partida', JSON.stringify(datosCompletos));
-          localStorage.setItem('ganador-partida', JSON.stringify(salaData.resultadosFinales?.ganador));
+          if (salaData.resultadosFinales) {
+            const datosCompletos = {
+              ranking: salaData.resultadosFinales.ranking || [],
+              estadisticasEquipo: salaData.resultadosFinales.estadisticasEquipo || null
+            };
+            localStorage.setItem('ranking-partida', JSON.stringify(datosCompletos));
+            localStorage.setItem('ganador-partida', JSON.stringify(salaData.resultadosFinales.ganador));
+          }
 
-          this.router.navigate(['/resultados'], {
-            queryParams: {
-              roomCode: this.roomCode,
-              tema: this.tematicas.join(','),
-              dificultad: this.dificultad
-            }
-          });
+          this.jugadoresEspera = this.jugadoresEspera.map(j => ({ ...j, terminado: true }));
+          this.totalJugadoresSala = this.jugadoresEspera.length;
+          this.cdr.detectChanges();
+
+          if (this.navegandoAResultados) return;
+          this.navegandoAResultados = true;
+
+          setTimeout(() => {
+            this.router.navigate(['/resultados'], {
+              queryParams: {
+                roomCode: this.roomCode,
+                tema: this.tematicas.join(','),
+                dificultad: this.dificultad
+              }
+            });
+          }, 2000);
         }
       } catch (error) {
         console.log('Error en polling:', error);

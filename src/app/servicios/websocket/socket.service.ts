@@ -66,8 +66,16 @@ export class SocketService {
         return this.socket.fromEvent('global_ranking_received');
     }
 
-    saveGameResult(userId: string, resultado: any) {
-        this.socket.emit('save_game_result', { userId, resultado });
+    saveGameResult(resultado: any) {
+        this.socket.emit('save_game_result', { roomCode: resultado.roomCode, result: resultado });
+    }
+
+    notifyProgress(roomCode: string) {
+        this.socket.emit('notify_progress', { roomCode });
+    }
+
+    onRankingUpdate(): Observable<any> {
+        return this.socket.fromEvent('ranking_update');
     }
 
     onGameResultSaved(): Observable<any> {

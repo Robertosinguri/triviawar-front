@@ -182,7 +182,7 @@ export class ConfigurarSalaComponent implements OnInit, OnDestroy {
     const user = this.authService.usuarioActual();
     if (!user) return;
 
-    const userId = user.email || user.uid || 'anon-' + Date.now();
+    const userId = user.uid || user.email || 'anon-' + Date.now();
 
     const roomData = {
       nombre: this.configuracion.nombreSala?.trim() || `${user.username || user.name}'s Game`,
@@ -207,7 +207,7 @@ export class ConfigurarSalaComponent implements OnInit, OnDestroy {
     if (!user) return;
 
     const jugadorData = {
-      id: user.email || user.uid || 'anon-' + Date.now(),
+      id: user.uid || user.email || 'anon-' + Date.now(),
       nombre: user.name || user.username || 'Invitado',
       tematica: '',
       dificultad: ''
