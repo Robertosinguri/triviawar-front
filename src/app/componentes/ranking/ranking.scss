@@ -215,6 +215,10 @@
       transition: all 0.3s ease;
       border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 
+      &:nth-child(even) {
+        background: rgba(255, 255, 255, 0.04);
+      }
+
       &:hover {
         background: rgba(255, 255, 255, 0.1);
         transform: scale(1.02);
@@ -226,7 +230,6 @@
         
         .posicion {
           color: #FFD700;
-          font-size: 1.2rem;
           
           &::before {
             content: '👑 ';
@@ -239,7 +242,6 @@
         
         .posicion {
           color: #C0C0C0;
-          font-size: 1.1rem;
           
           &::before {
             content: '🥈 ';
@@ -252,7 +254,6 @@
         
         .posicion {
           color: #CD7F32;
-          font-size: 1.1rem;
           
           &::before {
             content: '🥉 ';
@@ -356,6 +357,10 @@
       padding: 1rem 0.75rem;
       margin-bottom: 0.5rem;
       background: rgba(0, 0, 0, 0.4);
+
+      &:nth-child(even) {
+        background: rgba(0, 0, 0, 0.25);
+      }
       backdrop-filter: blur(10px);
       border: 1px solid rgba(255, 255, 255, 0.1);
       border-left: 3px solid $primary-aqua;

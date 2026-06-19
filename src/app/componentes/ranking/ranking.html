@@ -29,9 +29,8 @@
               <td class="avatar-cell">
                 <img class="ranking-avatar" [src]="avatarUrl(jugador)" [alt]="jugador.nombre" (error)="onAvatarError($event)">
               </td>
-              <td class="nombre" [attr.data-name]="jugador.nombre" [attr.data-email]="jugador.email">
+              <td class="nombre" [attr.data-name]="jugador.nombre">
                 <div class="ranking-name-text">{{jugador.nombre}}</div>
-                <div class="ranking-email-text" style="font-size: 0.85rem; color: rgba(255, 255, 255, 0.7); font-weight: normal; margin-top: 4px;">{{jugador.email || jugador.userId}}</div>
               </td>
               <td class="puntaje">{{jugador.puntajeTotal}} pts</td>
               <td>{{jugador.partidasJugadas}}</td>
@@ -97,7 +96,7 @@
                   </div>
                   <span class="mobile-ranking-score">{{jugador.puntajeTotal}} pts</span>
                 </div>
-                <div class="mobile-ranking-email">{{jugador.email || jugador.userId}}</div>
+                
               </div>
             </div>
           </li>
