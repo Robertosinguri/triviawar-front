@@ -224,6 +224,22 @@ export class EstadisticasComponent {
 
   // --- Presentación ---------------------------------------------------------
 
+  /** Nombre legible del estado de una respuesta (para la sábana y el informe). */
+  protected etiquetaEstado(estado: string): string {
+    switch (estado) {
+      case 'completada':
+        return 'Completada';
+      case 'excluida':
+        return 'Descartada';
+      case 'aplazada':
+        return 'En otro momento';
+      case 'duplicada':
+        return 'Duplicada';
+      default:
+        return estado;
+    }
+  }
+
   protected formatearFecha(iso: string | null): string {
     if (!iso) return 'Sin fecha';
 

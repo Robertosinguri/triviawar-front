@@ -389,7 +389,11 @@ const bloqueOrigen = (datos: PanelEstadisticas): Nodo[] => {
     ),
     filaFicha(
       'Tamaño de la muestra',
-      `${plural(datos.muestra.valida, 'encuesta completa', 'encuestas completas')} (base de todos los porcentajes), ${datos.muestra.descartadas} descartadas por el filtro de exclusión y ${datos.muestra.abandonos} aplazadas ("en otro momento"). Registros totales: ${datos.total}. Tasa de finalización: ${datos.muestra.tasaFinalizacion}%.`
+      `${plural(datos.muestra.valida, 'encuesta completa', 'encuestas completas')} (base de todos los porcentajes), ${datos.muestra.descartadas} descartadas por el filtro de exclusión, ${datos.muestra.duplicadas} descartadas por duplicado y ${datos.muestra.abandonos} aplazadas ("en otro momento"). Registros totales: ${datos.total}. Tasa de finalización: ${datos.muestra.tasaFinalizacion}%.`
+    ),
+    filaFicha(
+      'Respuestas duplicadas',
+      `La misma persona puede responder desde el celular y después desde la computadora. Para que eso no infle la muestra, al iniciar sesión con Google la respuesta se coteja contra las ya existentes por cuenta y por correo: si esa persona ya había respondido, la respuesta nueva se conserva como registro de auditoría pero no suma a ninguna estadística. Registros marcados como duplicados: ${datos.muestra.duplicadas}.`
     ),
     filaFicha(
       'Identificación',
@@ -705,10 +709,12 @@ const bloqueSabana = (datos: PanelEstadisticas): Nodo[] => {
     if (estado === 'completada') return 'Completa';
     if (estado === 'excluida') return 'Descartada';
     if (estado === 'aplazada') return 'Aplazada';
+    if (estado === 'duplicada') return 'Duplicada';
     return estado;
   };
 
   const origenTexto = (fila: FilaEncuesta): string => {
+    if (fila.estado === 'duplicada') return 'No suma a la muestra';
     if (fila.estado === 'excluida') return 'Fuera del segmento';
     if (fila.estado === 'aplazada') return 'Sin completar';
     if (fila.emailVerificado) return 'Verificada';

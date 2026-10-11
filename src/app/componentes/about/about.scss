@@ -1,8 +1,17 @@
 @use '../../theme/variables.scss' as *;
 
 // ══════════════════════════════════════════════════════════════
-// CONTENEDOR PRINCIPAL – Scroll fluido y fondos oscuros
+// PÁGINA "QUÉ ES TRIVIAWAR"
+// Encabezado institucional + problema / solución + cliente
 // ══════════════════════════════════════════════════════════════
+
+$about-cian: $primary-sky;
+$about-amarillo: $primary-yellow;
+$about-magenta: $primary-pink;
+$about-aqua: $primary-aqua;
+$about-borde: rgba(255, 255, 255, 0.1);
+$about-superficie: rgba(255, 255, 255, 0.06);
+
 .about-container {
     @extend %page-container;
     position: relative;
@@ -10,14 +19,14 @@
 }
 
 .about-main {
-    max-width: 1200px;
+    max-width: 1100px;
     margin: 0 auto;
     padding: 2rem 2rem 0;
     flex: 1;
     animation: fadeIn 0.6s ease-out;
 
     > *:not(:last-child) {
-        margin-bottom: 6rem;
+        margin-bottom: 5rem;
     }
 }
 
@@ -32,17 +41,15 @@
     }
 }
 
-// ══════════════════════════════════════════════════════════════
-// TÍTULO DE SECCIÓN COMPARTIDO
-// ══════════════════════════════════════════════════════════════
+// ── Título de sección compartido ──
 .section-title {
     font-family: $font-victor-mono;
     font-weight: 700;
-    font-size: 2rem;
+    font-size: 1.8rem;
     text-align: center;
-    color: $primary-aqua;
-    text-shadow: 0 0 20px rgba($primary-aqua, 0.4);
-    margin-bottom: 3rem;
+    color: $about-cian;
+    text-shadow: 0 0 20px rgba($about-cian, 0.4);
+    margin-bottom: 2.5rem;
     letter-spacing: 0.05em;
 
     &::after {
@@ -51,353 +58,300 @@
         width: 80px;
         height: 3px;
         margin: 1rem auto 0;
-        background: linear-gradient(90deg, transparent, $primary-aqua, transparent);
+        background: linear-gradient(90deg, transparent, $about-cian, transparent);
         border-radius: 2px;
     }
 }
 
 // ══════════════════════════════════════════════════════════════
-// SECCIÓN 1: EL ORIGEN – Hero
+// ENCABEZADO INSTITUCIONAL
+// ══════════════════════════════════════════════════════════════
+.ficha {
+    background: $about-superficie;
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid $about-borde;
+    border-radius: 18px;
+    padding: 2rem 2.25rem;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+
+    &::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 3px;
+        background: linear-gradient(90deg, $about-magenta, $about-cian, $about-amarillo);
+    }
+}
+
+.ficha-universidad {
+    font-family: $font-victor-mono;
+    font-size: 0.82rem;
+    font-weight: 700;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: $about-cian;
+    margin-bottom: 0.9rem;
+}
+
+.ficha-materia {
+    font-family: $font-red-hat;
+    font-size: 1.85rem;
+    font-weight: 700;
+    color: $dark-text;
+    line-height: 1.25;
+    margin-bottom: 0.4rem;
+}
+
+.ficha-proyecto {
+    font-family: $font-red-hat;
+    font-size: 1.05rem;
+    color: rgba($dark-text, 0.72);
+    font-style: italic;
+    margin-bottom: 1.75rem;
+}
+
+.ficha-datos {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.25rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    margin: 0;
+    text-align: left;
+}
+
+.ficha-dato {
+    min-width: 0;
+
+    dt {
+        font-family: $font-victor-mono;
+        font-size: 0.66rem;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        color: rgba($about-amarillo, 0.85);
+        margin-bottom: 0.35rem;
+    }
+
+    dd {
+        margin: 0;
+        font-family: $font-red-hat;
+        font-size: 0.92rem;
+        line-height: 1.5;
+        color: rgba($dark-text, 0.9);
+        overflow-wrap: anywhere;
+    }
+}
+
+// ══════════════════════════════════════════════════════════════
+// ¿QUÉ ES TRIVIAWAR?
 // ══════════════════════════════════════════════════════════════
 .hero-section {
     text-align: center;
 }
 
-.hero-content {
-    margin-bottom: 3.5rem;
-}
-
 .hero-title {
     font-family: $font-monoton;
-    font-size: 3rem;
-    color: $primary-yellow;
+    font-size: 2.8rem;
+    color: $about-amarillo;
     text-shadow:
-        0 0 20px rgba($primary-yellow, 0.5),
-        0 0 60px rgba($primary-yellow, 0.2);
-    margin-bottom: 2rem;
-    letter-spacing: 0.08em;
+        0 0 20px rgba($about-amarillo, 0.5),
+        0 0 60px rgba($about-amarillo, 0.2);
+    margin-bottom: 1.75rem;
+    letter-spacing: 0.06em;
     line-height: 1.2;
 }
 
-.hero-narrative {
+.hero-resumen {
     font-family: $font-red-hat;
-    font-size: 1.15rem;
+    font-size: 1.2rem;
     line-height: 1.8;
-    color: rgba(white, 0.88);
-    max-width: 900px;
-    margin: 0 auto;
-    background: rgba(255, 255, 255, 0.06);
-    backdrop-filter: blur(16px);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 16px;
-    padding: 1.5rem 2rem;
-}
-
-// ── Tarjetas de características (Glassmorphism) ──
-.features-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 2rem;
-}
-
-.feature-card {
-    background: rgba(255, 255, 255, 0.06);
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
-    border: 1px solid rgba(255, 255, 255, 0.12);
-    border-radius: 20px;
-    padding: 2rem 1.5rem;
-    text-align: center;
-    transition: all 0.3s ease;
-    position: relative;
-    overflow: hidden;
-
-    &::before {
-        content: '';
-        position: absolute;
-        inset: 0;
-        border-radius: 20px;
-        padding: 1px;
-        background: linear-gradient(
-            135deg,
-            rgba($primary-aqua, 0.3),
-            transparent 40%,
-            transparent 60%,
-            rgba($primary-pink, 0.2)
-        );
-        -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-        -webkit-mask-composite: xor;
-        mask-composite: exclude;
-        pointer-events: none;
-    }
-
-    &:hover {
-        transform: translateY(-8px);
-        border-color: rgba($primary-aqua, 0.4);
-        box-shadow:
-            0 12px 40px rgba($primary-aqua, 0.15),
-            0 0 30px rgba($primary-aqua, 0.05);
-        background: rgba(255, 255, 255, 0.09);
-
-        .feature-icon {
-            transform: scale(1.15);
-        }
-
-        .feature-title {
-            color: $primary-aqua;
-            text-shadow: 0 0 15px rgba($primary-aqua, 0.4);
-        }
-    }
-}
-
-.feature-icon {
-    display: block;
-    font-size: 3rem;
-    margin-bottom: 1.2rem;
-    transition: transform 0.3s ease;
-}
-
-.feature-title {
-    font-family: $font-victor-mono;
-    font-weight: 700;
-    font-size: 1.15rem;
-    color: white;
-    margin-bottom: 0.8rem;
-    transition: all 0.3s ease;
-}
-
-.feature-text {
-    font-family: $font-red-hat;
-    font-size: 0.95rem;
-    line-height: 1.65;
-    color: rgba(white, 0.78);
-}
-
-// ══════════════════════════════════════════════════════════════
-// SECCIÓN 2: REGLAS DE COMBATE – Guía Visual
-// ══════════════════════════════════════════════════════════════
-.guide-section {
-    text-align: center;
-}
-
-.steps-flow {
-    display: flex;
-    flex-direction: column;
-    gap: 1.5rem;
-    max-width: 800px;
-    margin: 0 auto;
-}
-
-.step-card {
-    display: flex;
-    align-items: flex-start;
-    gap: 1.5rem;
-    text-align: left;
-    background: rgba(255, 255, 255, 0.05);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 16px;
-    padding: 1.5rem 2rem;
-    transition: all 0.3s ease;
-
-    &:hover {
-        transform: translateX(8px);
-        border-color: rgba($primary-violet, 0.4);
-        box-shadow:
-            0 8px 30px rgba($primary-violet, 0.12),
-            0 0 20px rgba($primary-violet, 0.04);
-        background: rgba(255, 255, 255, 0.08);
-
-        .step-number {
-            background: $primary-violet;
-            box-shadow: 0 0 20px rgba($primary-violet, 0.5);
-            color: white;
-        }
-
-        .step-title {
-            color: $primary-violet;
-            text-shadow: 0 0 12px rgba($primary-violet, 0.3);
-        }
-    }
-}
-
-.step-number {
-    flex-shrink: 0;
-    width: 48px;
-    height: 48px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-family: $font-victor-mono;
-    font-weight: 700;
-    font-size: 1.3rem;
-    background: rgba(white, 0.1);
-    border: 2px solid rgba($primary-violet, 0.4);
-    color: $primary-violet;
-    transition: all 0.3s ease;
-}
-
-.step-content {
-    flex: 1;
-}
-
-.step-title {
-    font-family: $font-victor-mono;
-    font-weight: 700;
-    font-size: 1.1rem;
-    color: white;
-    margin-bottom: 0.5rem;
-    transition: all 0.3s ease;
-}
-
-.step-text {
-    font-family: $font-red-hat;
-    font-size: 0.95rem;
-    line-height: 1.65;
-    color: rgba(white, 0.78);
-}
-
-// ══════════════════════════════════════════════════════════════
-// SECCIÓN 3: EL GREMIO – Equipo
-// ══════════════════════════════════════════════════════════════
-.team-section {
-    text-align: center;
-}
-
-// Grid 3 + 2: 3 cards arriba, 2 cards centradas abajo
-.team-grid {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 1.5rem;
+    color: rgba(white, 0.9);
     max-width: 820px;
     margin: 0 auto;
-
-    // Forzamos 3 en la primera fila, 2 en la segunda centradas
-    .team-card {
-        flex: 0 0 calc((100% - 3rem) / 3); // 3 columnas con 2 gaps
-        max-width: calc((100% - 3rem) / 3);
-    }
-
-    // Las últimas 2 cards se centran automáticamente con el wrapper
-    .team-card:nth-child(n + 4) {
-        flex: 0 0 calc((100% - 1.5rem) / 2); // 2 columnas con 1 gap
-        max-width: calc((100% - 1.5rem) / 2);
-        max-width: 250px;
-    }
-}
-
-.team-card {
     background: rgba(255, 255, 255, 0.06);
     backdrop-filter: blur(16px);
+    border: 1px solid $about-borde;
+    border-radius: 16px;
+    padding: 1.75rem 2rem;
+}
+
+// ══════════════════════════════════════════════════════════════
+// EL PROBLEMA → LA SOLUCIÓN
+// ══════════════════════════════════════════════════════════════
+.duelo-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.bloque {
+    width: 100%;
+    background: $about-superficie;
+    backdrop-filter: blur(16px);
     -webkit-backdrop-filter: blur(16px);
-    border: 1px solid rgba(255, 255, 255, 0.12);
-    border-radius: 20px;
-    padding: 2rem 1.2rem 1.5rem;
-    text-align: center;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    position: relative;
-    overflow: hidden;
-    min-width: 0;
+    border: 1px solid $about-borde;
+    border-left: 3px solid $about-magenta;
+    border-radius: 16px;
+    padding: 1.75rem 2rem;
 
-    &::before {
-        content: '';
-        position: absolute;
-        inset: 0;
-        border-radius: 20px;
-        padding: 1px;
-        background: linear-gradient(
-            135deg,
-            rgba($primary-aqua, 0.25),
-            transparent 40%,
-            transparent 60%,
-            rgba($primary-pink, 0.15)
-        );
-        -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-        -webkit-mask-composite: xor;
-        mask-composite: exclude;
-        pointer-events: none;
-    }
-
-    &:hover {
-        transform: translateY(-8px);
-        border-color: rgba($primary-aqua, 0.4);
-        box-shadow:
-            0 12px 40px rgba($primary-aqua, 0.15),
-            0 0 30px rgba($primary-aqua, 0.05);
-        background: rgba(255, 255, 255, 0.09);
-
-        .team-img {
-            border-color: $primary-aqua;
-            box-shadow: 0 0 20px rgba($primary-aqua, 0.4);
-            transform: scale(1.05);
-        }
-
-        .team-name {
-            color: $primary-aqua;
-            text-shadow: 0 0 12px rgba($primary-aqua, 0.3);
-        }
+    &--solucion {
+        border-left-color: $about-aqua;
+        box-shadow: 0 0 40px rgba($about-aqua, 0.08);
     }
 }
 
-.team-avatar {
+.bloque-etiqueta {
+    display: inline-block;
+    font-family: $font-victor-mono;
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: $about-magenta;
+    margin-bottom: 0.9rem;
+
+    .bloque--solucion & {
+        color: $about-aqua;
+    }
+}
+
+.bloque-texto {
+    font-family: $font-red-hat;
+    font-size: 1.08rem;
+    line-height: 1.85;
+    color: rgba($dark-text, 0.88);
+    margin: 0;
+}
+
+// ── Conector vertical entre los dos bloques ──
+.bloque-conector {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.65rem 0;
+}
+
+.conector-linea {
+    width: 2px;
+    height: 22px;
+    background: linear-gradient(180deg, rgba($about-magenta, 0.5), rgba($about-aqua, 0.5));
+}
+
+.conector-flecha {
+    font-size: 0.8rem;
+    color: rgba($about-aqua, 0.9);
+    line-height: 1;
+}
+
+// ══════════════════════════════════════════════════════════════
+// EL CLIENTE
+// ══════════════════════════════════════════════════════════════
+.cliente-card {
+    background: rgba($about-aqua, 0.08);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba($about-aqua, 0.28);
+    border-radius: 18px;
+    padding: 2rem 2.25rem;
+    box-shadow: 0 0 45px rgba($about-aqua, 0.08);
+}
+
+.cliente-etiqueta {
+    display: inline-block;
+    font-family: $font-victor-mono;
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: $about-aqua;
     margin-bottom: 1rem;
 }
 
-.team-img {
-    width: 110px;
-    height: 110px;
-    object-fit: cover;
-    border-radius: 50%;
-    border: 3px solid rgba(white, 0.15);
-    box-shadow: 0 5px 20px rgba($primary-aqua, 0.25);
-    transition: all 0.3s ease;
+.cliente-texto {
+    font-family: $font-red-hat;
+    font-size: 1.08rem;
+    line-height: 1.85;
+    color: rgba($dark-text, 0.9);
+    margin: 0 0 1.5rem;
 }
 
-.team-info {
-    .team-name {
-        font-family: $font-victor-mono;
-        font-weight: 700;
-        font-size: 1.1rem;
-        color: white;
-        margin-bottom: 0.4rem;
-        transition: all 0.3s ease;
-    }
-
-    .team-role {
-        font-family: $font-red-hat;
-        font-size: 0.85rem;
-        line-height: 1.5;
-        color: rgba(white, 0.65);
-    }
-}
-
-// ── Banner inferior del equipo ──
-.team-banner {
-    margin-top: 3rem;
+.cliente-motivacion {
     display: flex;
-    justify-content: center;
+    align-items: flex-start;
+    gap: 0.9rem;
+    padding: 1.25rem 1.35rem;
+    background: rgba(0, 0, 0, 0.22);
+    border-radius: 14px;
 
-    .banner-img {
-        max-width: 100%;
-        width: 820px;
-        height: auto;
-        border-radius: 20px;
-        border: 1px solid rgba(white, 0.12);
-        box-shadow: 0 10px 40px rgba($primary-aqua, 0.15);
-        object-fit: cover;
-        aspect-ratio: 16 / 9;
-        transition: all 0.3s ease;
-
-        &:hover {
-            border-color: rgba($primary-aqua, 0.4);
-            box-shadow: 0 15px 50px rgba($primary-aqua, 0.25);
-            transform: translateY(-4px);
-        }
+    p {
+        margin: 0;
+        font-family: $font-red-hat;
+        font-size: 1rem;
+        line-height: 1.75;
+        color: rgba($dark-text, 0.85);
     }
+}
+
+.motivacion-icono {
+    font-size: 1.35rem;
+    line-height: 1.4;
+    flex-shrink: 0;
+}
+
+// ══════════════════════════════════════════════════════════════
+// QUÉ ENCONTRÁS ADENTRO
+// ══════════════════════════════════════════════════════════════
+.pilares-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1.5rem;
+}
+
+.pilar-card {
+    background: $about-superficie;
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid $about-borde;
+    border-radius: 18px;
+    padding: 1.75rem 1.4rem;
+    text-align: center;
+    transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+
+    &:hover {
+        transform: translateY(-4px);
+        border-color: rgba($about-cian, 0.35);
+        box-shadow: 0 12px 35px rgba(0, 0, 0, 0.28);
+    }
+}
+
+.pilar-icono {
+    display: block;
+    font-size: 1.9rem;
+    line-height: 1;
+    margin-bottom: 1rem;
+}
+
+.pilar-titulo {
+    font-family: $font-victor-mono;
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: $about-cian;
+    margin-bottom: 0.7rem;
+    line-height: 1.4;
+}
+
+.pilar-texto {
+    font-family: $font-red-hat;
+    font-size: 0.9rem;
+    line-height: 1.7;
+    color: rgba($dark-text, 0.78);
+    margin: 0;
 }
 
 // ══════════════════════════════════════════════════════════════
@@ -405,266 +359,114 @@
 // ══════════════════════════════════════════════════════════════
 .about-footer {
     text-align: center;
-    padding: 3rem 1rem 4rem;
+    padding: 2.5rem 1rem 3rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
 
-    .footer-text {
-        font-family: $font-red-hat;
-        font-size: 0.95rem;
-        line-height: 1.7;
-        color: rgba(white, 0.45);
-        max-width: 750px;
-        margin: 0 auto;
-        font-style: italic;
-    }
+.footer-text {
+    font-family: $font-victor-mono;
+    font-size: 0.8rem;
+    line-height: 1.7;
+    color: rgba($dark-text, 0.6);
+    margin: 0 0 0.5rem;
+}
+
+.footer-nota {
+    font-family: $font-red-hat;
+    font-size: 0.85rem;
+    color: rgba($dark-text, 0.42);
+    margin: 0;
 }
 
 // ══════════════════════════════════════════════════════════════
-// MODAL
-// ══════════════════════════════════════════════════════════════
-.image-modal {
-    position: fixed;
-    inset: 0;
-    background: rgba(0, 0, 0, 0.85);
-    backdrop-filter: blur(5px);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 99999;
-    animation: fadeIn 0.3s ease-out;
-
-    .modal-content {
-        position: relative;
-        max-width: 90vw;
-        max-height: 90vh;
-        cursor: default;
-        display: flex;
-        justify-content: center;
-        z-index: 2;
-        pointer-events: none;
-
-        .modal-image {
-            max-width: 100%;
-            max-height: 85vh;
-            width: auto;
-            height: auto;
-            object-fit: contain;
-            border-radius: 15px;
-            box-shadow: 0 20px 60px rgba($primary-aqua, 0.4);
-            pointer-events: none;
-        }
-
-        .close-btn {
-            position: absolute;
-            top: -15px;
-            right: -15px;
-            width: 40px;
-            height: 40px;
-            background: rgba($primary-pink, 0.9);
-            color: white;
-            border: none;
-            border-radius: 50%;
-            font-size: 1.5rem;
-            font-weight: bold;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.3s ease;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
-            z-index: 3;
-            pointer-events: all;
-
-            &:hover {
-                background: $primary-yellow;
-                color: $dark-bg;
-                transform: scale(1.1) rotate(90deg);
-            }
-        }
-    }
-}
-
-// ══════════════════════════════════════════════════════════════
-// RESPONSIVE – Tablet (≤ 1024px)
+// RESPONSIVE
 // ══════════════════════════════════════════════════════════════
 @media (max-width: $tablet-large) {
-    .about-main {
-        max-width: 90%;
-
-        > *:not(:last-child) {
-            margin-bottom: 5rem;
-        }
+    .pilares-grid {
+        grid-template-columns: repeat(2, 1fr);
     }
 
     .hero-title {
-        font-size: 2.5rem;
+        font-size: 2.3rem;
     }
 
-    .features-grid {
-        grid-template-columns: repeat(3, 1fr);
-        gap: 1.2rem;
-    }
-
-    .team-grid {
-        gap: 1.2rem;
-
-        .team-card {
-            flex: 0 0 calc((100% - 2.4rem) / 3);
-            max-width: calc((100% - 2.4rem) / 3);
-        }
-
-        .team-card:nth-child(n + 4) {
-            flex: 0 0 calc((100% - 1.2rem) / 2);
-            max-width: calc((100% - 1.2rem) / 2);
-            max-width: 220px;
-        }
-    }
-
-    .team-banner .banner-img {
-        width: 100%;
-        max-width: 700px;
+    .ficha-datos {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+        text-align: center;
     }
 }
 
-// ══════════════════════════════════════════════════════════════
-// RESPONSIVE – Móvil (≤ 768px)
-// ══════════════════════════════════════════════════════════════
-@media (max-width: $tablet-small) {
+@include mobile-only {
     .about-main {
-        padding: 1.2rem 1.2rem 0;
+        padding: 1.25rem 1rem 0;
 
         > *:not(:last-child) {
-            margin-bottom: 4rem;
+            margin-bottom: 3.25rem;
         }
+    }
+
+    .ficha {
+        padding: 1.5rem 1.25rem;
+    }
+
+    .ficha-materia {
+        font-size: 1.4rem;
+    }
+
+    .ficha-proyecto {
+        font-size: 0.95rem;
+    }
+
+    .hero-title {
+        font-size: 1.75rem;
+        letter-spacing: 0.04em;
+    }
+
+    .hero-resumen {
+        font-size: 1.02rem;
+        line-height: 1.75;
+        padding: 1.35rem 1.25rem;
     }
 
     .section-title {
         font-size: 1.4rem;
         margin-bottom: 2rem;
-
-        &::after {
-            width: 60px;
-        }
     }
 
-    // ── Hero ──
-    .hero-title {
-        font-size: 1.8rem;
+    .bloque {
+        padding: 1.4rem 1.25rem;
     }
 
-    .hero-narrative {
+    .bloque-texto,
+    .cliente-texto {
         font-size: 1rem;
-        padding: 1rem 1.25rem;
     }
 
-    .features-grid {
+    .cliente-card {
+        padding: 1.5rem 1.25rem;
+    }
+
+    .pilares-grid {
         grid-template-columns: 1fr;
-        gap: 1rem;
+        gap: 1.15rem;
     }
 
-    .feature-card {
-        padding: 1.5rem 1.2rem;
-    }
-
-    // ── Guía ──
-    .step-card {
-        flex-direction: column;
-        align-items: center;
-        text-align: center;
-        padding: 1.5rem;
-
-        &:hover {
-            transform: translateY(-4px);
-        }
-    }
-
-    .step-number {
-        width: 42px;
-        height: 42px;
-        font-size: 1.1rem;
-    }
-
-    .step-title {
-        font-size: 1rem;
-    }
-
-    // ── Equipo ──
-    .team-grid {
-        flex-direction: column;
-        align-items: center;
-        gap: 1rem;
-        max-width: 400px;
-
-        .team-card {
-            flex: 0 0 100%;
-            max-width: 100%;
-            width: 100%;
-        }
-
-        .team-card:nth-child(n + 4) {
-            flex: 0 0 100%;
-            max-width: 100%;
-            width: 100%;
-        }
-    }
-
-    .team-card {
-        padding: 1.5rem 1rem;
-    }
-
-    .team-banner {
-        margin-top: 2rem;
-
-        .banner-img {
-            width: 100%;
-            max-width: 400px;
-            aspect-ratio: 16 / 9;
-        }
-    }
-
-    .team-img {
-        width: 90px;
-        height: 90px;
-    }
-
-    .team-info .team-name {
-        font-size: 1rem;
-    }
-
-    // ── Footer ──
     .about-footer {
-        padding: 2rem 1rem 3rem;
-
-        .footer-text {
-            font-size: 0.88rem;
-        }
-    }
-
-    // ── Modal ──
-    .image-modal {
-        .modal-content {
-            max-width: 95vw;
-
-            .modal-image {
-                max-height: 80vh;
-            }
-
-            .close-btn {
-                top: 5px;
-                right: 5px;
-            }
-        }
+        padding: 2rem 0.5rem 2.5rem;
     }
 }
 
-// ══════════════════════════════════════════════════════════════
-// RESPONSIVE – Móvil pequeño (≤ 414px)
-// ══════════════════════════════════════════════════════════════
-@media (max-width: $mobile-large) {
-    .hero-title {
-        font-size: 1.4rem;
+@media (prefers-reduced-motion: reduce) {
+    .about-main {
+        animation: none;
     }
 
-    .section-title {
-        font-size: 1.2rem;
+    .pilar-card {
+        transition: none;
+
+        &:hover {
+            transform: none;
+        }
     }
 }

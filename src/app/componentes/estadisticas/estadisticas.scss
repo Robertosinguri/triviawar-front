@@ -763,6 +763,13 @@ $panel-superficie: rgba(255, 255, 255, 0.04);
     border-color: rgba($panel-amarillo, 0.3);
   }
 
+  // La misma cuenta ya había respondido: se conserva como evidencia pero no suma.
+  &--duplicada {
+    color: rgba($panel-magenta, 0.95);
+    background: rgba($panel-magenta, 0.1);
+    border-color: rgba($panel-magenta, 0.32);
+  }
+
   &--ok {
     color: #6ee7c8;
     background: rgba($panel-aqua, 0.12);

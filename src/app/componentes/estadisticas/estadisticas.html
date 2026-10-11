@@ -85,6 +85,12 @@
       </article>
 
       <article class="panel-dato">
+        <span class="panel-dato-valor">{{ datos.muestra.duplicadas }}</span>
+        <span class="panel-dato-etiqueta">Duplicadas</span>
+        <span class="panel-dato-nota">La misma cuenta ya había respondido</span>
+      </article>
+
+      <article class="panel-dato">
         <span class="panel-dato-valor">{{ datos.muestra.abandonos }}</span>
         <span class="panel-dato-etiqueta">En otro momento</span>
         <span class="panel-dato-nota">Pueden volver a responder</span>
@@ -214,6 +220,7 @@
             <option value="completada" [selected]="filtroEstado() === 'completada'">Completadas</option>
             <option value="excluida" [selected]="filtroEstado() === 'excluida'">Descartadas</option>
             <option value="aplazada" [selected]="filtroEstado() === 'aplazada'">En otro momento</option>
+            <option value="duplicada" [selected]="filtroEstado() === 'duplicada'">Duplicadas</option>
           </select>
         </label>
 
@@ -265,7 +272,7 @@
               <tr [class.panel-tabla-fila--abierta]="filaAbierta() === fila.id">
                 <td class="panel-celda-fecha">{{ formatearFecha(fila.fecha) }}</td>
                 <td>
-                  <span class="panel-chip" [class]="'panel-chip--' + fila.estado">{{ fila.estado }}</span>
+                  <span class="panel-chip" [class]="'panel-chip--' + fila.estado" [title]="fila.duplicadoDe ? 'Ya había respondido: se conserva la respuesta ' + fila.duplicadoDe : ''">{{ etiquetaEstado(fila.estado) }}</span>
                 </td>
 
                 @for (pregunta of preguntas; track pregunta.id) {

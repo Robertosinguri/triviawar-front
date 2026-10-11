@@ -71,6 +71,8 @@ export interface RespuestaEnvio {
   id?: string;
   estado?: EstadoEncuesta;
   duplicada?: boolean;
+  /** Respuesta que sí cuenta, cuando esta quedó marcada como duplicada. */
+  duplicadoDe?: string | null;
   error?: string;
   vinculada?: boolean;
 }

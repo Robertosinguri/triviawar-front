@@ -29,6 +29,12 @@ export interface FilaEncuesta {
     abrioEn: string | null;
   };
   intentosDeCambio: number;
+  /**
+   * Si esta respuesta es de alguien que ya había respondido (misma cuenta o mismo
+   * correo), acá está el id de la respuesta que sí cuenta. La fila se conserva
+   * como evidencia, pero queda fuera de la muestra válida.
+   */
+  duplicadoDe: string | null;
   sospechosa: boolean;
   senalesDeRiesgo: string[];
 }
@@ -46,6 +52,8 @@ export interface PanelEstadisticas {
     completada: number;
     excluida: number;
     aplazada: number;
+    /** La misma persona ya había respondido: fuera de la muestra válida. */
+    duplicada: number;
     otros: number;
   };
   muestra: {
@@ -55,6 +63,8 @@ export interface PanelEstadisticas {
     descartadas: number;
     /** Dijeron "en otro momento" y todavía no volvieron. */
     abandonos: number;
+    /** Respuestas descartadas por ser de alguien que ya había respondido. */
+    duplicadas: number;
     tasaFinalizacion: number;
   };
   identidad: {

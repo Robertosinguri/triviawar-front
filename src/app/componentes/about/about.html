@@ -3,135 +3,89 @@
         <main class="about-main">
 
             <!-- ═══════════════════════════════════════════
-                 SECCIÓN 1: EL ORIGEN (Hero Section)
+                 ENCABEZADO INSTITUCIONAL
+                 ═══════════════════════════════════════════ -->
+            <header class="ficha">
+                <p class="ficha-universidad">{{ institucion.universidad }}</p>
+                <h1 class="ficha-materia">{{ institucion.materia }}</h1>
+                <p class="ficha-proyecto">{{ institucion.proyecto }}</p>
+
+                <dl class="ficha-datos">
+                    <div class="ficha-dato">
+                        <dt>Año lectivo / cuatrimestre</dt>
+                        <dd>{{ institucion.cuatrimestre }}</dd>
+                    </div>
+                    <div class="ficha-dato">
+                        <dt>Equipo</dt>
+                        <dd>{{ institucion.equipo.join(' / ') }}</dd>
+                    </div>
+                    <div class="ficha-dato">
+                        <dt>Grupo</dt>
+                        <dd>{{ institucion.grupo }} – {{ institucion.comision }}</dd>
+                    </div>
+                </dl>
+            </header>
+
+            <!-- ═══════════════════════════════════════════
+                 QUÉ ES TRIVIAWAR
                  ═══════════════════════════════════════════ -->
             <section class="hero-section">
-                <div class="hero-content">
-                    <h1 class="hero-title">BIENVENIDO A LA ARENA</h1>
-                    <p class="hero-narrative">
-                        Trivia War nació con la misión de revolucionar el aprendizaje y facilitar la preparación de exámenes a través de cuestionarios dinámicos e interactivos. Lo que inició como una solución de estudio en las aulas del IFTS n° 11 desarrollada por el equipo MVPP, se transformó en un ecosistema multijugador en tiempo real; una arena competitiva donde medir tus conocimientos y entrenar tu mente bajo presión.
-                    </p>
+                <h2 class="hero-title">Sobre la Aplicación</h2>
+                <p class="hero-resumen">{{ resumen }}</p>
+            </section>
+
+            <!-- ═══════════════════════════════════════════
+                 EL PROBLEMA → LA SOLUCIÓN
+                 ═══════════════════════════════════════════ -->
+            <section class="duelo-section">
+                <article class="bloque bloque--problema">
+                    <span class="bloque-etiqueta">{{ problema.titulo }}</span>
+                    <p class="bloque-texto">{{ problema.texto }}</p>
+                </article>
+
+                <div class="bloque-conector" aria-hidden="true">
+                    <span class="conector-linea"></span>
+                    <span class="conector-flecha">▼</span>
+                    <span class="conector-linea"></span>
                 </div>
 
-                <div class="features-grid">
-                    <div class="feature-card">
-                        <span class="feature-icon">🧠</span>
-                        <h3 class="feature-title">Desafíos Implacables</h3>
-                        <p class="feature-text">
-                            Un motor de juego que se adapta a ti. Desde prácticas estratégicas hasta el modo Killer, donde cada segundo cuenta.
-                        </p>
-                    </div>
-                    <div class="feature-card">
-                        <span class="feature-icon">⚡</span>
-                        <h3 class="feature-title">Conexión Instantánea</h3>
-                        <p class="feature-text">
-                            Enfrentamientos globales en tiempo real. Sin esperas, sin turnos; pura adrenalina competitiva.
-                        </p>
-                    </div>
-                    <div class="feature-card">
-                        <span class="feature-icon">🛡️</span>
-                        <h3 class="feature-title">Identidad Protegida</h3>
-                        <p class="feature-text">
-                            En esta arena solo habla tu conocimiento. Tu privacidad está resguardada bajo un alias de batalla único.
-                        </p>
+                <article class="bloque bloque--solucion">
+                    <span class="bloque-etiqueta">{{ solucion.titulo }}</span>
+                    <p class="bloque-texto">{{ solucion.texto }}</p>
+                </article>
+            </section>
+
+            <!-- ═══════════════════════════════════════════
+                 EL CLIENTE
+                 ═══════════════════════════════════════════ -->
+            <section class="cliente-section">
+                <h2 class="section-title">¿PARA QUIÉN ES?</h2>
+
+                <div class="cliente-card">
+                    <span class="cliente-etiqueta">{{ cliente.titulo }}</span>
+                    <p class="cliente-texto">{{ cliente.texto }}</p>
+
+                    <div class="cliente-motivacion">
+                        <span class="motivacion-icono">🤝</span>
+                        <p>{{ motivacion }}</p>
                     </div>
                 </div>
             </section>
 
             <!-- ═══════════════════════════════════════════
-                 SECCIÓN 2: REGLAS DE COMBATE (Guía Visual)
+                 QUÉ ENCONTRÁS ADENTRO
                  ═══════════════════════════════════════════ -->
-            <section class="guide-section">
-                <h2 class="section-title">GUÍA DE SUPERVIVENCIA</h2>
+            <section class="pilares-section">
+                <h2 class="section-title">QUÉ ENCONTRÁS ADENTRO</h2>
 
-                <div class="steps-flow">
-                    <div class="step-card">
-                        <div class="step-number">1</div>
-                        <div class="step-content">
-                            <h3 class="step-title">Elige tu Modalidad</h3>
-                            <p class="step-text">
-                                Practica en el modo individual para afilar tus habilidades o ingresa al Lobby para desafiar a jugadores reales en salas personalizadas.
-                            </p>
-                        </div>
-                    </div>
-                    <div class="step-card">
-                        <div class="step-number">2</div>
-                        <div class="step-content">
-                            <h3 class="step-title">Domina el Tiempo</h3>
-                            <p class="step-text">
-                                No solo importa responder bien, sino ser el más rápido. El tiempo es tu principal recurso (y tu peor enemigo).
-                            </p>
-                        </div>
-                    </div>
-                    <div class="step-card">
-                        <div class="step-number">3</div>
-                        <div class="step-content">
-                            <h3 class="step-title">Escala los Rangos</h3>
-                            <p class="step-text">
-                                Acumula puntos de victoria en cada partida para subir en el Ranking Global y desbloquear nuevos avatares que demuestren tu estatus en la comunidad.
-                            </p>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            <!-- ═══════════════════════════════════════════
-                 SECCIÓN 3: EL GREMIO (El Equipo)
-                 ═══════════════════════════════════════════ -->
-            <section class="team-section">
-                <h2 class="section-title">EL EQUIPO DETRÁS DE LA ARENA</h2>
-
-                <div class="team-grid">
-                    <div class="team-card" (click)="openImageModal(0)">
-                        <div class="team-avatar">
-                            <img [src]="teamMembers[0].src" [alt]="teamMembers[0].alt" class="team-img">
-                        </div>
-                        <div class="team-info">
-                            <h4 class="team-name">Anto</h4>
-                            <p class="team-role">Directora de Operaciones & Diseño de Interfaz</p>
-                        </div>
-                    </div>
-                    <div class="team-card" (click)="openImageModal(1)">
-                        <div class="team-avatar">
-                            <img [src]="teamMembers[1].src" [alt]="teamMembers[1].alt" class="team-img">
-                        </div>
-                        <div class="team-info">
-                            <h4 class="team-name">Gera</h4>
-                            <p class="team-role">Arquitecto de Sistemas & Lógica de Combate</p>
-                        </div>
-                    </div>
-                    <div class="team-card" (click)="openImageModal(2)">
-                        <div class="team-avatar">
-                            <img [src]="teamMembers[2].src" [alt]="teamMembers[2].alt" class="team-img">
-                        </div>
-                        <div class="team-info">
-                            <h4 class="team-name">Robert</h4>
-                            <p class="team-role">Backend - Coordinador de Integración & Despliegue de Red</p>
-                        </div>
-                    </div>
-                    <div class="team-card" (click)="openImageModal(3)">
-                        <div class="team-avatar">
-                            <img [src]="teamMembers[3].src" [alt]="teamMembers[3].alt" class="team-img">
-                        </div>
-                        <div class="team-info">
-                            <h4 class="team-name">Jesi</h4>
-                            <p class="team-role">Especialista en Control de Calidad & Tácticas de Simulación</p>
-                        </div>
-                    </div>
-                    <div class="team-card" (click)="openImageModal(4)">
-                        <div class="team-avatar">
-                            <img [src]="teamMembers[4].src" [alt]="teamMembers[4].alt" class="team-img">
-                        </div>
-                        <div class="team-info">
-                            <h4 class="team-name">Ari</h4>
-                            <p class="team-role">Especialista en efectos sonoros & experiencia auditiva</p>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Banner inferior del equipo -->
-                <div class="team-banner">
-                    <img [src]="teamMembers[5].src" alt="Equipo MVPP" class="banner-img">
+                <div class="pilares-grid">
+                    @for (pilar of pilares; track pilar.titulo) {
+                    <article class="pilar-card">
+                        <span class="pilar-icono">{{ pilar.icono }}</span>
+                        <h3 class="pilar-titulo">{{ pilar.titulo }}</h3>
+                        <p class="pilar-texto">{{ pilar.texto }}</p>
+                    </article>
+                    }
                 </div>
             </section>
 
@@ -140,21 +94,11 @@
                  ═══════════════════════════════════════════ -->
             <footer class="about-footer">
                 <p class="footer-text">
-                    Un agradecimiento especial al cuerpo docente del IFTS n° 11 y a cada uno de los beta testers que ayudaron a forjar y equilibrar la arena de Trivia War.
+                    {{ institucion.materia }} · {{ institucion.universidad }} ·
+                    {{ institucion.grupo }} – {{ institucion.comision }}
                 </p>
+                <p class="footer-nota">Proyecto académico en desarrollo.</p>
             </footer>
-
-            <!-- ═══════════════════════════════════════════
-                 MODAL DE IMAGEN
-                 ═══════════════════════════════════════════ -->
-            @if (showImageModal && selectedImage !== null) {
-            <div class="image-modal" (click)="closeImageModal()">
-                <div class="modal-content" (click)="$event.stopPropagation()">
-                    <img [src]="teamMembers[selectedImage].src" [alt]="teamMembers[selectedImage].alt" class="modal-image">
-                    <button class="close-btn" (click)="closeImageModal()">&times;</button>
-                </div>
-            </div>
-            }
 
         </main>
     </app-navbar>

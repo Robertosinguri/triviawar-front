@@ -305,7 +305,12 @@ reanudarMusicaContexto() {
     return;
   }
   
-  if (rutaActual === '/dashboard' || rutaActual === '/ranking' || rutaActual === '/about') {
+  if (
+    rutaActual === '/dashboard' ||
+    rutaActual === '/ranking' ||
+    rutaActual === '/about' ||
+    rutaActual === '/about-clasico'
+  ) {
     
     this.musicaDashboardActiva = true;
     this.reproducirMusicaLarga('dashboard', this.volumenMusica);

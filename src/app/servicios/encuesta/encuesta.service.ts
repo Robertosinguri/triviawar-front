@@ -250,7 +250,13 @@ export class EncuestaService {
         })
       );
 
-      console.log('🔗 Encuesta vinculada con la cuenta:', respuesta);
+      if (respuesta.duplicada) {
+        // Ya había respondido con esta cuenta (o con este correo) desde otro
+        // dispositivo: se conserva la primera respuesta y esta no suma.
+        console.log('🚫 Esta cuenta ya había respondido la encuesta: se conserva la respuesta original');
+      } else {
+        console.log('🔗 Encuesta vinculada con la cuenta:', respuesta);
+      }
 
       // Si se vinculó (o si no había encuesta que vincular) ya no hay nada pendiente.
       this.borrar(this.CLAVES.pendiente);
