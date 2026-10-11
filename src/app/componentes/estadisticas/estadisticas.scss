@@ -1,0 +1,946 @@
+@use "../../theme/variables.scss" as *;
+
+/*
+  Panel de resultados de la encuesta.
+
+  Es una pantalla "oculta": no tiene ningún enlace en la app. Se accede sólo por
+  URL y con la clave del grupo, que valida el backend.
+
+  Ojo: el body tiene `overflow: hidden`, así que el panel se maneja con su propio
+  contenedor fijo que scrollea.
+*/
+
+$panel-cian: $primary-sky;
+$panel-aqua: $primary-aqua;
+$panel-amarillo: $primary-yellow;
+$panel-magenta: $primary-pink;
+$panel-borde: rgba(255, 255, 255, 0.09);
+$panel-superficie: rgba(255, 255, 255, 0.04);
+
+%panel-contenedor {
+  position: fixed;
+  inset: 0;
+  z-index: 5;
+  overflow-y: auto;
+  overflow-x: hidden;
+  background: rgba($dark-bg, 0.94);
+  backdrop-filter: blur(6px);
+  color: rgba($dark-text, 0.9);
+  font-family: $font-victor-mono;
+}
+
+// --- Pantalla de acceso ------------------------------------------------------
+
+.panel-acceso {
+  @extend %panel-contenedor;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px 18px;
+}
+
+.panel-acceso-caja {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 380px;
+  padding: 30px 26px;
+  text-align: center;
+  background: rgba($dark-bg, 0.92);
+  border: 1px solid $panel-borde;
+  border-radius: 18px;
+  box-shadow: 0 18px 50px rgba(0, 0, 0, 0.45);
+}
+
+.panel-acceso-icono {
+  font-size: 1.9rem;
+  line-height: 1;
+  margin-bottom: 12px;
+}
+
+.panel-acceso-titulo {
+  margin: 0 0 8px;
+  font-size: 1.15rem;
+  letter-spacing: 0.02em;
+  background: linear-gradient(135deg, $panel-cian, $panel-aqua);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.panel-acceso-texto {
+  margin: 0 0 20px;
+  font-size: 0.78rem;
+  line-height: 1.5;
+  color: rgba($dark-text, 0.6);
+}
+
+.panel-acceso-label {
+  margin-bottom: 6px;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: rgba($panel-cian, 0.75);
+  text-align: left;
+}
+
+.panel-acceso-input {
+  width: 100%;
+  margin-bottom: 16px;
+  padding: 11px 13px;
+  font-family: inherit;
+  font-size: 0.9rem;
+  color: $dark-text;
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid $panel-borde;
+  border-radius: 10px;
+  box-sizing: border-box;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+
+  &::placeholder {
+    color: rgba($dark-text, 0.25);
+  }
+
+  &:focus {
+    outline: none;
+    border-color: rgba($panel-cian, 0.7);
+    box-shadow: 0 0 0 3px rgba($panel-cian, 0.15);
+  }
+}
+
+// --- Contenedor general ------------------------------------------------------
+
+.panel {
+  @extend %panel-contenedor;
+
+  padding: 26px clamp(14px, 3vw, 34px) 44px;
+}
+
+.panel-header {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  align-items: flex-start;
+  justify-content: space-between;
+  padding-bottom: 16px;
+  border-bottom: 1px solid $panel-borde;
+}
+
+.panel-titulo {
+  margin: 0 0 4px;
+  font-size: 1.28rem;
+  letter-spacing: 0.02em;
+  background: linear-gradient(135deg, $panel-cian, $panel-aqua);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.panel-subtitulo {
+  margin: 0;
+  font-size: 0.74rem;
+  color: rgba($dark-text, 0.55);
+  text-transform: capitalize;
+}
+
+.panel-header-acciones {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.panel-seccion-titulo {
+  margin: 0 0 10px;
+  font-size: 0.92rem;
+  letter-spacing: 0.03em;
+  color: rgba($panel-cian, 0.92);
+}
+
+.panel-nota {
+  margin: 0;
+  font-size: 0.7rem;
+  line-height: 1.5;
+  color: rgba($dark-text, 0.5);
+}
+
+.panel-vacio {
+  margin: 0;
+  padding: 18px;
+  font-size: 0.78rem;
+  text-align: center;
+  color: rgba($dark-text, 0.45);
+}
+
+.panel-error {
+  margin: 12px 0 0;
+  font-size: 0.76rem;
+  color: $panel-magenta;
+}
+
+.panel-error--suelto {
+  margin: 14px 0 0;
+}
+
+.panel-aviso {
+  margin: 14px 0 0;
+  padding: 10px 13px;
+  font-size: 0.74rem;
+  color: rgba($panel-amarillo, 0.95);
+  background: rgba($panel-amarillo, 0.08);
+  border: 1px solid rgba($panel-amarillo, 0.28);
+  border-radius: 10px;
+}
+
+// --- Botones -----------------------------------------------------------------
+
+.panel-btn {
+  padding: 9px 15px;
+  font-family: inherit;
+  font-size: 0.76rem;
+  color: rgba($dark-text, 0.88);
+  background: $panel-superficie;
+  border: 1px solid $panel-borde;
+  border-radius: 9px;
+  cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease, transform 0.15s ease;
+
+  &:hover:not(:disabled) {
+    background: rgba(255, 255, 255, 0.09);
+    border-color: rgba($panel-cian, 0.45);
+    transform: translateY(-1px);
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: default;
+  }
+}
+
+.panel-btn--primario {
+  width: 100%;
+  padding: 12px;
+  font-weight: 600;
+  color: $dark-bg;
+  background: linear-gradient(135deg, $panel-aqua, $panel-cian);
+  border-color: transparent;
+
+  &:hover:not(:disabled) {
+    background: linear-gradient(135deg, $panel-cian, $panel-aqua);
+  }
+}
+
+.panel-btn--salir {
+  color: rgba($panel-magenta, 0.9);
+  border-color: rgba($panel-magenta, 0.3);
+}
+
+// El informe es la acción principal de la cabecera: se destaca sobre las demás.
+.panel-btn--destacado {
+  font-weight: 600;
+  color: $dark-bg;
+  background: linear-gradient(135deg, $panel-aqua, $panel-cian);
+  border-color: transparent;
+
+  &:hover:not(:disabled) {
+    background: linear-gradient(135deg, $panel-cian, $panel-aqua);
+    border-color: transparent;
+  }
+}
+
+.panel-btn-mini {
+  padding: 4px 9px;
+  font-family: inherit;
+  font-size: 0.7rem;
+  color: rgba($dark-text, 0.75);
+  background: $panel-superficie;
+  border: 1px solid $panel-borde;
+  border-radius: 7px;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+
+  &:hover:not(:disabled) {
+    color: $dark-text;
+    background: rgba(255, 255, 255, 0.09);
+  }
+
+  &:disabled {
+    opacity: 0.4;
+    cursor: default;
+  }
+
+  &--activo {
+    color: $dark-bg;
+    font-weight: 600;
+    background: linear-gradient(135deg, $panel-aqua, $panel-cian);
+    border-color: transparent;
+  }
+}
+
+// --- Ficha técnica -----------------------------------------------------------
+
+.panel-ficha {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 12px;
+  margin: 20px 0 26px;
+}
+
+.panel-dato {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding: 14px 16px;
+  background: $panel-superficie;
+  border: 1px solid $panel-borde;
+  border-radius: 13px;
+}
+
+.panel-dato--destacado {
+  background: rgba($panel-aqua, 0.09);
+  border-color: rgba($panel-aqua, 0.35);
+}
+
+.panel-dato-valor {
+  font-size: 1.5rem;
+  font-weight: 700;
+  line-height: 1.1;
+  color: $panel-cian;
+}
+
+.panel-dato--destacado .panel-dato-valor {
+  color: #6ee7c8;
+}
+
+.panel-dato-etiqueta {
+  font-size: 0.74rem;
+  color: rgba($dark-text, 0.85);
+}
+
+.panel-dato-nota {
+  font-size: 0.66rem;
+  line-height: 1.4;
+  color: rgba($dark-text, 0.45);
+}
+
+// --- Intención de uso --------------------------------------------------------
+
+.panel-intencion {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 22px;
+  align-items: center;
+  padding: 20px 22px;
+  margin-bottom: 26px;
+  background: linear-gradient(135deg, rgba($panel-aqua, 0.08), rgba($panel-cian, 0.05));
+  border: 1px solid rgba($panel-aqua, 0.28);
+  border-radius: 16px;
+}
+
+.panel-donut {
+  position: relative;
+  flex: 0 0 auto;
+  width: 124px;
+  height: 124px;
+
+  svg {
+    width: 100%;
+    height: 100%;
+    transform: rotate(-90deg);
+  }
+}
+
+.panel-donut-fondo {
+  fill: none;
+  stroke: rgba(255, 255, 255, 0.08);
+  stroke-width: 10;
+}
+
+.panel-donut-valor {
+  fill: none;
+  stroke: $panel-aqua;
+  stroke-width: 10;
+  stroke-linecap: round;
+  filter: drop-shadow(0 0 6px rgba($panel-aqua, 0.7));
+  transition: stroke-dasharray 0.6s ease;
+}
+
+.panel-donut-texto {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: #6ee7c8;
+}
+
+.panel-intencion-texto {
+  flex: 1 1 260px;
+  min-width: 0;
+}
+
+.panel-intencion-frase {
+  margin: 0 0 8px;
+  font-size: 0.84rem;
+  line-height: 1.5;
+  color: rgba($dark-text, 0.88);
+
+  strong {
+    color: $panel-cian;
+  }
+}
+
+// --- Bloques de preguntas ----------------------------------------------------
+
+.panel-bloques {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(330px, 1fr));
+  gap: 16px;
+  margin-bottom: 26px;
+}
+
+.panel-bloque {
+  padding: 18px 20px 16px;
+  background: $panel-superficie;
+  border: 1px solid $panel-borde;
+  border-radius: 14px;
+}
+
+.panel-bloque-header {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+}
+
+.panel-bloque-numero {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  margin-top: 1px;
+  font-size: 0.68rem;
+  color: $dark-bg;
+  background: linear-gradient(135deg, $panel-aqua, $panel-cian);
+  border-radius: 50%;
+}
+
+.panel-bloque-titulo {
+  margin: 0;
+  font-size: 0.83rem;
+  font-weight: 600;
+  line-height: 1.45;
+  color: $panel-cian;
+}
+
+.panel-bloque-total {
+  margin: 8px 0 12px;
+  font-size: 0.68rem;
+  color: rgba($dark-text, 0.45);
+}
+
+.panel-opcion {
+  margin-bottom: 9px;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+}
+
+.panel-opcion-encabezado {
+  display: flex;
+  gap: 10px;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: 4px;
+}
+
+.panel-opcion-texto {
+  flex: 1 1 auto;
+  min-width: 0;
+  font-size: 0.76rem;
+  line-height: 1.45;
+  color: rgba($dark-text, 0.8);
+}
+
+.panel-opcion-numeros {
+  flex: 0 0 auto;
+  display: flex;
+  gap: 6px;
+  align-items: baseline;
+  font-size: 0.72rem;
+  color: rgba($panel-cian, 0.95);
+}
+
+.panel-opcion-conteo {
+  font-size: 0.66rem;
+  color: rgba($dark-text, 0.4);
+}
+
+.panel-barra {
+  display: block;
+  width: 100%;
+  height: 6px;
+  overflow: hidden;
+  background: rgba(0, 0, 0, 0.35);
+  border-radius: 999px;
+}
+
+.panel-barra-relleno {
+  display: block;
+  height: 100%;
+  background: linear-gradient(90deg, $panel-aqua, $panel-cian);
+  border-radius: 999px;
+  transition: width 0.5s ease;
+}
+
+// --- Evolución diaria --------------------------------------------------------
+
+.panel-evolucion {
+  padding: 18px 20px;
+  margin-bottom: 26px;
+  background: $panel-superficie;
+  border: 1px solid $panel-borde;
+  border-radius: 14px;
+}
+
+.panel-dias {
+  display: flex;
+  gap: 10px;
+  align-items: flex-end;
+  overflow-x: auto;
+  padding-bottom: 4px;
+}
+
+.panel-dia {
+  display: flex;
+  flex: 0 0 auto;
+  flex-direction: column;
+  gap: 4px;
+  align-items: center;
+  min-width: 58px;
+}
+
+.panel-dia-barra-contenedor {
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  width: 100%;
+  height: 78px;
+}
+
+.panel-dia-barra {
+  display: block;
+  width: 22px;
+  min-height: 3px;
+  background: linear-gradient(180deg, $panel-cian, $panel-aqua);
+  border-radius: 4px 4px 0 0;
+  transition: height 0.5s ease;
+}
+
+.panel-dia-total {
+  font-size: 0.72rem;
+  color: rgba($dark-text, 0.85);
+}
+
+.panel-dia-fecha {
+  font-size: 0.62rem;
+  color: rgba($dark-text, 0.42);
+}
+
+// --- Sábana ------------------------------------------------------------------
+
+.panel-sabana {
+  padding: 20px 22px;
+  background: $panel-superficie;
+  border: 1px solid $panel-borde;
+  border-radius: 14px;
+}
+
+.panel-sabana-header {
+  margin-bottom: 14px;
+}
+
+.panel-filtros {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: flex-end;
+  margin-bottom: 14px;
+}
+
+.panel-filtro {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  font-size: 0.68rem;
+  color: rgba($panel-cian, 0.75);
+
+  select,
+  input {
+    padding: 8px 10px;
+    font-family: inherit;
+    font-size: 0.76rem;
+    color: $dark-text;
+    background: rgba(0, 0, 0, 0.3);
+    border: 1px solid $panel-borde;
+    border-radius: 8px;
+    box-sizing: border-box;
+
+    &:focus {
+      outline: none;
+      border-color: rgba($panel-cian, 0.6);
+    }
+  }
+
+  select {
+    min-width: 150px;
+    cursor: pointer;
+  }
+
+  option {
+    color: $dark-text;
+    background: $dark-bg;
+  }
+}
+
+.panel-filtro--busqueda input {
+  min-width: 210px;
+}
+
+.panel-tabla-scroll {
+  max-height: 62vh;
+  overflow: auto;
+  border: 1px solid $panel-borde;
+  border-radius: 10px;
+}
+
+.panel-tabla {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.74rem;
+
+  thead th {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    padding: 9px 10px;
+    font-size: 0.68rem;
+    font-weight: 600;
+    text-align: left;
+    white-space: nowrap;
+    color: rgba($panel-cian, 0.9);
+    background: #2c2f3d;
+    border-bottom: 1px solid $panel-borde;
+  }
+
+  tbody td {
+    padding: 8px 10px;
+    vertical-align: top;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  }
+
+  tbody tr:hover:not(.panel-tabla-detalle) {
+    background: rgba(255, 255, 255, 0.03);
+  }
+}
+
+.panel-tabla-fila--abierta {
+  background: rgba($panel-cian, 0.06);
+}
+
+.panel-celda-fecha {
+  white-space: nowrap;
+  color: rgba($dark-text, 0.6);
+}
+
+.panel-celda-respuesta {
+  max-width: 190px;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  color: rgba($dark-text, 0.78);
+}
+
+.panel-celda-identidad {
+  max-width: 200px;
+}
+
+.panel-email {
+  display: block;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  color: rgba($panel-cian, 0.9);
+}
+
+.panel-nombre {
+  display: block;
+  font-size: 0.68rem;
+  color: rgba($dark-text, 0.5);
+}
+
+.panel-celda-dispositivo {
+  white-space: nowrap;
+  color: rgba($dark-text, 0.55);
+}
+
+.panel-celda-control {
+  white-space: nowrap;
+}
+
+.panel-celda-vacia {
+  color: rgba($dark-text, 0.25);
+}
+
+.panel-tabla-detalle td {
+  background: rgba(0, 0, 0, 0.25);
+}
+
+.panel-comentario-completo {
+  margin: 0 0 12px;
+  font-size: 0.78rem;
+  line-height: 1.55;
+  font-style: italic;
+  color: rgba($dark-text, 0.88);
+}
+
+.panel-detalle {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 10px;
+  margin: 0 0 12px;
+
+  .panel-detalle-item {
+    padding: 9px 11px;
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 9px;
+  }
+
+  dt {
+    margin-bottom: 3px;
+    font-size: 0.66rem;
+    color: rgba($panel-cian, 0.7);
+  }
+
+  dd {
+    margin: 0;
+    font-size: 0.74rem;
+    line-height: 1.45;
+    color: rgba($dark-text, 0.85);
+  }
+}
+
+// --- Chips -------------------------------------------------------------------
+
+.panel-chip {
+  display: inline-block;
+  padding: 2px 7px;
+  font-size: 0.63rem;
+  border-radius: 999px;
+  color: rgba($dark-text, 0.75);
+  background: rgba(255, 255, 255, 0.07);
+  border: 1px solid transparent;
+
+  &--completada {
+    color: #6ee7c8;
+    background: rgba($panel-aqua, 0.12);
+    border-color: rgba($panel-aqua, 0.35);
+  }
+
+  &--excluida {
+    color: rgba($panel-cian, 0.95);
+    background: rgba($panel-cian, 0.1);
+    border-color: rgba($panel-cian, 0.3);
+  }
+
+  &--aplazada {
+    color: rgba($panel-amarillo, 0.95);
+    background: rgba($panel-amarillo, 0.1);
+    border-color: rgba($panel-amarillo, 0.3);
+  }
+
+  &--ok {
+    color: #6ee7c8;
+    background: rgba($panel-aqua, 0.12);
+    border-color: rgba($panel-aqua, 0.3);
+  }
+
+  &--aviso {
+    color: rgba($panel-amarillo, 0.95);
+    background: rgba($panel-amarillo, 0.1);
+    border-color: rgba($panel-amarillo, 0.3);
+  }
+
+  &--alerta {
+    color: rgba($panel-magenta, 0.95);
+    background: rgba($panel-magenta, 0.12);
+    border-color: rgba($panel-magenta, 0.35);
+  }
+}
+
+// --- Paginado ----------------------------------------------------------------
+
+.panel-paginado {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 14px;
+}
+
+.panel-paginado-info {
+  font-size: 0.72rem;
+  color: rgba($dark-text, 0.55);
+}
+
+.panel-paginado-controles {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+
+.panel-paginado-tamano {
+  display: flex;
+  gap: 7px;
+  align-items: center;
+  font-size: 0.68rem;
+  color: rgba($dark-text, 0.5);
+
+  select {
+    padding: 5px 8px;
+    font-family: inherit;
+    font-size: 0.72rem;
+    color: $dark-text;
+    background: rgba(0, 0, 0, 0.3);
+    border: 1px solid $panel-borde;
+    border-radius: 7px;
+    cursor: pointer;
+
+    option {
+      color: $dark-text;
+      background: $dark-bg;
+    }
+  }
+}
+
+// --- Comentarios -------------------------------------------------------------
+
+.panel-comentarios {
+  margin-top: 26px;
+}
+
+.panel-lista-comentarios {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 12px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.panel-comentario {
+  padding: 14px 16px;
+  background: $panel-superficie;
+  border: 1px solid $panel-borde;
+  border-left: 2px solid rgba($panel-cian, 0.6);
+  border-radius: 12px;
+}
+
+.panel-comentario-texto {
+  margin: 0 0 8px;
+  font-size: 0.8rem;
+  line-height: 1.55;
+  font-style: italic;
+  color: rgba($dark-text, 0.88);
+}
+
+.panel-comentario-meta {
+  margin: 0;
+  font-size: 0.66rem;
+  color: rgba($dark-text, 0.45);
+}
+
+.panel-footer {
+  margin-top: 30px;
+  padding-top: 14px;
+  font-size: 0.66rem;
+  text-align: center;
+  color: rgba($dark-text, 0.35);
+  border-top: 1px solid $panel-borde;
+}
+
+// --- Responsive --------------------------------------------------------------
+
+@media (max-width: $tablet-large) {
+  .panel {
+    padding: 20px 14px 40px;
+  }
+
+  .panel-bloques {
+    grid-template-columns: 1fr;
+  }
+
+  .panel-intencion {
+    justify-content: center;
+    text-align: center;
+  }
+
+  .panel-donut {
+    width: 108px;
+    height: 108px;
+  }
+}
+
+@media (max-width: $mobile-large) {
+  .panel-header-acciones {
+    width: 100%;
+
+    .panel-btn {
+      flex: 1 1 auto;
+      text-align: center;
+    }
+  }
+
+  .panel-ficha {
+    grid-template-columns: repeat(auto-fit, minmax(128px, 1fr));
+    gap: 9px;
+  }
+
+  .panel-dato {
+    padding: 11px 12px;
+  }
+
+  .panel-dato-valor {
+    font-size: 1.25rem;
+  }
+
+  .panel-sabana {
+    padding: 14px 12px;
+  }
+
+  .panel-filtro {
+    flex: 1 1 100%;
+
+    select,
+    input {
+      width: 100%;
+    }
+  }
+
+  .panel-tabla-scroll {
+    max-height: 56vh;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .panel-barra-relleno,
+  .panel-donut-valor,
+  .panel-dia-barra {
+    transition: none;
+  }
+}

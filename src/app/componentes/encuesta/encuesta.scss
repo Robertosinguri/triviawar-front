@@ -1,0 +1,498 @@
+@use "../../theme/variables.scss" as *;
+
+/*
+  Paleta de TriviaWar aplicada a la encuesta:
+    CIAN     -> las preguntas (lo que hay que leer)
+    AMARILLO -> las respuestas posibles (lo que se puede elegir)
+    MAGENTA  -> la respuesta elegida (se distingue de un vistazo)
+*/
+$encuesta-cian: $primary-sky;         // #00cfe6
+$encuesta-amarillo: $primary-yellow;  // #e6bd00
+$encuesta-magenta: $primary-pink;     // #ff508c
+$encuesta-magenta-claro: #ff8fbb;     // texto elegido: mantiene buen contraste
+
+/*
+  Encuesta de bienvenida.
+  z-index 10500: por encima del login (2/3) y de cualquier navbar (hasta 9998).
+*/
+
+.encuesta-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 10500;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 16px;
+  background: rgba(8, 8, 14, 0.78);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  overscroll-behavior: contain;
+
+  animation: encuestaFondo 0.25s ease-out;
+}
+
+.encuesta-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+
+  width: 100%;
+  max-width: 560px;
+  max-height: 90dvh;
+
+  overflow: hidden;
+
+  background: linear-gradient(160deg, rgba(40, 42, 54, 0.98), rgba(24, 25, 33, 0.98));
+  border: 1px solid rgba($primary-aqua, 0.35);
+  border-radius: 20px;
+  box-shadow:
+    0 0 0 1px rgba(0, 0, 0, 0.4),
+    0 18px 50px rgba(0, 0, 0, 0.55),
+    0 0 40px rgba($primary-aqua, 0.18);
+
+  animation: encuestaAparecer 0.32s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+/* --- Encabezado ---------------------------------------------------------- */
+
+.encuesta-header {
+  flex-shrink: 0;
+  padding: 22px 22px 16px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+}
+
+.encuesta-titulo {
+  margin: 0 0 6px;
+  font-family: $font-victor-mono, monospace;
+  font-size: 1.3rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  background: linear-gradient(135deg, $primary-aqua, $primary-sky);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.encuesta-subtitulo {
+  margin: 0 0 14px;
+  font-size: 0.82rem;
+  line-height: 1.45;
+  color: rgba(255, 255, 255, 0.72);
+}
+
+.encuesta-progreso {
+  height: 4px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.1);
+  overflow: hidden;
+}
+
+.encuesta-progreso-barra {
+  display: block;
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, $primary-aqua, $primary-sky);
+  transition: width 0.3s ease;
+}
+
+/* --- Cuerpo con las preguntas -------------------------------------------- */
+
+.encuesta-cuerpo {
+  flex: 1 1 auto;
+  min-height: 0;
+  padding: 14px 18px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+
+  &::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: rgba($primary-aqua, 0.4);
+    border-radius: 999px;
+  }
+}
+
+.encuesta-pregunta {
+  margin: 0 0 16px;
+  padding: 0;
+  border: 0;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+}
+
+.encuesta-pregunta-titulo {
+  display: flex;
+  align-items: flex-start;
+  gap: 9px;
+
+  margin: 0 0 6px;
+  padding: 0;
+
+  font-size: 0.86rem;
+  font-weight: 600;
+  line-height: 1.4;
+  color: $encuesta-cian;
+}
+
+.encuesta-pregunta-texto {
+  flex: 1;
+}
+
+.encuesta-numero {
+  flex-shrink: 0;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 19px;
+  height: 19px;
+  margin-top: 1px;
+
+  font-family: $font-victor-mono, monospace;
+  font-size: 0.66rem;
+  font-weight: 700;
+  color: $dark-bg;
+
+  background: linear-gradient(135deg, $primary-aqua, $primary-sky);
+  border-radius: 50%;
+}
+
+.encuesta-ayuda {
+  margin: 0 0 6px 28px;
+  font-size: 0.7rem;
+  color: rgba($encuesta-cian, 0.6);
+}
+
+.encuesta-opciones {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+/*
+  Cada opción es una fila mínima: el control real (radio/checkbox) queda
+  invisible pero funcional, y el marcador visual es un punto de 7px.
+  El punto se alinea con la PRIMERA línea del texto con un margen en `em`,
+  así queda bien tanto si la opción ocupa una línea como si ocupa tres.
+*/
+.encuesta-opcion {
+  position: relative;
+
+  display: grid;
+  grid-template-columns: 7px 1fr;
+  align-items: start;
+  column-gap: 9px;
+
+  padding: 6px 8px;
+
+  font-size: 0.8rem;
+  line-height: 1.45;
+  /* Amarillo de la marca: es una respuesta disponible */
+  color: $encuesta-amarillo;
+
+  background: transparent;
+  border: 0;
+  border-radius: 8px;
+
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+
+  &:hover {
+    background: rgba($encuesta-amarillo, 0.08);
+  }
+
+  /* Opción elegida: pasa a magenta y se prende el punto */
+  &--elegida {
+    background: rgba($encuesta-magenta, 0.14);
+
+    .encuesta-opcion-texto {
+      color: $encuesta-magenta-claro;
+    }
+
+    .encuesta-punto {
+      border-color: transparent;
+      background: linear-gradient(135deg, $encuesta-magenta, $primary-violet);
+      box-shadow: 0 0 8px rgba($encuesta-magenta, 0.85);
+      transform: scale(1.25);
+    }
+  }
+
+  /* El control real: invisible, pero sigue existiendo para el navegador
+     (accesible por teclado y para lectores de pantalla) */
+  input {
+    position: absolute;
+    top: 0;
+    left: 0;
+
+    width: 1px;
+    height: 1px;
+    margin: 0;
+    padding: 0;
+
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  /* Foco por teclado sobre toda la fila */
+  &:has(input:focus-visible) {
+    outline: 2px solid rgba($encuesta-cian, 0.75);
+    outline-offset: 2px;
+  }
+}
+
+.encuesta-punto {
+  width: 7px;
+  height: 7px;
+
+  /* 0.45em ≈ media línea: centra el punto con la primera línea del texto */
+  margin-top: 0.45em;
+
+  border: 1px solid rgba($encuesta-amarillo, 0.55);
+  border-radius: 50%;
+
+  transition: background 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease;
+}
+
+.encuesta-opcion-texto {
+  min-width: 0;
+}
+
+/* --- Caja de comentarios -------------------------------------------------- */
+
+.encuesta-comentario .encuesta-pregunta-titulo {
+  display: block;
+  margin-bottom: 4px;
+}
+
+.encuesta-comentario .encuesta-ayuda {
+  margin-left: 0;
+}
+
+.encuesta-textarea {
+  width: 100%;
+  min-height: 74px;
+  padding: 11px 13px;
+
+  font-family: inherit;
+  font-size: 0.84rem;
+  line-height: 1.45;
+  /* Lo que escribe el usuario es su respuesta: también va en amarillo */
+  color: $encuesta-amarillo;
+
+  background: rgba(0, 0, 0, 0.35);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 12px;
+
+  resize: vertical;
+
+  &::placeholder {
+    color: rgba(255, 255, 255, 0.35);
+  }
+
+  &:focus {
+    outline: none;
+    border-color: rgba($encuesta-cian, 0.75);
+    box-shadow: 0 0 0 3px rgba($encuesta-cian, 0.16);
+  }
+}
+
+/* --- Campo trampa (fuera de pantalla, invisible para humanos) ------------- */
+
+.encuesta-honeypot {
+  position: absolute;
+  left: -9999px;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* --- Error de envío ------------------------------------------------------- */
+
+.encuesta-error {
+  flex-shrink: 0;
+  margin: 0 22px 12px;
+  padding: 11px 13px;
+
+  font-size: 0.79rem;
+  line-height: 1.4;
+  color: #ffc2d4;
+
+  background: rgba($primary-pink, 0.12);
+  border: 1px solid rgba($primary-pink, 0.4);
+  border-radius: 12px;
+
+  animation: encuestaFondo 0.2s ease-out;
+}
+
+/* --- Pie con las acciones ------------------------------------------------- */
+
+.encuesta-footer {
+  flex-shrink: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+
+  padding: 14px 22px 18px;
+
+  background: rgba(0, 0, 0, 0.22);
+  border-top: 1px solid rgba(255, 255, 255, 0.07);
+}
+
+.encuesta-btn-primario,
+.encuesta-btn-secundario {
+  flex: 1 1 150px;
+  min-height: 46px;
+  padding: 12px 18px;
+
+  font-family: $font-victor-mono, monospace;
+  font-size: 0.82rem;
+  font-weight: 700;
+
+  border-radius: 999px;
+  cursor: pointer;
+  transition: transform 0.16s ease, opacity 0.16s ease, box-shadow 0.16s ease, border-color 0.16s ease;
+}
+
+.encuesta-btn-primario {
+  color: $dark-bg;
+  background: linear-gradient(135deg, $primary-aqua, $primary-sky);
+  border: 0;
+  box-shadow: 0 6px 18px rgba($primary-aqua, 0.28);
+
+  &:hover:not(:disabled) {
+    transform: translateY(-1px);
+    box-shadow: 0 9px 22px rgba($primary-aqua, 0.38);
+  }
+
+  &:disabled {
+    opacity: 0.42;
+    cursor: not-allowed;
+    box-shadow: none;
+  }
+}
+
+.encuesta-btn-secundario {
+  color: rgba(255, 255, 255, 0.85);
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+
+  &:hover:not(:disabled) {
+    border-color: rgba(255, 255, 255, 0.6);
+    transform: translateY(-1px);
+  }
+
+  &:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+}
+
+/* --- Pantalla de agradecimiento ------------------------------------------- */
+
+.encuesta-gracias {
+  padding: 38px 26px 30px;
+  text-align: center;
+}
+
+.encuesta-gracias-icono {
+  font-size: 2.6rem;
+  line-height: 1;
+  margin-bottom: 12px;
+  animation: encuestaAparecer 0.4s ease-out;
+}
+
+.encuesta-gracias-titulo {
+  margin: 0 0 8px;
+  font-family: $font-victor-mono, monospace;
+  font-size: 1.4rem;
+  background: linear-gradient(135deg, $primary-aqua, $primary-sky);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.encuesta-gracias-texto {
+  margin: 0 0 22px;
+  font-size: 0.86rem;
+  line-height: 1.5;
+  color: rgba(255, 255, 255, 0.78);
+}
+
+/* --- Animaciones ---------------------------------------------------------- */
+
+@keyframes encuestaFondo {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes encuestaAparecer {
+  from {
+    opacity: 0;
+    transform: translateY(14px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* --- Ajustes para pantallas chicas --------------------------------------- */
+
+@media (max-width: $mobile-large) {
+  .encuesta-overlay {
+    padding: 10px;
+    align-items: flex-end;
+  }
+
+  .encuesta-card {
+    max-width: 100%;
+    max-height: 92dvh;
+    border-radius: 18px;
+  }
+
+  .encuesta-header {
+    padding: 18px 16px 14px;
+  }
+
+  .encuesta-titulo {
+    font-size: 1.15rem;
+  }
+
+  .encuesta-cuerpo {
+    padding: 12px 12px;
+  }
+
+  .encuesta-opcion {
+    padding: 5px 6px;
+    font-size: 0.79rem;
+  }
+
+  .encuesta-footer {
+    padding: 12px 16px 16px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .encuesta-overlay,
+  .encuesta-card,
+  .encuesta-gracias-icono {
+    animation: none;
+  }
+
+  .encuesta-progreso-barra,
+  .encuesta-btn-primario,
+  .encuesta-btn-secundario,
+  .encuesta-opcion {
+    transition: none;
+  }
+}

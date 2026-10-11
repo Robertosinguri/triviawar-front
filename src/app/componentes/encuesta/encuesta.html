@@ -1,0 +1,146 @@
+<!--
+  Encuesta de bienvenida: se antepone a todo (z-index 10500, por encima del login).
+  No tiene botón de cerrar ni cierra al tocar el fondo: eso es intencional.
+-->
+@if (encuesta.visible()) {
+  <div
+    class="encuesta-overlay"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="encuesta-titulo"
+  >
+    <div class="encuesta-card">
+
+      @if (encuesta.estadoVista() === 'gracias') {
+        <!-- Pantalla de cierre: se muestra unos segundos y el modal se va solo -->
+        <div class="encuesta-gracias">
+          <div class="encuesta-gracias-icono" aria-hidden="true">✅</div>
+          <h2 class="encuesta-gracias-titulo">{{ textos.agradecimientoTitulo }}</h2>
+          <p class="encuesta-gracias-texto">{{ textos.agradecimientoTexto }}</p>
+          <button type="button" class="encuesta-btn-primario" (click)="cerrarGracias()">
+            {{ textos.botonListo }}
+          </button>
+        </div>
+
+      } @else {
+
+        <header class="encuesta-header">
+          <h2 id="encuesta-titulo" class="encuesta-titulo">{{ textos.titulo }}</h2>
+          <p class="encuesta-subtitulo">{{ textos.subtitulo }}</p>
+
+          <div
+            class="encuesta-progreso"
+            role="progressbar"
+            [attr.aria-valuenow]="encuesta.progreso()"
+            aria-valuemin="0"
+            aria-valuemax="100"
+          >
+            <span class="encuesta-progreso-barra" [style.width.%]="encuesta.progreso()"></span>
+          </div>
+        </header>
+
+        <div class="encuesta-cuerpo">
+
+          @for (pregunta of encuesta.preguntasVisibles(); track pregunta.id; let i = $index) {
+            <fieldset class="encuesta-pregunta">
+              <legend class="encuesta-pregunta-titulo">
+                <span class="encuesta-numero" aria-hidden="true">{{ i + 1 }}</span>
+                <span class="encuesta-pregunta-texto">{{ pregunta.titulo }}</span>
+              </legend>
+
+              @if (pregunta.ayuda) {
+                <p class="encuesta-ayuda">{{ pregunta.ayuda }}</p>
+              }
+
+              <div class="encuesta-opciones">
+                @for (opcion of pregunta.opciones; track opcion.valor) {
+                  <label
+                    class="encuesta-opcion"
+                    [class.encuesta-opcion--elegida]="esSeleccionada(pregunta.id, opcion.valor)"
+                  >
+                    <input
+                      type="radio"
+                      [name]="pregunta.id"
+                      [checked]="esSeleccionada(pregunta.id, opcion.valor)"
+                      (change)="seleccionar(pregunta.id, opcion.valor)"
+                    >
+                    <!-- Marcador visual: el control real va invisible -->
+                    <span class="encuesta-punto" aria-hidden="true"></span>
+                    <span class="encuesta-opcion-texto">{{ opcion.valor }}</span>
+                  </label>
+                }
+              </div>
+            </fieldset>
+          }
+
+          <!-- La caja de comentarios no se muestra si el usuario quedó excluido -->
+          @if (!encuesta.excluido()) {
+            <div class="encuesta-pregunta encuesta-comentario">
+              <label class="encuesta-pregunta-titulo" for="encuesta-comentario">
+                <span class="encuesta-pregunta-texto">{{ preguntaComentario.titulo }}</span>
+              </label>
+              <p class="encuesta-ayuda">
+                {{ preguntaComentario.ayuda }} ·
+                {{ encuesta.comentario().length }}/{{ preguntaComentario.maximoCaracteres }}
+              </p>
+              <textarea
+                id="encuesta-comentario"
+                class="encuesta-textarea"
+                rows="3"
+                [value]="encuesta.comentario()"
+                [attr.maxlength]="preguntaComentario.maximoCaracteres"
+                (input)="onComentario($event)"
+              ></textarea>
+            </div>
+          }
+
+          <!-- Campo trampa: invisible para una persona, los bots lo completan -->
+          <div class="encuesta-honeypot" aria-hidden="true">
+            <label for="encuesta-campo-web">No completar este campo</label>
+            <input
+              id="encuesta-campo-web"
+              type="text"
+              tabindex="-1"
+              autocomplete="off"
+              [value]="encuesta.honeypot()"
+              (input)="onHoneypot($event)"
+            >
+          </div>
+
+        </div>
+
+        @if (encuesta.errorEnvio()) {
+          <div class="encuesta-error" role="alert">{{ encuesta.errorEnvio() }}</div>
+        }
+
+        <footer class="encuesta-footer">
+          <button
+            type="button"
+            class="encuesta-btn-secundario"
+            [disabled]="encuesta.enviando()"
+            (click)="posponer()"
+          >
+            {{ textos.botonEnPosponer }}
+          </button>
+
+          <button
+            type="button"
+            class="encuesta-btn-primario"
+            [disabled]="encuesta.enviando() || !encuesta.completo()"
+            (click)="enviar()"
+          >
+            @if (encuesta.enviando()) {
+              Enviando...
+            } @else if (encuesta.errorEnvio()) {
+              {{ textos.botonReintentar }}
+            } @else {
+              {{ textos.botonEnviar }}
+            }
+          </button>
+        </footer>
+
+      }
+
+    </div>
+  </div>
+}

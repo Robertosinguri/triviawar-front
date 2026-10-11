@@ -9,6 +9,7 @@ import { Routes } from '@angular/router';
 import { RankingComponent } from './componentes/ranking/ranking';
 import { ResultadosComponent } from './componentes/resultados/resultados';
 import { ArenaComponent } from './componentes/arena/arena';
+import { EstadisticasComponent } from './componentes/estadisticas/estadisticas';
 import { authGuard } from './auth.guard'; 
 
 export const routes: Routes = [
@@ -92,6 +93,15 @@ export const routes: Routes = [
     path: 'resultados',
     component: ResultadosComponent,
     canActivate: [authGuard]
+  },
+
+  // RUTA 13: Panel de resultados de la encuesta.
+  // No lleva authGuard a propósito: no es una pantalla de juego y no está
+  // enlazada desde ningún lado. El acceso lo protege la clave que valida el
+  // backend, no la sesión del juego.
+  {
+    path: 'estadisticas',
+    component: EstadisticasComponent
   },
 
   // RUTA OPCIONAL: Si el usuario teclea una URL incorrecta, redirige al splash

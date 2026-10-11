@@ -30,7 +30,11 @@
             "styles": [
               "src/styles.scss"
             ],
-            "outputMode": "static"
+            "outputMode": "static",
+            "allowedCommonJsDependencies": [
+              "pdfmake/build/pdfmake",
+              "pdfmake/build/vfs_fonts"
+            ]
           },
           "configurations": {
             "production": {

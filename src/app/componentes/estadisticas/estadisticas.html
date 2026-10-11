@@ -1,0 +1,433 @@
+<!-- ═══════════════════ Pantalla de acceso ═══════════════════ -->
+@if (!panel.datos()) {
+  <div class="panel-acceso">
+    <form class="panel-acceso-caja" (submit)="ingresar($event)">
+      <span class="panel-acceso-icono" aria-hidden="true">🔒</span>
+      <h1 class="panel-acceso-titulo">Panel de resultados</h1>
+      <p class="panel-acceso-texto">
+        Acceso restringido. Ingresá la clave del grupo para ver las estadísticas de la encuesta.
+      </p>
+
+      <label class="panel-acceso-label" for="claveAcceso">Clave de acceso</label>
+      <input
+        id="claveAcceso"
+        type="password"
+        class="panel-acceso-input"
+        placeholder="••••••••"
+        autocomplete="current-password"
+        [value]="claveIngresada()"
+        (input)="onClave($event)"
+      >
+
+      <button type="submit" class="panel-btn panel-btn--primario" [disabled]="panel.cargando()">
+        {{ panel.cargando() ? 'Verificando…' : 'Ingresar' }}
+      </button>
+
+      @if (panel.error()) {
+        <p class="panel-error">{{ panel.error() }}</p>
+      }
+    </form>
+  </div>
+}
+
+<!-- ═══════════════════ Panel ═══════════════════ -->
+@if (panel.datos(); as datos) {
+  <div class="panel">
+    <header class="panel-header">
+      <div>
+        <h1 class="panel-titulo">Resultados de la encuesta</h1>
+        <p class="panel-subtitulo">
+          {{ datos.muestra.valida }} encuestas completas ·
+          actualizado el {{ formatearFecha(datos.generadoEn) }}
+        </p>
+      </div>
+
+      <div class="panel-header-acciones">
+        <button
+          type="button"
+          class="panel-btn panel-btn--destacado"
+          (click)="descargarPdf()"
+          [disabled]="generandoInforme()"
+          title="Informe completo en PDF, con la ficha técnica y el origen de los datos"
+        >
+          {{ generandoInforme() ? 'Generando…' : 'Informe PDF' }}
+        </button>
+        <button type="button" class="panel-btn" (click)="actualizar()" [disabled]="panel.cargando()">
+          {{ panel.cargando() ? 'Actualizando…' : 'Actualizar' }}
+        </button>
+        <button type="button" class="panel-btn" (click)="descargarCsv()">Descargar CSV</button>
+        <button type="button" class="panel-btn panel-btn--salir" (click)="salir()">Salir</button>
+      </div>
+    </header>
+
+    @if (panel.error()) {
+      <p class="panel-error panel-error--suelto">{{ panel.error() }}</p>
+    }
+
+    @if (datos.truncado) {
+      <p class="panel-aviso">
+        Se alcanzó el máximo de respuestas que lee el panel, así que los totales podrían estar incompletos.
+      </p>
+    }
+
+    <!-- Ficha técnica -->
+    <section class="panel-ficha">
+      <article class="panel-dato panel-dato--destacado">
+        <span class="panel-dato-valor">{{ datos.muestra.valida }}</span>
+        <span class="panel-dato-etiqueta">Muestra válida</span>
+        <span class="panel-dato-nota">Encuestas completas</span>
+      </article>
+
+      <article class="panel-dato">
+        <span class="panel-dato-valor">{{ datos.muestra.descartadas }}</span>
+        <span class="panel-dato-etiqueta">Descartadas</span>
+        <span class="panel-dato-nota">Fuera del filtro de exclusión</span>
+      </article>
+
+      <article class="panel-dato">
+        <span class="panel-dato-valor">{{ datos.muestra.abandonos }}</span>
+        <span class="panel-dato-etiqueta">En otro momento</span>
+        <span class="panel-dato-nota">Pueden volver a responder</span>
+      </article>
+
+      <article class="panel-dato">
+        <span class="panel-dato-valor">{{ datos.muestra.tasaFinalizacion }}%</span>
+        <span class="panel-dato-etiqueta">Finalización</span>
+        <span class="panel-dato-nota">De los que abrieron la encuesta</span>
+      </article>
+
+      <article class="panel-dato">
+        <span class="panel-dato-valor">{{ datos.identidad.porcentajeVerificado }}%</span>
+        <span class="panel-dato-etiqueta">Identidad verificada</span>
+        <span class="panel-dato-nota">{{ datos.identidad.conCorreoVerificado }} con cuenta de Google</span>
+      </article>
+
+      <article class="panel-dato">
+        <span class="panel-dato-valor">{{ datos.total }}</span>
+        <span class="panel-dato-etiqueta">Registros totales</span>
+        <span class="panel-dato-nota">Incluye descartadas y aplazadas</span>
+      </article>
+    </section>
+
+    <!-- Intención de uso -->
+    @if (intencion(); as intencionUso) {
+      <section class="panel-intencion">
+        <div class="panel-donut">
+          <svg viewBox="0 0 100 100" aria-hidden="true">
+            <circle class="panel-donut-fondo" cx="50" cy="50" r="42"></circle>
+            <circle
+              class="panel-donut-valor"
+              cx="50"
+              cy="50"
+              r="42"
+              [attr.stroke-dasharray]="(intencionUso.porcentaje / 100 * 263.9) + ' 263.9'"
+            ></circle>
+          </svg>
+          <span class="panel-donut-texto">{{ intencionUso.porcentaje }}%</span>
+        </div>
+
+        <div class="panel-intencion-texto">
+          <h2 class="panel-seccion-titulo">Intención de uso</h2>
+          <p class="panel-intencion-frase">
+            <strong>{{ intencionUso.cantidad }} de {{ intencionUso.total }}</strong> respondieron
+            “Sí, totalmente” a sumar la app a sus aplicaciones.
+          </p>
+          <p class="panel-nota">
+            Es el porcentaje que después alimenta el SOM. Acá no se calcula: el SOM necesita
+            el TAM y el SAM reales, que todavía no están medidos.
+          </p>
+        </div>
+      </section>
+    }
+
+    <!-- Los 4 bloques de preguntas -->
+    <section class="panel-bloques">
+      @for (bloque of bloques(); track bloque.id; let indice = $index) {
+        <article class="panel-bloque">
+          <header class="panel-bloque-header">
+            <span class="panel-bloque-numero">{{ indice + 1 }}</span>
+            <h2 class="panel-bloque-titulo">{{ bloque.titulo }}</h2>
+          </header>
+
+          <p class="panel-bloque-total">
+            {{ bloque.total }} {{ bloque.total === 1 ? 'respuesta' : 'respuestas' }}
+          </p>
+
+          @for (opcion of bloque.opciones; track opcion.valor) {
+            <div class="panel-opcion">
+              <div class="panel-opcion-encabezado">
+                <span class="panel-opcion-texto">{{ opcion.valor }}</span>
+                <span class="panel-opcion-numeros">
+                  <strong>{{ opcion.porcentaje }}%</strong>
+                  <span class="panel-opcion-conteo">{{ opcion.cantidad }}</span>
+                </span>
+              </div>
+              <span class="panel-barra">
+                <span class="panel-barra-relleno" [style.width.%]="opcion.porcentaje"></span>
+              </span>
+            </div>
+          }
+        </article>
+      }
+    </section>
+
+    <!-- Evolución diaria -->
+    <section class="panel-evolucion">
+      <h2 class="panel-seccion-titulo">Evolución de la muestra</h2>
+
+      @if (datos.porDia.length) {
+        <div class="panel-dias">
+          @for (dia of datos.porDia; track dia.fecha) {
+            <div class="panel-dia">
+              <span class="panel-dia-barra-contenedor">
+                <span
+                  class="panel-dia-barra"
+                  [style.height.%]="(dia.total / maximoPorDia()) * 100"
+                  [title]="dia.total + ' respuestas (' + dia.completadas + ' completas)'"
+                ></span>
+              </span>
+              <span class="panel-dia-total">{{ dia.total }}</span>
+              <span class="panel-dia-fecha">{{ dia.fecha }}</span>
+            </div>
+          }
+        </div>
+      } @else {
+        <p class="panel-vacio">Todavía no hay respuestas.</p>
+      }
+    </section>
+
+    <!-- Sábana de respuestas -->
+    <section class="panel-sabana">
+      <header class="panel-sabana-header">
+        <h2 class="panel-seccion-titulo">Sábana de respuestas</h2>
+        <p class="panel-nota">
+          Una fila por dispositivo. Las respuestas quedan congeladas al enviarse: se guarda la
+          primera, no la última.
+        </p>
+      </header>
+
+      <div class="panel-filtros">
+        <label class="panel-filtro">
+          <span>Estado</span>
+          <select [value]="filtroEstado()" (change)="cambiarEstado($event)">
+            <option value="todas" [selected]="filtroEstado() === 'todas'">Todas</option>
+            <option value="completada" [selected]="filtroEstado() === 'completada'">Completadas</option>
+            <option value="excluida" [selected]="filtroEstado() === 'excluida'">Descartadas</option>
+            <option value="aplazada" [selected]="filtroEstado() === 'aplazada'">En otro momento</option>
+          </select>
+        </label>
+
+        @if (preguntaNivel) {
+          <label class="panel-filtro">
+            <span>Nivel educativo</span>
+            <select [value]="filtroNivel()" (change)="cambiarNivel($event)">
+              <option value="todos" [selected]="filtroNivel() === 'todos'">Todos</option>
+              @for (opcion of preguntaNivel.opciones; track opcion.valor) {
+                <option [value]="opcion.valor" [selected]="filtroNivel() === opcion.valor">
+                  {{ opcion.valor }}
+                </option>
+              }
+            </select>
+          </label>
+        }
+
+        <label class="panel-filtro panel-filtro--busqueda">
+          <span>Buscar</span>
+          <input
+            type="search"
+            placeholder="correo, nombre o comentario"
+            [value]="busqueda()"
+            (input)="onBusqueda($event)"
+          >
+        </label>
+
+        <button type="button" class="panel-btn" (click)="limpiarFiltros()">Limpiar</button>
+      </div>
+
+      <div class="panel-tabla-scroll">
+        <table class="panel-tabla">
+          <thead>
+            <tr>
+              <th>Fecha</th>
+              <th>Estado</th>
+              @for (pregunta of preguntas; track pregunta.id; let i = $index) {
+                <th [title]="pregunta.titulo">P{{ i + 1 }}</th>
+              }
+              <th>Comentario</th>
+              <th>Identidad</th>
+              <th>Dispositivo</th>
+              <th>Control</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            @for (fila of filasDeLaPagina(); track fila.id) {
+              <tr [class.panel-tabla-fila--abierta]="filaAbierta() === fila.id">
+                <td class="panel-celda-fecha">{{ formatearFecha(fila.fecha) }}</td>
+                <td>
+                  <span class="panel-chip" [class]="'panel-chip--' + fila.estado">{{ fila.estado }}</span>
+                </td>
+
+                @for (pregunta of preguntas; track pregunta.id) {
+                  <td class="panel-celda-respuesta" [title]="fila.respuestas[pregunta.id] || 'Sin responder'">
+                    {{ fila.respuestas[pregunta.id] || '—' }}
+                  </td>
+                }
+
+                <td class="panel-celda-comentario">
+                  @if (fila.comentario) {
+                    <button type="button" class="panel-btn-mini" (click)="alternarComentario(fila.id)">
+                      {{ filaAbierta() === fila.id ? 'Ocultar' : 'Ver' }}
+                    </button>
+                  } @else {
+                    <span class="panel-celda-vacia">—</span>
+                  }
+                </td>
+
+                <td class="panel-celda-identidad">
+                  @if (fila.email) {
+                    <span class="panel-email">{{ fila.email }}</span>
+                    @if (fila.emailVerificado) {
+                      <span class="panel-chip panel-chip--ok">verificado</span>
+                    }
+                    @if (fila.nombre) {
+                      <span class="panel-nombre">{{ fila.nombre }}</span>
+                    }
+                  } @else {
+                    <span class="panel-chip">anónima</span>
+                  }
+                </td>
+
+                <td class="panel-celda-dispositivo">
+                  {{ fila.dispositivo.so || 'Sin dato' }} · {{ fila.dispositivo.navegador || 'Sin dato' }}
+                  @if (fila.dispositivo.pwaInstalada) {
+                    <span class="panel-chip panel-chip--ok">PWA</span>
+                  }
+                </td>
+
+                <td class="panel-celda-control">
+                  @if (fila.sospechosa) {
+                    <span class="panel-chip panel-chip--alerta">sospechosa</span>
+                  }
+                  @if (fila.intentosDeCambio) {
+                    <span class="panel-chip panel-chip--aviso">
+                      {{ fila.intentosDeCambio }} intento{{ fila.intentosDeCambio === 1 ? '' : 's' }} de cambio
+                    </span>
+                  }
+                  @if (!fila.sospechosa && !fila.intentosDeCambio) {
+                    <span class="panel-celda-vacia">—</span>
+                  }
+                </td>
+              </tr>
+
+              @if (filaAbierta() === fila.id) {
+                <tr class="panel-tabla-detalle">
+                  <td [attr.colspan]="preguntas.length + 6">
+                    @if (fila.comentario) {
+                      <p class="panel-comentario-completo">“{{ fila.comentario }}”</p>
+                    }
+
+                    <dl class="panel-detalle">
+                      @for (pregunta of preguntas; track pregunta.id) {
+                        <div class="panel-detalle-item">
+                          <dt>{{ pregunta.titulo }}</dt>
+                          <dd>{{ fila.respuestas[pregunta.id] || 'Sin responder' }}</dd>
+                        </div>
+                      }
+                    </dl>
+
+                    <p class="panel-nota">
+                      Dispositivo: {{ fila.dispositivo.so || 'desconocido' }} ·
+                      {{ fila.dispositivo.navegador || 'desconocido' }}
+                      @if (fila.dispositivo.pwaInstalada) { · app instalada }
+                      · {{ formatearFecha(fila.fecha) }}
+                    </p>
+                  </td>
+                </tr>
+              }
+            }
+
+            @if (!filasDeLaPagina().length) {
+              <tr>
+                <td [attr.colspan]="preguntas.length + 6" class="panel-vacio">
+                  No hay respuestas que coincidan con los filtros.
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+
+      <div class="panel-paginado">
+        <span class="panel-paginado-info">{{ rangoMostrado() }}</span>
+
+        <div class="panel-paginado-controles">
+          <button
+            type="button"
+            class="panel-btn-mini"
+            [disabled]="pagina() === 1"
+            (click)="irAPagina(pagina() - 1)"
+          >
+            ‹ Anterior
+          </button>
+
+          @for (numero of paginasVisibles(); track numero) {
+            <button
+              type="button"
+              class="panel-btn-mini"
+              [class.panel-btn-mini--activo]="numero === pagina()"
+              (click)="irAPagina(numero)"
+            >
+              {{ numero }}
+            </button>
+          }
+
+          <button
+            type="button"
+            class="panel-btn-mini"
+            [disabled]="pagina() === totalPaginas()"
+            (click)="irAPagina(pagina() + 1)"
+          >
+            Siguiente ›
+          </button>
+        </div>
+
+        <label class="panel-paginado-tamano">
+          <span>Por página</span>
+          <select [value]="tamano()" (change)="cambiarTamano($event)">
+            @for (opcion of tamanos; track opcion) {
+              <option [value]="opcion" [selected]="opcion === tamano()">{{ opcion }}</option>
+            }
+          </select>
+        </label>
+      </div>
+    </section>
+
+    <!-- Lectura cualitativa -->
+    <section class="panel-comentarios">
+      <h2 class="panel-seccion-titulo">Comentarios ({{ comentarios().length }})</h2>
+
+      @if (comentarios().length) {
+        <ul class="panel-lista-comentarios">
+          @for (fila of comentarios(); track fila.id) {
+            <li class="panel-comentario">
+              <p class="panel-comentario-texto">“{{ fila.comentario }}”</p>
+              <p class="panel-comentario-meta">
+                {{ fila.respuestas[preguntaNivel?.id || 'nivelEducativo'] || 'Sin nivel declarado' }}
+                · {{ formatearFecha(fila.fecha) }}
+                @if (fila.emailVerificado && fila.email) { · {{ fila.email }} }
+              </p>
+            </li>
+          }
+        </ul>
+      } @else {
+        <p class="panel-vacio">Todavía no hay comentarios escritos.</p>
+      }
+    </section>
+
+    <footer class="panel-footer">
+      Panel privado · {{ datos.total }} registros · cuestionario v{{ datos.versionCuestionario }} · no está
+      enlazado desde ninguna parte de la aplicación
+    </footer>
+  </div>
+}

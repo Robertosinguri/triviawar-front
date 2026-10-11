@@ -1,5 +1,5 @@
 import { Injectable, signal, Optional, inject } from '@angular/core';
-import { Auth, signInWithEmailAndPassword, createUserWithEmailAndPassword, updateProfile, User, authState, signOut, signInWithPopup, GoogleAuthProvider } from '@angular/fire/auth';
+import { Auth, signInWithEmailAndPassword, createUserWithEmailAndPassword, updateProfile, User, authState, signOut, signInWithPopup, GoogleAuthProvider, signInAnonymously } from '@angular/fire/auth';
 import { BehaviorSubject, Observable, from } from 'rxjs';
 import { map, catchError } from 'rxjs/operators';
 import { HttpClient } from '@angular/common/http';
@@ -39,10 +39,18 @@ export class FirebaseAuthService {
     private readonly isLoading = signal(false);
     private readonly error = signal<string | null>(null);
 
+    /**
+     * ¿La sesión de Firebase es anónima? Sirve para identificar el dispositivo
+     * mientras se responde la encuesta, pero NO da acceso al juego: un usuario
+     * anónimo nunca cuenta como autenticado.
+     */
+    private readonly isAnonymousSession = signal(false);
+
     readonly isAuthenticated$ = this.isAuthenticated.asReadonly();
     readonly currentUser$ = this.currentUser.asReadonly();
     readonly isLoading$ = this.isLoading.asReadonly();
     readonly error$ = this.error.asReadonly();
+    readonly isAnonymous$ = this.isAnonymousSession.asReadonly();
 
     constructor() {
         this.checkAuthState();
@@ -52,6 +60,17 @@ export class FirebaseAuthService {
         // Mantenemos esto para detectar si ya hay una sesión de Firebase activa 
         // o si queremos sincronizar con el token que recibimos del backend
         authState(this.auth).subscribe((user: User | null) => {
+            // Una sesión anónima NO es un login: sólo identifica al dispositivo
+            // mientras se contesta la encuesta. No debe habilitar el juego.
+            if (user?.isAnonymous) {
+                this.isAnonymousSession.set(true);
+                this.isAuthenticated.set(false);
+                this.currentUser.set(null);
+                return;
+            }
+
+            this.isAnonymousSession.set(false);
+
             if (user) {
                 this.updateSignalsFromFirebase(user);
             } else {
@@ -86,6 +105,52 @@ export class FirebaseAuthService {
             uid: userData.uid
         });
         this.isAuthenticated.set(true);
+    }
+
+    // --- Sesión anónima e ID token (para la encuesta) ------------------------
+
+    /**
+     * Crea una sesión anónima de Firebase para poder identificar el dispositivo
+     * sin pedirle ningún dato al usuario. No da acceso al juego.
+     *
+     * Requiere que el proveedor "Anónimo" esté habilitado en Firebase Console.
+     * Si no lo está, no rompe nada: devuelve null y la encuesta se identifica
+     * con el deviceId del navegador.
+     */
+    async iniciarSesionAnonima(): Promise<string | null> {
+        try {
+            const actual = this.auth.currentUser;
+
+            // Si ya hay una sesión real, no se toca nada.
+            if (actual && !actual.isAnonymous) return null;
+
+            // Si ya hay una sesión anónima, se reutiliza la misma.
+            if (actual?.isAnonymous) return actual.uid;
+
+            const credencial = await signInAnonymously(this.auth);
+            console.log('🔐 Sesión anónima creada:', credencial.user.uid);
+            return credencial.user.uid;
+        } catch (error) {
+            console.warn('🔐 No se pudo crear la sesión anónima (¿está habilitado el proveedor Anonymous en Firebase Console?):', error);
+            return null;
+        }
+    }
+
+    /** ¿La sesión actual de Firebase es anónima? */
+    esSesionAnonima(): boolean {
+        return this.auth.currentUser?.isAnonymous === true;
+    }
+
+    /** ID token del usuario actual, o null si no hay sesión. */
+    async obtenerIdToken(): Promise<string | null> {
+        try {
+            const usuario = this.auth.currentUser;
+            if (!usuario) return null;
+            return await usuario.getIdToken();
+        } catch (error) {
+            console.warn('🔐 No se pudo obtener el ID token:', error);
+            return null;
+        }
     }
 
     async login(credentials: LoginCredentials): Promise<boolean> {
