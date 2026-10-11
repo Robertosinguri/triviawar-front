@@ -215,6 +215,12 @@
           @if (mensajePwa()) {
             <div class="login-pwa-message">{{ mensajePwa() }}</div>
           }
+
+          @if (puedeAbrirEnChrome()) {
+            <button type="button" class="login-chrome-btn" (click)="abrirEnChrome()">
+              🌐 Abrir en Chrome e instalar
+            </button>
+          }
         </div>
       }
       

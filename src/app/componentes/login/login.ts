@@ -19,14 +19,29 @@ export class Login {
 
   protected readonly mensajePwa = signal('');
 
+  /** Mostrar el botón "Abrir en Chrome" (Firefox en Android). */
+  protected readonly puedeAbrirEnChrome = this.pwaInstallService.puedeAbrirEnChrome;
+
+  protected abrirEnChrome(): void {
+    this.pwaInstallService.abrirEnChrome();
+  }
+
   protected async instalarPwa(): Promise<void> {
-    const mensaje = await this.pwaInstallService.install();
-    this.mensajePwa.set(mensaje);
-    
-    if (mensaje) {
-      setTimeout(() => {
-        this.mensajePwa.set('');
-      }, 5000);
+    this.mensajePwa.set('');
+
+    try {
+      const mensaje = await this.pwaInstallService.install();
+      this.mensajePwa.set(mensaje);
+
+      if (mensaje) {
+        // Se deja visible más tiempo porque las instrucciones manuales son más largas.
+        setTimeout(() => {
+          this.mensajePwa.set('');
+        }, 9000);
+      }
+    } catch (error) {
+      console.error('📲 Error al intentar instalar la PWA:', error);
+      this.mensajePwa.set('😕 No se pudo iniciar la instalación. Probá desde el menú del navegador.');
     }
   }
 
