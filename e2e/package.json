@@ -1,0 +1,19 @@
+{
+  "name": "triviawar-e2e",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Pruebas de caja negra (API/WebSocket + E2E de UI) para TriviaWar",
+  "scripts": {
+    "test": "playwright test",
+    "test:api": "playwright test api",
+    "test:ui": "playwright test ui",
+    "test:headed": "playwright test ui --headed",
+    "report": "playwright show-report report"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.64.0",
+    "@types/node": "^26.6.5",
+    "socket.io-client": "^4.8.4",
+    "typescript": "^7.0.2"
+  }
+}
