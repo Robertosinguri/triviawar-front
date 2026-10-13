@@ -32,6 +32,11 @@ export class SocketService {
         this.socket.emit('start_game', { roomCode });
     }
 
+    // Mantiene viva la sala mientras el jugador sigue en el lobby
+    heartbeat(roomCode: string) {
+        this.socket.emit('heartbeat', { roomCode });
+    }
+
     // Oyentes (Servidor -> Cliente)
     onRoomCreated(): Observable<any> {
         return this.socket.fromEvent('room_created');

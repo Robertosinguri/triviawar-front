@@ -33,7 +33,7 @@
       <!-- Lista de Jugadores -->
       <div
         style="background: rgba(255,255,255,0.1); border-radius: 10px; padding: 20px; margin: 0 auto 2rem; max-width: 600px;">
-        <h3 style="color: #01BA9A; margin-bottom: 15px;">👥 Jugadores ({{jugadores.length}}/{{maxJugadores}})</h3>
+        <h3 style="color: #01BA9A; margin-bottom: 15px;">👥 Jugadores ({{jugadores.length}}/{{maxJugadores || '?'}})</h3>
 
         @for (jugador of jugadores; track jugador.nombre) {
         <div
@@ -66,7 +66,7 @@
 
       <!-- Estado del Juego -->
       <div style="text-align: center;">
-        @if (!todosListos() || jugadores.length < maxJugadores) {
+        @if (maxJugadores === 0 || !todosListos() || jugadores.length < maxJugadores) {
         <p style="color: #E6BD00; font-size: 1.1rem; margin: 0;">
           ⏳ Esperando que todos los jugadores se unan y estén listos...
         </p>
