@@ -13,6 +13,7 @@ interface PreguntaArena {
   pregunta: string;
   opciones: string[];
   respuestaCorrecta: number;
+  respuestaCorrectaTexto?: string;
   tematica: string;
   dificultad: string;
   aportadoPor?: string;
@@ -51,6 +52,9 @@ export class ArenaComponent implements OnInit, OnDestroy {
   respuestaSeleccionada: number | null = null;
   mostrarRespuesta: boolean = false;
   respuestaCorrecta: boolean = false;
+  // Se activa si la pregunta trae datos incoherentes (p. ej. la respuesta correcta
+  // no apunta a ninguna opción real): en ese caso no se afirma ninguna respuesta.
+  preguntaInvalida: boolean = false;
 
   rondaActual: number = 1;
   mostrarIntermedio: boolean = false;
@@ -209,6 +213,7 @@ export class ArenaComponent implements OnInit, OnDestroy {
       this.respuestaSeleccionada = null;
       this.mostrarRespuesta = false;
       this.respuestaCorrecta = false;
+      this.preguntaInvalida = false;
       this.tiempoRestante = 30;
     }
   }
@@ -251,7 +256,25 @@ export class ArenaComponent implements OnInit, OnDestroy {
       this.limpiarTimer();
       this.mostrarRespuesta = true;
 
-      if (this.respuestaSeleccionada === this.preguntaActualObj.respuestaCorrecta) {
+      const opciones = this.preguntaActualObj.opciones || [];
+      const indice = this.preguntaActualObj.respuestaCorrecta;
+      const indiceValido = Number.isInteger(indice) &&
+        indice >= 0 && indice < opciones.length &&
+        typeof opciones[indice] === 'string' && opciones[indice].trim() !== '';
+
+      if (!indiceValido) {
+        // GUARD: nunca afirmamos una respuesta correcta que no existe. Si esto
+        // aparece, el dato vino mal desde la generación con IA (ver logs del backend).
+        console.warn('[ARENA] Pregunta con respuesta correcta inválida; no se otorgan puntos ni se afirma una respuesta.',
+          JSON.stringify(this.preguntaActualObj));
+        this.preguntaInvalida = true;
+        this.respuestaCorrecta = false;
+        return;
+      }
+
+      this.preguntaInvalida = false;
+
+      if (this.respuestaSeleccionada === indice) {
         this.respuestaCorrecta = true;
         this.correctasCount++;
         

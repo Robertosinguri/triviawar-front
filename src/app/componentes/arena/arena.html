@@ -117,6 +117,13 @@
 
         @if (mostrarRespuesta) {
         <div class="answer-feedback">
+          @if (preguntaInvalida) {
+          <!-- Datos incoherentes: no afirmamos una respuesta correcta -->
+          <div class="feedback-content arena-feedback">
+            <h3>⚠️ Respuesta no disponible</h3>
+            <p>Esta pregunta llegó con datos incompletos, así que no se otorgan puntos.</p>
+          </div>
+          } @else {
           <div class="feedback-content arena-feedback" [class.correct]="respuestaCorrecta"
             [class.incorrect]="!respuestaCorrecta">
             <h3>{{respuestaCorrecta ? '¡Correcto! 🎯' : 'Incorrecto ❌'}}</h3>
@@ -127,6 +134,7 @@
             </p>
             }
           </div>
+          }
 
           <button class="next-btn arena-next" (click)="siguientePregunta()">
             {{esUltimaPregunta() ? '🏆 Ver Resultados' : '➡️ Siguiente Pregunta'}}
