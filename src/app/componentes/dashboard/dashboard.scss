@@ -615,6 +615,41 @@
   }
 }
 
+// ── Fondos decorativos de las cards ─────────────────────────────────────────
+// La imagen va DETRÁS del contenido y atenuada para que acompañe sin ganar
+// protagonismo. Para calibrar cada una:
+//   --<card>-bg-opacity  : intensidad (0 = invisible, 1 = imagen a full)
+//   background-position  : encuadre de la imagen (cover recorta los bordes)
+//   $opacidad            : valor por defecto de esa intensidad
+@mixin fondo-decorativo($imagen, $variable, $posicion: center, $opacidad: 0.18) {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate; // deja el ::before por debajo del texto y del botón
+
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background-image: url($imagen);
+    background-size: cover;
+    background-position: $posicion;
+    background-repeat: no-repeat;
+    opacity: var(#{$variable}, #{$opacidad});
+    pointer-events: none; // no bloquea el click de los botones
+  }
+}
+
+.option-card.create-room {
+  @include fondo-decorativo('/crear-sala-bg.webp', '--crear-sala-bg-opacity', center 45%);
+}
+
+// La ilustración de los gatos tiene fondo claro, así que pide menos intensidad
+// que la de Crear Sala para no "lavar" la card.
+.option-card.training-room {
+  @include fondo-decorativo('/entrenamiento-bg.webp', '--entrenamiento-bg-opacity', center 40%, 0.12);
+}
+
 .primary-btn {
   border: none;
   border-radius: 25px;
