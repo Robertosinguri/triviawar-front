@@ -226,19 +226,26 @@ const LAYOUT_CITA = {
 /* ═════════════════════════ Cálculos ═════════════════════════ */
 
 /**
- * Distribución de cada pregunta.
+ * Distribución de cada pregunta, sobre la muestra válida.
  *
  * Se calcula acá (y no se recibe ya armado) para que el informe sea autónomo:
  * recibe la misma respuesta cruda del backend que usa el panel y llega a los
  * mismos números por su cuenta.
+ *
+ * La opción de exclusión (la marcada con `excluye`) NO se lista: quien la elige
+ * queda fuera de la muestra y por definición nunca suma dentro de este segmento.
+ * Su conteo se ve en la sección "Población total".
  */
 export const contarBloques = (datos: PanelEstadisticas): BloquePregunta[] =>
   PREGUNTAS.map((pregunta) => {
     const conteo = datos.distribuciones[pregunta.id] || {};
     const total = Object.values(conteo).reduce((suma, cantidad) => suma + cantidad, 0);
-    const conocidas = new Set(pregunta.opciones.map((opcion) => opcion.valor));
 
-    const opciones: OpcionContada[] = pregunta.opciones.map((opcion) => {
+    // Solo las opciones que pueden pertenecer a la muestra válida.
+    const opcionesValidas = pregunta.opciones.filter((opcion) => !opcion.excluye);
+    const conocidas = new Set(opcionesValidas.map((opcion) => opcion.valor));
+
+    const opciones: OpcionContada[] = opcionesValidas.map((opcion) => {
       const cantidad = conteo[opcion.valor] || 0;
       return { valor: opcion.valor, cantidad, porcentaje: porcentaje(cantidad, total) };
     });
@@ -427,7 +434,7 @@ const bloqueOrigen = (datos: PanelEstadisticas): Nodo[] => {
 };
 
 const bloqueSintesis = (datos: PanelEstadisticas, bloques: BloquePregunta[]): Nodo[] => {
-  const nodos: Nodo[] = [tituloSeccion('2. Síntesis de resultados')];
+  const nodos: Nodo[] = [tituloSeccion('3. Síntesis de resultados')];
 
   if (!datos.muestra.valida) {
     nodos.push({
@@ -441,15 +448,27 @@ const bloqueSintesis = (datos: PanelEstadisticas, bloques: BloquePregunta[]): No
   }
 
   const buscar = (id: string): BloquePregunta | null => bloques.find((bloque) => bloque.id === id) ?? null;
+
+  /** La primera opción: es la que define el "Sí, totalmente" de intención de uso. */
   const primero = (id: string): { opcion: OpcionContada | null; total: number } => {
     const bloque = buscar(id);
     return { opcion: bloque?.opciones[0] ?? null, total: bloque?.total ?? 0 };
   };
 
+  /** La opción más elegida: para no afirmar "mayoritario" sobre la que no lo es. */
+  const mayor = (id: string): { opcion: OpcionContada | null; total: number } => {
+    const bloque = buscar(id);
+    const opcion =
+      bloque && bloque.opciones.length
+        ? bloque.opciones.reduce((maximo, actual) => (actual.cantidad > maximo.cantidad ? actual : maximo))
+        : null;
+    return { opcion, total: bloque?.total ?? 0 };
+  };
+
   const intencion = primero(PREGUNTA_INTENCION);
-  const nivel = primero('nivelEducativo');
-  const tradicional = primero('experienciaTradicional');
-  const habito = primero('comoAprende');
+  const nivel = mayor('nivelEducativo');
+  const tradicional = mayor('experienciaTradicional');
+  const habito = mayor('comoAprende');
 
   const puntos: string[] = [];
 
@@ -498,9 +517,9 @@ const bloqueSintesis = (datos: PanelEstadisticas, bloques: BloquePregunta[]): No
 
 const bloqueResultados = (bloques: BloquePregunta[]): Nodo[] => {
   const nodos: Nodo[] = [
-    tituloSeccion('3. Resultados por pregunta'),
+    tituloSeccion('4. Resultados por pregunta (muestra válida)'),
     parrafo(
-      'Cada pregunta se responde con una sola opción, así que las respuestas de cada cuadro suman el 100% de su base. Las barras son proporcionales al porcentaje.'
+      'Todos los cuadros de esta sección se calculan sólo sobre la muestra válida: las encuestas completas. Cada pregunta se responde con una sola opción, así que las respuestas de cada cuadro suman el 100% de esa base. La opción que corta el cuestionario no se lista acá: quien la eligió quedó fuera de la muestra y está contado en la población total (sección 2).'
     )
   ];
 
@@ -515,8 +534,8 @@ const bloqueResultados = (bloques: BloquePregunta[]): Nodo[] => {
 
     nodos.push({
       text: bloque.total
-        ? `Base: ${plural(bloque.total, 'respuesta', 'respuestas')} (100%)`
-        : 'Base: sin respuestas',
+        ? `Base: ${plural(bloque.total, 'respuesta válida', 'respuestas válidas')} (100% de la muestra válida)`
+        : 'Base: sin respuestas en la muestra válida',
       fontSize: 7.5,
       color: COLOR.suave,
       margin: [0, 2, 0, 5]
@@ -603,7 +622,7 @@ const bloqueCalidad = (datos: PanelEstadisticas): Nodo[] => {
   ];
 
   return [
-    tituloSeccion('4. Identidad, calidad y dispositivo'),
+    tituloSeccion('5. Identidad, calidad y dispositivo'),
     parrafo(
       'Sólo las encuestas completas cuentan para los porcentajes de identidad y dispositivo: son la muestra válida del informe.'
     ),
@@ -621,15 +640,10 @@ const bloqueCalidad = (datos: PanelEstadisticas): Nodo[] => {
   ];
 };
 
-const bloqueEvolucion = (datos: PanelEstadisticas): Nodo[] => {
-  const nodos: Nodo[] = [
-    tituloSeccion('5. Evolución de la captura'),
-    parrafo('Respuestas recibidas por día desde el inicio del relevamiento hasta el corte.')
-  ];
-
+/** Tabla de respuestas por día. Cuenta todos los registros: es la población total. */
+const tablaEvolucion = (datos: PanelEstadisticas): Nodo[] => {
   if (!datos.porDia.length) {
-    nodos.push({ text: 'Sin registros todavía.', fontSize: 8.5, italics: true, color: COLOR.suave });
-    return nodos;
+    return [{ text: 'Sin registros todavía.', fontSize: 8.5, italics: true, color: COLOR.suave }];
   }
 
   const maximo = Math.max(1, ...datos.porDia.map((dia) => dia.total));
@@ -645,12 +659,125 @@ const bloqueEvolucion = (datos: PanelEstadisticas): Nodo[] => {
     ]);
   }
 
-  nodos.push({
-    table: { widths: ['*', 60, 60, ANCHO_BARRA + 8], body: filas },
-    layout: LAYOUT_TABLA
-  });
+  return [{ table: { widths: ['*', 60, 60, ANCHO_BARRA + 8], body: filas }, layout: LAYOUT_TABLA }];
+};
 
-  return nodos;
+/**
+ * Población total: el relevamiento completo, antes de analizar la muestra válida.
+ *
+ * Es el puente del informe: muestra de un vistazo que la muestra válida es sólo
+ * una porción del total y deja asentado que las secciones siguientes se calculan
+ * únicamente sobre esa porción. La evolución diaria va acá adentro porque cuenta
+ * todos los registros, no sólo las encuestas completas.
+ */
+const bloquePoblacion = (datos: PanelEstadisticas): Nodo[] => {
+  const total = datos.total;
+  const validas = datos.muestra.valida;
+
+  const partes: { concepto: string; nota: string; cantidad: number; valida: boolean }[] = [
+    {
+      concepto: 'Completadas (muestra válida)',
+      nota: 'Base de las secciones 3 y 4.',
+      cantidad: datos.estados.completada,
+      valida: true
+    },
+    {
+      concepto: 'En otro momento',
+      nota: 'No completaron; pueden volver a responder.',
+      cantidad: datos.estados.aplazada,
+      valida: false
+    },
+    {
+      concepto: 'Duplicadas',
+      nota: 'La misma cuenta ya había respondido.',
+      cantidad: datos.estados.duplicada,
+      valida: false
+    },
+    {
+      concepto: 'Descartadas (filtro de exclusión)',
+      nota: 'Eligieron la opción que corta el cuestionario.',
+      cantidad: datos.estados.excluida,
+      valida: false
+    }
+  ];
+
+  // El backend puede reportar un cajón "otros": si tiene datos, se muestra.
+  if (datos.estados.otros) {
+    partes.push({
+      concepto: 'Otros',
+      nota: 'Estado no reconocido.',
+      cantidad: datos.estados.otros,
+      valida: false
+    });
+  }
+
+  const filas: Nodo[][] = [
+    [th('Estado de la respuesta'), th('Registros', 'right'), th('% del total', 'right'), th('Distribución')]
+  ];
+
+  for (const parte of partes) {
+    filas.push([
+      {
+        stack: [
+          {
+            text: parte.concepto,
+            fontSize: 8.5,
+            bold: parte.valida,
+            color: parte.valida ? COLOR.cian : COLOR.tinta
+          },
+          { text: parte.nota, fontSize: 7, color: COLOR.suave }
+        ]
+      },
+      td(String(parte.cantidad), 'right'),
+      td(`${porcentaje(parte.cantidad, total)}%`, 'right'),
+      barra(parte.cantidad, total)
+    ]);
+  }
+
+  filas.push([
+    { text: 'Total de registros', fontSize: 8.5, bold: true, color: COLOR.tinta },
+    { text: String(total), fontSize: 8.5, bold: true, alignment: 'right' },
+    { text: total ? '100%' : '—', fontSize: 8.5, bold: true, alignment: 'right' },
+    { text: '' }
+  ]);
+
+  return [
+    tituloSeccion('2. Población total'),
+    parrafo(
+      `Todos los registros recibidos hasta el corte, sin filtrar: ${plural(total, 'registro', 'registros')} en total. La muestra válida es sólo una parte de esta población, no el total.`
+    ),
+    { table: { widths: ['*', 52, 52, ANCHO_BARRA + 8], body: filas }, layout: LAYOUT_TABLA },
+    {
+      table: {
+        widths: ['*'],
+        body: [
+          [
+            {
+              stack: [
+                {
+                  text: `De acá en adelante se analiza solo la muestra válida: ${plural(validas, 'encuesta completa', 'encuestas completas')} (${porcentajeTexto(validas, total)} de la población).`,
+                  fontSize: 9,
+                  bold: true,
+                  color: COLOR.tinta
+                },
+                {
+                  text: 'La opción que corta el cuestionario no se lista en los cuadros por pregunta: quien la eligió quedó fuera de la muestra y está contado en "Descartadas".',
+                  fontSize: 7.5,
+                  color: COLOR.suave,
+                  margin: [0, 2, 0, 0]
+                }
+              ]
+            }
+          ]
+        ]
+      },
+      layout: LAYOUT_TARJETA,
+      margin: [0, 8, 0, 0]
+    },
+    { text: 'Evolución de la captura', fontSize: 9, bold: true, color: COLOR.tinta, margin: [0, 14, 0, 4] },
+    parrafo('Respuestas recibidas por día desde el inicio del relevamiento hasta el corte. Cuenta todos los registros, también los que quedan fuera de la muestra válida.'),
+    ...tablaEvolucion(datos)
+  ];
 };
 
 const bloqueSabana = (datos: PanelEstadisticas): Nodo[] => {
@@ -875,10 +1002,10 @@ export const construirInforme = (datos: PanelEstadisticas): Nodo => {
     content: [
       ...bloqueCabecera(datos),
       ...bloqueOrigen(datos),
+      ...bloquePoblacion(datos),
       ...bloqueSintesis(datos, bloques),
       ...bloqueResultados(bloques),
       ...bloqueCalidad(datos),
-      ...bloqueEvolucion(datos),
       ...bloqueSabana(datos),
       ...bloqueComentarios(datos)
     ]

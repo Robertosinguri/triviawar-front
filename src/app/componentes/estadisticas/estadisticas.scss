@@ -323,6 +323,234 @@ $panel-superficie: rgba(255, 255, 255, 0.04);
   color: rgba($dark-text, 0.45);
 }
 
+// --- Población total ---------------------------------------------------------
+// El bloque que separa "todo lo que se recolectó" del "segmento que se analiza":
+// primero se ve la población completa y recién después la muestra válida.
+
+.panel-poblacion {
+  padding: 18px 20px;
+  margin-bottom: 26px;
+  background: $panel-superficie;
+  border: 1px solid $panel-borde;
+  border-radius: 14px;
+}
+
+.panel-poblacion-header {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 14px;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: 14px;
+}
+
+.panel-poblacion-total {
+  margin: 0;
+  font-size: 0.74rem;
+  color: rgba($dark-text, 0.55);
+
+  strong {
+    font-size: 1.05rem;
+    color: $panel-cian;
+  }
+}
+
+// La barra única: cada segmento ocupa su porción del total.
+.panel-poblacion-barra {
+  display: flex;
+  width: 100%;
+  height: 20px;
+  overflow: hidden;
+  background: rgba(0, 0, 0, 0.35);
+  border-radius: 999px;
+}
+
+.panel-poblacion-segmento {
+  display: block;
+  flex: 0 0 auto;
+  height: 100%;
+  min-width: 4px;
+  background: rgba(255, 255, 255, 0.22);
+  transition: width 0.5s ease;
+
+  // La muestra válida es la porción que se analiza: se pinta fuerte.
+  &--completada {
+    background: linear-gradient(135deg, $panel-aqua, $panel-cian);
+    box-shadow: 0 0 12px rgba($panel-aqua, 0.5);
+  }
+
+  &--aplazada {
+    background: rgba($panel-amarillo, 0.75);
+  }
+
+  &--duplicada {
+    background: rgba($panel-magenta, 0.75);
+  }
+
+  // Una sola respuesta: se pinta como un gris claro bien visible para que no se
+  // lea como "espacio vacío" de la barra.
+  &--excluida {
+    background: rgba(203, 213, 225, 0.9);
+  }
+
+  &--otros {
+    background: rgba(255, 255, 255, 0.35);
+  }
+}
+
+.panel-poblacion-leyenda {
+  display: grid;
+  gap: 8px;
+  margin: 14px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.panel-poblacion-fila {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  padding: 8px 11px;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid transparent;
+  border-radius: 10px;
+
+  &--valida {
+    background: rgba($panel-aqua, 0.09);
+    border-color: rgba($panel-aqua, 0.35);
+  }
+}
+
+.panel-poblacion-punto {
+  flex: 0 0 auto;
+  width: 11px;
+  height: 11px;
+  background: rgba(255, 255, 255, 0.25);
+  border-radius: 3px;
+
+  &--completada {
+    background: linear-gradient(135deg, $panel-aqua, $panel-cian);
+  }
+
+  &--aplazada {
+    background: rgba($panel-amarillo, 0.75);
+  }
+
+  &--duplicada {
+    background: rgba($panel-magenta, 0.75);
+  }
+
+  &--excluida {
+    background: rgba(203, 213, 225, 0.9);
+  }
+
+  &--otros {
+    background: rgba(255, 255, 255, 0.2);
+  }
+}
+
+.panel-poblacion-fila-texto {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  min-width: 0;
+  font-size: 0.78rem;
+  color: rgba($dark-text, 0.9);
+
+  strong {
+    font-weight: 600;
+  }
+}
+
+.panel-poblacion-nota {
+  font-size: 0.66rem;
+  line-height: 1.4;
+  color: rgba($dark-text, 0.68);
+}
+
+.panel-poblacion-cifra {
+  display: flex;
+  flex: 0 0 auto;
+  flex-direction: column;
+  align-items: flex-end;
+  line-height: 1.15;
+
+  strong {
+    font-size: 1.05rem;
+    color: $panel-cian;
+  }
+}
+
+.panel-poblacion-fila--valida .panel-poblacion-cifra strong {
+  color: #6ee7c8;
+}
+
+.panel-poblacion-porcentaje {
+  font-size: 0.66rem;
+  color: rgba($dark-text, 0.45);
+}
+
+.panel-poblacion-puente {
+  margin: 14px 0 0;
+  padding: 12px 14px;
+  font-size: 0.76rem;
+  line-height: 1.5;
+  color: rgba($dark-text, 0.85);
+  background: rgba($panel-cian, 0.06);
+  border: 1px dashed rgba($panel-cian, 0.35);
+  border-radius: 10px;
+
+  strong {
+    color: $panel-cian;
+  }
+}
+
+// Divisor entre las dos poblaciones: acá empieza el análisis de la muestra válida.
+.panel-division {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  padding: 16px 20px;
+  margin: 4px 0 20px;
+  background: linear-gradient(135deg, rgba($panel-aqua, 0.14), rgba($panel-cian, 0.07));
+  border: 1px solid rgba($panel-aqua, 0.4);
+  border-radius: 16px;
+}
+
+.panel-division-numero {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  min-width: 60px;
+  height: 60px;
+  padding: 0 10px;
+  font-size: 1.7rem;
+  font-weight: 700;
+  color: $dark-bg;
+  background: linear-gradient(135deg, $panel-aqua, $panel-cian);
+  border-radius: 14px;
+}
+
+.panel-division-texto {
+  min-width: 0;
+}
+
+.panel-division-titulo {
+  margin: 0 0 4px;
+  font-size: 1.1rem;
+  letter-spacing: 0.02em;
+  color: #6ee7c8;
+}
+
+.panel-division-subtitulo {
+  margin: 0;
+  max-width: 70ch;
+  font-size: 0.74rem;
+  line-height: 1.5;
+  color: rgba($dark-text, 0.72);
+}
+
 // --- Intención de uso --------------------------------------------------------
 
 .panel-intencion {
@@ -924,6 +1152,21 @@ $panel-superficie: rgba(255, 255, 255, 0.04);
 
   .panel-dato-valor {
     font-size: 1.25rem;
+  }
+
+  .panel-poblacion {
+    padding: 14px 12px;
+  }
+
+  .panel-division {
+    align-items: flex-start;
+    padding: 14px;
+  }
+
+  .panel-division-numero {
+    min-width: 52px;
+    height: 52px;
+    font-size: 1.4rem;
   }
 
   .panel-sabana {

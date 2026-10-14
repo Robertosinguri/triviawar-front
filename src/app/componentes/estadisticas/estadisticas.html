@@ -115,6 +115,89 @@
       </article>
     </section>
 
+    <!-- ═══════════════ Bloque 1 · Población total ═══════════════ -->
+    <section class="panel-poblacion">
+      <header class="panel-poblacion-header">
+        <h2 class="panel-seccion-titulo">Población total</h2>
+        <p class="panel-poblacion-total">
+          <strong>{{ totalPoblacion() }}</strong> respuestas recolectadas
+        </p>
+      </header>
+
+      <div
+        class="panel-poblacion-barra"
+        role="img"
+        [attr.aria-label]="'Población total: ' + totalPoblacion() + ' respuestas'"
+      >
+        @for (parte of poblacionTotal(); track parte.clave) {
+          <span
+            [class]="'panel-poblacion-segmento panel-poblacion-segmento--' + parte.clave"
+            [style.width.%]="parte.porcentaje"
+            [title]="parte.etiqueta + ': ' + parte.cantidad + ' (' + parte.porcentaje + '%)'"
+          ></span>
+        }
+      </div>
+
+      <ul class="panel-poblacion-leyenda">
+        @for (parte of poblacionTotal(); track parte.clave) {
+          <li class="panel-poblacion-fila" [class.panel-poblacion-fila--valida]="parte.valida">
+            <span [class]="'panel-poblacion-punto panel-poblacion-punto--' + parte.clave"></span>
+            <span class="panel-poblacion-fila-texto">
+              <strong>{{ parte.etiqueta }}</strong>
+              <span class="panel-poblacion-nota">{{ parte.nota }}</span>
+            </span>
+            <span class="panel-poblacion-cifra">
+              <strong>{{ parte.cantidad }}</strong>
+              <span class="panel-poblacion-porcentaje">{{ parte.porcentaje }}%</span>
+            </span>
+          </li>
+        }
+      </ul>
+
+      <p class="panel-poblacion-puente">
+        De acá en adelante se analiza <strong>solo la muestra válida</strong>:
+        {{ datos.muestra.valida }} encuestas completas ({{ porcentajeValido() }}% de la población).
+      </p>
+    </section>
+
+    <!-- Evolución diaria, sobre toda la población recolectada -->
+    <section class="panel-evolucion">
+      <h2 class="panel-seccion-titulo">Evolución de la población total</h2>
+
+      @if (datos.porDia.length) {
+        <div class="panel-dias">
+          @for (dia of datos.porDia; track dia.fecha) {
+            <div class="panel-dia">
+              <span class="panel-dia-barra-contenedor">
+                <span
+                  class="panel-dia-barra"
+                  [style.height.%]="(dia.total / maximoPorDia()) * 100"
+                  [title]="dia.total + ' respuestas (' + dia.completadas + ' completas)'"
+                ></span>
+              </span>
+              <span class="panel-dia-total">{{ dia.total }}</span>
+              <span class="panel-dia-fecha">{{ dia.fecha }}</span>
+            </div>
+          }
+        </div>
+      } @else {
+        <p class="panel-vacio">Todavía no hay respuestas.</p>
+      }
+    </section>
+
+    <!-- ═══════════════ Bloque 2 · Muestra válida ═══════════════ -->
+    <div class="panel-division">
+      <span class="panel-division-numero">{{ datos.muestra.valida }}</span>
+      <div class="panel-division-texto">
+        <h2 class="panel-division-titulo">Muestra válida</h2>
+        <p class="panel-division-subtitulo">
+          Encuestas completas. Todo lo que sigue se calcula solo sobre este segmento
+          ({{ porcentajeValido() }}% de la población). La opción de exclusión no se lista acá:
+          quien la eligió quedó fuera de la muestra y se cuenta en “Descartadas”.
+        </p>
+      </div>
+    </div>
+
     <!-- Intención de uso -->
     @if (intencion(); as intencionUso) {
       <section class="panel-intencion">
@@ -156,7 +239,7 @@
           </header>
 
           <p class="panel-bloque-total">
-            {{ bloque.total }} {{ bloque.total === 1 ? 'respuesta' : 'respuestas' }}
+            Base: {{ bloque.total }} {{ bloque.total === 1 ? 'respuesta válida' : 'respuestas válidas' }}
           </p>
 
           @for (opcion of bloque.opciones; track opcion.valor) {
@@ -174,31 +257,6 @@
             </div>
           }
         </article>
-      }
-    </section>
-
-    <!-- Evolución diaria -->
-    <section class="panel-evolucion">
-      <h2 class="panel-seccion-titulo">Evolución de la muestra</h2>
-
-      @if (datos.porDia.length) {
-        <div class="panel-dias">
-          @for (dia of datos.porDia; track dia.fecha) {
-            <div class="panel-dia">
-              <span class="panel-dia-barra-contenedor">
-                <span
-                  class="panel-dia-barra"
-                  [style.height.%]="(dia.total / maximoPorDia()) * 100"
-                  [title]="dia.total + ' respuestas (' + dia.completadas + ' completas)'"
-                ></span>
-              </span>
-              <span class="panel-dia-total">{{ dia.total }}</span>
-              <span class="panel-dia-fecha">{{ dia.fecha }}</span>
-            </div>
-          }
-        </div>
-      } @else {
-        <p class="panel-vacio">Todavía no hay respuestas.</p>
       }
     </section>
 

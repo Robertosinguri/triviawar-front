@@ -13,6 +13,24 @@ const TAMANOS = [10, 25, 50];
 const PREGUNTA_INTENCION = 'sumariaLaApp';
 
 /**
+ * Una parte de la población total (un estado), lista para el gráfico global.
+ *
+ * El panel muestra DOS poblaciones bien separadas: primero la población total
+ * (todo lo recolectado) y después la muestra válida (solo las completas). Este
+ * tipo describe la primera.
+ */
+interface SegmentoPoblacion {
+  /** Estado del backend (`completada`, `aplazada`, ...). Se usa para el color. */
+  clave: string;
+  etiqueta: string;
+  nota: string;
+  cantidad: number;
+  porcentaje: number;
+  /** ¿Es la porción que después se analiza? Se resalta en el gráfico. */
+  valida: boolean;
+}
+
+/**
  * Panel de resultados de la encuesta.
  *
  * Es una página "oculta": no tiene ningún enlace en la aplicación y sólo entra
@@ -58,7 +76,17 @@ export class EstadisticasComponent {
 
   // --- Datos derivados ------------------------------------------------------
 
-  /** Los 4 bloques de preguntas con sus porcentajes ya calculados. */
+  /**
+   * Los bloques de preguntas con sus porcentajes ya calculados.
+   *
+   * Se calculan SOLO sobre la muestra válida (las encuestas completas): es el
+   * mismo denominador que usa el backend en `distribuciones`. Por eso cada
+   * bloque suma 100% sobre esa base, que se aclara en el encabezado del bloque.
+   *
+   * La opción de exclusión (la marcada con `excluye`) NO se lista acá: quien la
+   * elige queda fuera de la muestra, así que por definición nunca puede sumar
+   * dentro de este segmento. Su conteo se ve arriba, en "Población total".
+   */
   protected readonly bloques = computed<BloquePregunta[]>(() => {
     const datos = this.panel.datos();
     if (!datos) return [];
@@ -66,18 +94,22 @@ export class EstadisticasComponent {
     return PREGUNTAS.map((pregunta) => {
       const conteo = datos.distribuciones[pregunta.id] || {};
       const total = Object.values(conteo).reduce((suma, cantidad) => suma + cantidad, 0);
-      const conocidas = new Set(pregunta.opciones.map((opcion) => opcion.valor));
+
+      // Solo las opciones que pueden pertenecer a la muestra válida.
+      const opcionesValidas = pregunta.opciones.filter((opcion) => !opcion.excluye);
+      const conocidas = new Set(opcionesValidas.map((opcion) => opcion.valor));
 
       const calcular = (cantidad: number): number =>
         total ? Math.round((cantidad / total) * 1000) / 10 : 0;
 
-      const opciones: OpcionContada[] = pregunta.opciones.map((opcion) => {
+      const opciones: OpcionContada[] = opcionesValidas.map((opcion) => {
         const cantidad = conteo[opcion.valor] || 0;
         return { valor: opcion.valor, cantidad, porcentaje: calcular(cantidad) };
       });
 
       // Si algún día se cambia el texto de una opción, lo ya guardado no se pierde:
-      // se muestra igual, al final del bloque.
+      // se muestra igual, al final del bloque. (Un valor de la opción de exclusión
+      // no debería estar acá, pero si pasara se muestra en vez de ocultarlo.)
       for (const [valor, cantidad] of Object.entries(conteo)) {
         if (!conocidas.has(valor)) {
           opciones.push({ valor, cantidad, porcentaje: calcular(cantidad) });
@@ -86,6 +118,83 @@ export class EstadisticasComponent {
 
       return { id: pregunta.id, titulo: pregunta.titulo, total, opciones };
     });
+  });
+
+  // --- Población total ------------------------------------------------------
+
+  /** Cuántas respuestas se recolectaron en total, sin filtrar por estado. */
+  protected readonly totalPoblacion = computed(() => this.panel.datos()?.total ?? 0);
+
+  /** Qué porción de la población total es la muestra válida, en porcentaje. */
+  protected readonly porcentajeValido = computed(() => {
+    const total = this.totalPoblacion();
+    const validas = this.panel.datos()?.muestra.valida ?? 0;
+    return total ? Math.round((validas / total) * 1000) / 10 : 0;
+  });
+
+  /**
+   * Las partes de la población total, para el gráfico global de arriba.
+   *
+   * Son los mismos números que la ficha técnica, pero dibujados como una barra
+   * única: el objetivo es que se vea de un vistazo que la muestra válida es solo
+   * una porción del total, y que todo lo que viene después se calcula ahí.
+   */
+  protected readonly poblacionTotal = computed<SegmentoPoblacion[]>(() => {
+    const datos = this.panel.datos();
+    if (!datos) return [];
+
+    const partes: SegmentoPoblacion[] = [
+      {
+        clave: 'completada',
+        etiqueta: 'Completadas',
+        nota: 'Es la muestra válida: sobre estas se calcula todo lo que sigue.',
+        cantidad: datos.estados.completada,
+        valida: true,
+        porcentaje: 0
+      },
+      {
+        clave: 'aplazada',
+        etiqueta: 'En otro momento',
+        nota: 'Pueden volver a responder.',
+        cantidad: datos.estados.aplazada,
+        valida: false,
+        porcentaje: 0
+      },
+      {
+        clave: 'duplicada',
+        etiqueta: 'Duplicadas',
+        nota: 'La misma cuenta ya había respondido.',
+        cantidad: datos.estados.duplicada,
+        valida: false,
+        porcentaje: 0
+      },
+      {
+        clave: 'excluida',
+        etiqueta: 'Descartadas',
+        nota: 'Eligieron la opción de exclusión.',
+        cantidad: datos.estados.excluida,
+        valida: false,
+        porcentaje: 0
+      }
+    ];
+
+    // El backend puede reportar un cajón "otros": si tiene datos, se muestra.
+    if (datos.estados.otros) {
+      partes.push({
+        clave: 'otros',
+        etiqueta: 'Otros',
+        nota: 'Estado no reconocido.',
+        cantidad: datos.estados.otros,
+        valida: false,
+        porcentaje: 0
+      });
+    }
+
+    const total = this.totalPoblacion() || 1;
+    return partes.map((parte) => ({
+      ...parte,
+      porcentaje: Math.round((parte.cantidad / total) * 1000) / 10
+    }));
   });
 
   /** Intención de uso: el dato que después alimenta el SOM. */
