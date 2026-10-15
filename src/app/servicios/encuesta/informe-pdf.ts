@@ -79,6 +79,19 @@ const siNo = (valor: boolean): string => (valor ? 'Sí' : 'No');
 
 const oGuion = (valor: string | null | undefined): string => (valor && valor.trim() ? valor : '—');
 
+/** Zona de referencia por defecto si el panel no la informa. */
+const ZONA_HORARIA_POR_DEFECTO = 'America/Argentina/Buenos_Aires';
+
+/**
+ * Zona con la que se muestran las fechas del informe.
+ *
+ * Se fija al construir el documento (ver `construirInforme`) con la zona que
+ * informa el panel, para que la sábana, el PDF y el gráfico de días usen el mismo
+ * criterio. Si se usara la zona del navegador, un informe abierto desde otro país
+ * mostraría otro día.
+ */
+let zonaHorariaInforme = ZONA_HORARIA_POR_DEFECTO;
+
 const formatearFechaHora = (iso: string | null | undefined): string => {
   if (!iso) return '—';
 
@@ -86,12 +99,31 @@ const formatearFechaHora = (iso: string | null | undefined): string => {
   if (Number.isNaN(fecha.getTime())) return '—';
 
   return fecha.toLocaleString('es-AR', {
+    timeZone: zonaHorariaInforme,
     day: '2-digit',
     month: '2-digit',
     year: 'numeric',
     hour: '2-digit',
     minute: '2-digit'
   });
+};
+
+/** Fecha `AAAA-MM-DD` de un ISO en una zona dada (para el nombre del archivo). */
+const fechaEnZona = (iso: string | null | undefined, zona: string): string => {
+  const fecha = iso ? new Date(iso) : new Date();
+  const valida = Number.isNaN(fecha.getTime()) ? new Date() : fecha;
+
+  const partes: Record<string, string> = {};
+  for (const { type, value } of new Intl.DateTimeFormat('en-CA', {
+    timeZone: zona,
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit'
+  }).formatToParts(valida)) {
+    partes[type] = value;
+  }
+
+  return `${partes['year']}-${partes['month']}-${partes['day']}`;
 };
 
 /** La fecha viene como "AAAA-MM-DD": se muestra como "DD/MM" para la serie diaria. */
@@ -963,6 +995,10 @@ const bloqueComentarios = (datos: PanelEstadisticas): Nodo[] => {
  * incluidos: es de circulación interna y su sentido es la trazabilidad.
  */
 export const construirInforme = (datos: PanelEstadisticas): Nodo => {
+  // Fija la zona de referencia ANTES de armar los bloques: todos los formateadores
+  // de fecha del documento la leen de acá.
+  zonaHorariaInforme = datos.zonaHoraria || ZONA_HORARIA_POR_DEFECTO;
+
   const bloques = contarBloques(datos);
   const corte = formatearFechaHora(datos.generadoEn);
 
@@ -1012,9 +1048,10 @@ export const construirInforme = (datos: PanelEstadisticas): Nodo => {
   };
 };
 
-/** Nombre del archivo: incluye la fecha del corte. */
+/** Nombre del archivo: incluye la fecha del corte, en la zona de referencia. */
 export const nombreArchivoInforme = (datos: PanelEstadisticas): string => {
-  const fecha = (datos.generadoEn || new Date().toISOString()).slice(0, 10);
+  const zona = datos.zonaHoraria || ZONA_HORARIA_POR_DEFECTO;
+  const fecha = fechaEnZona(datos.generadoEn, zona);
   return `triviawar-informe-encuesta-${fecha}.pdf`;
 };
 

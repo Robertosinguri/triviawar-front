@@ -9,6 +9,9 @@ import { descargarInforme, nombreArchivoInforme } from '../../servicios/encuesta
 /** Tamaños de página disponibles para la sábana. */
 const TAMANOS = [10, 25, 50];
 
+/** Zona de referencia por defecto si el panel no la informa. */
+const ZONA_HORARIA_POR_DEFECTO = 'America/Argentina/Buenos_Aires';
+
 /** Pregunta de la que sale el número de intención de uso. */
 const PREGUNTA_INTENCION = 'sumariaLaApp';
 
@@ -349,6 +352,11 @@ export class EstadisticasComponent {
     }
   }
 
+  /**
+   * Formatea una fecha/hora con la zona de referencia del estudio, no con la del
+   * navegador: si no, el día que se ve acá no coincidiría con la barra del gráfico
+   * (que el backend agrupa en esa misma zona).
+   */
   protected formatearFecha(iso: string | null): string {
     if (!iso) return 'Sin fecha';
 
@@ -356,12 +364,30 @@ export class EstadisticasComponent {
     if (Number.isNaN(fecha.getTime())) return 'Sin fecha';
 
     return fecha.toLocaleString('es-AR', {
+      timeZone: this.panel.datos()?.zonaHoraria || ZONA_HORARIA_POR_DEFECTO,
       day: '2-digit',
       month: '2-digit',
       year: '2-digit',
       hour: '2-digit',
       minute: '2-digit'
     });
+  }
+
+  /** Fecha AAAA-MM-DD de hoy en la zona de referencia (para el nombre del CSV). */
+  private fechaDeHoy(): string {
+    const zona = this.panel.datos()?.zonaHoraria || ZONA_HORARIA_POR_DEFECTO;
+    const partes: Record<string, string> = {};
+
+    for (const { type, value } of new Intl.DateTimeFormat('en-CA', {
+      timeZone: zona,
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit'
+    }).formatToParts(new Date())) {
+      partes[type] = value;
+    }
+
+    return `${partes['year']}-${partes['month']}-${partes['day']}`;
   }
 
   /** "1 a 10 de 24" para la barra de paginado. */
@@ -427,7 +453,7 @@ export class EstadisticasComponent {
     const enlace = document.createElement('a');
 
     enlace.href = url;
-    enlace.download = `triviawar-encuesta-${new Date().toISOString().slice(0, 10)}.csv`;
+    enlace.download = `triviawar-encuesta-${this.fechaDeHoy()}.csv`;
     enlace.click();
 
     URL.revokeObjectURL(url);

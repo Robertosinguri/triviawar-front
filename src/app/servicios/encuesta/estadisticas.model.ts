@@ -42,6 +42,12 @@ export interface FilaEncuesta {
 /** Panel completo: ficha técnica, distribuciones, contexto y sábana. */
 export interface PanelEstadisticas {
   generadoEn: string;
+  /**
+   * Zona horaria de referencia del estudio (ej. `America/Argentina/Buenos_Aires`).
+   * El backend agrupa los días del panel con este criterio: el front la usa para
+   * mostrar las horas igual (y no con la zona del navegador).
+   */
+  zonaHoraria: string;
   /** Versión del cuestionario vigente al momento del corte. */
   versionCuestionario: string;
   /** Cuántos registros hay de cada versión (para detectar mezclas). */
