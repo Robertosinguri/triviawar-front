@@ -224,6 +224,18 @@ const LAYOUT_TABLA = {
   paddingBottom: (): number => 3.5
 };
 
+/** Layout específico para la sábana: 10 columnas en A4 requieren padding compacto para evitar desbordes */
+const LAYOUT_SABANA = {
+  hLineWidth: (indice: number, nodo: { table: { body: unknown[] } }): number =>
+    indice === 0 || indice === 1 || indice === nodo.table.body.length ? 0.8 : 0.35,
+  vLineWidth: (): number => 0,
+  hLineColor: (indice: number): string => (indice === 0 || indice === 1 ? COLOR.cian : COLOR.linea),
+  paddingLeft: (): number => 3,
+  paddingRight: (): number => 3,
+  paddingTop: (): number => 2.5,
+  paddingBottom: (): number => 2.5
+};
+
 const LAYOUT_FICHA = {
   hLineWidth: (): number => 0.35,
   vLineWidth: (): number => 0,
@@ -497,16 +509,23 @@ const bloqueSintesis = (datos: PanelEstadisticas, bloques: BloquePregunta[]): No
     return { opcion, total: bloque?.total ?? 0 };
   };
 
-  const intencion = primero(PREGUNTA_INTENCION);
+  const bloqueIntencion = buscar(PREGUNTA_INTENCION);
+  const siTotalmente = bloqueIntencion?.opciones[0] ?? null;
+  const talVez = bloqueIntencion?.opciones[1] ?? null;
+  const noUso = bloqueIntencion?.opciones[2] ?? null;
+  const totalIntencion = bloqueIntencion?.total ?? 0;
+  const positivoTotal = (siTotalmente?.cantidad ?? 0) + (talVez?.cantidad ?? 0);
+  const positivoPct = totalIntencion ? porcentajeTexto(positivoTotal, totalIntencion) : '0%';
+
   const nivel = mayor('nivelEducativo');
   const tradicional = mayor('experienciaTradicional');
   const habito = mayor('comoAprende');
 
   const puntos: string[] = [];
 
-  if (intencion.opcion) {
+  if (bloqueIntencion && siTotalmente) {
     puntos.push(
-      `Intención de uso: ${porcentajeTexto(intencion.opcion.cantidad, intencion.total)} de la muestra (${intencion.opcion.cantidad} de ${intencion.total}) respondió "${intencion.opcion.valor}" Es el dato que alimenta la proyección de mercado.`
+      `Intención de uso: ${positivoPct} de la muestra (${positivoTotal} de ${totalIntencion}) muestra intención positiva o condicional de sumar la app (${porcentajeTexto(siTotalmente.cantidad, totalIntencion)} "Sí, totalmente" y ${talVez ? porcentajeTexto(talVez.cantidad, totalIntencion) : '0%'} "Tal vez - depende de los temas"). El rechazo estricto es de solo ${noUso ? porcentajeTexto(noUso.cantidad, totalIntencion) : '0%'}.`
     );
   }
 
@@ -593,6 +612,27 @@ const bloqueResultados = (bloques: BloquePregunta[]): Nodo[] => {
       table: { widths: ['*', 44, 34, ANCHO_BARRA + 8], body: filas },
       layout: LAYOUT_TABLA
     });
+
+    if (bloque.id === PREGUNTA_INTENCION) {
+      const si = bloque.opciones[0];
+      const talVez = bloque.opciones[1];
+      const no = bloque.opciones[2];
+      const favorables = (si?.cantidad ?? 0) + (talVez?.cantidad ?? 0);
+
+      nodos.push({
+        text:
+          `Nota de análisis: sobre las ${plural(bloque.total, 'respuesta válida', 'respuestas válidas')} de la muestra, ` +
+          `${porcentajeTexto(si?.cantidad ?? 0, bloque.total)} eligió "Sí, totalmente" y ` +
+          `${porcentajeTexto(talVez?.cantidad ?? 0, bloque.total)} "Tal vez - depende de los temas". ` +
+          `La intención favorable (SOM) suma ${porcentajeTexto(favorables, bloque.total)}, ` +
+          `y el rechazo estricto queda en ${porcentajeTexto(no?.cantidad ?? 0, bloque.total)} ` +
+          `(${no?.cantidad ?? 0} de ${bloque.total}).`,
+        fontSize: 7.8,
+        italics: true,
+        color: COLOR.suave,
+        margin: [0, 4, 0, 6]
+      });
+    }
   });
 
   return nodos;
@@ -851,6 +891,7 @@ const bloqueSabana = (datos: PanelEstadisticas): Nodo[] => {
   });
 
   const encabezado: Nodo[] = [
+    th('#', 'center'),
     th('Fecha y hora'),
     th('Estado'),
     th('Origen'),
@@ -881,11 +922,22 @@ const bloqueSabana = (datos: PanelEstadisticas): Nodo[] => {
     return 'Anónima';
   };
 
-  for (const fila of datos.listado) {
+  const totalRegistros = datos.listado.length;
+
+  datos.listado.forEach((fila, idx) => {
+    const numFila = idx + 1;
+    const numFilaStr = '#' + String(numFila).padStart(totalRegistros >= 100 ? 3 : 2, '0');
+
     const celdas: Nodo[] = [
-      { text: formatearFechaHora(fila.fecha), fontSize: 7.5, color: COLOR.tinta },
-      { text: estadoTexto(fila.estado), fontSize: 7.5, color: COLOR.suave },
-      { text: origenTexto(fila), fontSize: 7.5, color: COLOR.suave }
+      {
+        text: numFilaStr,
+        fontSize: 7,
+        alignment: 'center',
+        color: COLOR.suave
+      },
+      { text: formatearFechaHora(fila.fecha), fontSize: 7, color: COLOR.tinta },
+      { text: estadoTexto(fila.estado), fontSize: 7, color: COLOR.suave },
+      { text: origenTexto(fila), fontSize: 7, color: COLOR.suave }
     ];
 
     PREGUNTAS.forEach((pregunta, indice) => {
@@ -895,7 +947,7 @@ const bloqueSabana = (datos: PanelEstadisticas): Nodo[] => {
 
       celdas.push({
         text: codigo,
-        fontSize: 7.5,
+        fontSize: 7,
         alignment: 'center',
         color: sinResponder ? COLOR.linea : COLOR.tinta,
         bold: !sinResponder,
@@ -904,26 +956,25 @@ const bloqueSabana = (datos: PanelEstadisticas): Nodo[] => {
     });
 
     celdas.push(
-      { text: oGuion(fila.email), fontSize: 7.5, color: fila.emailVerificado ? COLOR.tinta : COLOR.suave },
-      { text: oGuion(fila.nombre), fontSize: 7.5, color: COLOR.suave }
+      { text: oGuion(fila.email), fontSize: 7, color: fila.emailVerificado ? COLOR.tinta : COLOR.suave },
+      { text: oGuion(fila.nombre), fontSize: 7, color: COLOR.suave }
     );
 
     filas.push(celdas);
-  }
+  });
 
-  // Los anchos están medidos para que la tabla entre en el ancho de la página
-  // (A4 menos márgenes): si no, pdfmake comprime las columnas y recorta el
-  // correo y el nombre.
-  const anchos: (number | string)[] = [58, 46, 50, ...PREGUNTAS.map(() => 20), 150, 62];
+  // Los anchos están medidos para que la tabla entre holgadamente en el ancho imprimible
+  // de la página A4 (515 pt entre márgenes). Correo usa '*' para absorber el ancho restante.
+  const anchos: (number | string)[] = [18, 50, 38, 40, ...PREGUNTAS.map(() => 14), '*', 56];
 
   nodos.push({
     table: { widths: anchos, body: filas, dontBreakRows: true, headerRows: 1 },
-    layout: LAYOUT_TABLA,
-    fontSize: 7.5
+    layout: LAYOUT_SABANA,
+    fontSize: 7
   });
 
   nodos.push({
-    text: 'Las respuestas no se pueden modificar una vez enviadas: si un registro muestra un intento de cambio (ver la columna Control del panel), el dato que se conserva es el primero.',
+    text: 'En la sábana, la columna «#» identifica cada registro de la muestra para su correlación con las citas del Anexo B (Comentarios).',
     fontSize: 7.5,
     italics: true,
     color: COLOR.suave,
@@ -937,6 +988,11 @@ const bloqueComentarios = (datos: PanelEstadisticas): Nodo[] => {
   const conComentario = datos.listado.filter((fila) => fila.comentario.trim().length > 0);
   const nivelId = PREGUNTAS[0]?.id ?? 'nivelEducativo';
 
+  // Mapa id de fila -> número secuencial en la sábana
+  const mapaIndice = new Map<string, number>();
+  datos.listado.forEach((fila, idx) => mapaIndice.set(fila.id, idx + 1));
+  const totalRegistros = datos.listado.length;
+
   const nodos: Nodo[] = [
     tituloSeccion(`7. Anexo B. Comentarios (${conComentario.length})`),
     parrafo(PREGUNTA_COMENTARIO.titulo)
@@ -947,11 +1003,13 @@ const bloqueComentarios = (datos: PanelEstadisticas): Nodo[] => {
     return nodos;
   }
 
-  for (const fila of conComentario) {
+  conComentario.forEach((fila, idxComentario) => {
+    const numFila = mapaIndice.get(fila.id) ?? (idxComentario + 1);
+    const numFilaStr = '#' + String(numFila).padStart(totalRegistros >= 100 ? 3 : 2, '0');
+    const numComentarioStr = `C-${String(idxComentario + 1).padStart(2, '0')}`;
+
     const partes = [oGuion(fila.respuestas[nivelId]), formatearFechaHora(fila.fecha)];
 
-    // El informe siempre lleva el contacto; si el correo no está verificado se
-    // aclara, para no dar por buena la autoría del comentario.
     if (fila.email) {
       partes.push(fila.emailVerificado ? fila.email : `${fila.email} (sin verificar)`);
     }
@@ -963,8 +1021,16 @@ const bloqueComentarios = (datos: PanelEstadisticas): Nodo[] => {
           [
             {
               stack: [
+                {
+                  text: [
+                    { text: `${numComentarioStr} `, bold: true, color: COLOR.cian },
+                    { text: `· Registro ${numFilaStr} en sábana`, color: COLOR.suave, fontSize: 8 }
+                  ],
+                  fontSize: 8.5,
+                  margin: [0, 0, 0, 3]
+                },
                 { text: `“${fila.comentario.trim()}”`, fontSize: 9, color: COLOR.tinta, lineHeight: 1.3 },
-                { text: partes.join('  ·  '), fontSize: 7.5, color: COLOR.suave, margin: [0, 3, 0, 0] }
+                { text: partes.join('  ·  '), fontSize: 7.5, color: COLOR.suave, margin: [0, 4, 0, 0] }
               ]
             }
           ]
@@ -973,10 +1039,10 @@ const bloqueComentarios = (datos: PanelEstadisticas): Nodo[] => {
       layout: LAYOUT_CITA,
       margin: [0, 0, 0, 7]
     });
-  }
+  });
 
   nodos.push({
-    text: `Comentarios escritos: ${conComentario.length} de ${datos.muestra.valida} encuestas completas. Los comentarios se reproducen textualmente, sin corregir ni clasificar.`,
+    text: `Comentarios escritos: ${conComentario.length} de ${datos.muestra.valida} encuestas completas. Cada cita referencia el número de registro (#) correspondiente en la sábana (Anexo A).`,
     fontSize: 7.5,
     italics: true,
     color: COLOR.suave,

@@ -199,36 +199,176 @@
     </div>
 
     <!-- Intención de uso -->
-    @if (intencion(); as intencionUso) {
+    @if (intencionDeUso(); as intencionUso) {
       <section class="panel-intencion">
-        <div class="panel-donut">
-          <svg viewBox="0 0 100 100" aria-hidden="true">
-            <circle class="panel-donut-fondo" cx="50" cy="50" r="42"></circle>
-            <circle
-              class="panel-donut-valor"
-              cx="50"
-              cy="50"
-              r="42"
-              [attr.stroke-dasharray]="(intencionUso.porcentaje / 100 * 263.9) + ' 263.9'"
-            ></circle>
-          </svg>
-          <span class="panel-donut-texto">{{ intencionUso.porcentaje }}%</span>
+
+        <!-- Gráficos de intención: 1. Distribución 100% y 2. Adopción acumulada (SOM) -->
+        <div class="panel-intencion-graficos">
+          
+          <!-- Gráfico 1: El 100% (Anillo continuo multipartes) -->
+          <div class="panel-grafico-item">
+            <span class="panel-grafico-etiqueta">1. Distribución</span>
+            <div class="panel-donut">
+              <svg viewBox="0 0 100 100" aria-hidden="true">
+                <circle class="panel-donut-fondo" cx="50" cy="50" r="42"></circle>
+                <!-- Segmento Sí (Verde/Aqua) -->
+                <circle
+                  class="panel-donut-arco panel-donut-arco--si"
+                  cx="50" cy="50" r="42"
+                  [attr.stroke-dasharray]="intencionUso.lenSi + ' ' + intencionUso.c"
+                  [attr.stroke-dashoffset]="intencionUso.offsetSi"
+                ></circle>
+                <!-- Segmento Tal vez (Amarillo) -->
+                <circle
+                  class="panel-donut-arco panel-donut-arco--talvez"
+                  cx="50" cy="50" r="42"
+                  [attr.stroke-dasharray]="intencionUso.lenTalVez + ' ' + intencionUso.c"
+                  [attr.stroke-dashoffset]="intencionUso.offsetTalVez"
+                ></circle>
+                <!-- Segmento No (Gris) -->
+                <circle
+                  class="panel-donut-arco panel-donut-arco--no"
+                  cx="50" cy="50" r="42"
+                  [attr.stroke-dasharray]="intencionUso.lenNo + ' ' + intencionUso.c"
+                  [attr.stroke-dashoffset]="intencionUso.offsetNo"
+                ></circle>
+              </svg>
+              <div class="panel-donut-centro">
+                <span class="panel-donut-cifra">{{ intencionUso.total }}</span>
+                <span class="panel-donut-subcifra">100%</span>
+              </div>
+            </div>
+            <span class="panel-grafico-pie">Muestra total</span>
+          </div>
+
+          <!-- Conector de integración -->
+          <div class="panel-grafico-conector" aria-hidden="true">
+            <span class="panel-grafico-signo">➔</span>
+          </div>
+
+          <!-- Gráfico 2: Adopción potencial / SOM (93.5%) -->
+          <div class="panel-grafico-item">
+            <span class="panel-grafico-etiqueta">2. Adopción (SOM)</span>
+            <div class="panel-donut">
+              <svg viewBox="0 0 100 100" aria-hidden="true">
+                <circle class="panel-donut-fondo" cx="50" cy="50" r="42"></circle>
+                <!-- Segmento Sí -->
+                <circle
+                  class="panel-donut-arco panel-donut-arco--si"
+                  cx="50" cy="50" r="42"
+                  [attr.stroke-dasharray]="intencionUso.lenSi + ' ' + intencionUso.c"
+                  [attr.stroke-dashoffset]="intencionUso.offsetSi"
+                ></circle>
+                <!-- Segmento Tal vez empalmado para completar 93.5% -->
+                <circle
+                  class="panel-donut-arco panel-donut-arco--talvez"
+                  cx="50" cy="50" r="42"
+                  [attr.stroke-dasharray]="intencionUso.lenTalVez + ' ' + intencionUso.c"
+                  [attr.stroke-dashoffset]="intencionUso.offsetTalVez"
+                ></circle>
+              </svg>
+              <div class="panel-donut-centro">
+                <span class="panel-donut-cifra panel-donut-cifra--destacada">{{ intencionUso.positivoPorcentaje }}%</span>
+                <span class="panel-donut-subcifra">favorable</span>
+              </div>
+            </div>
+            <span class="panel-grafico-pie">Sí + Tal vez</span>
+          </div>
+
+          <!-- Desglose de los 3 puntos de P4, a todo el ancho y debajo de los dos círculos:
+               fuera del ítem para no descuadrar la altura de los círculos.
+               Sí + Tal vez + No = 100%, la misma base del círculo 1 (Distribución). -->
+          <div class="panel-som-desglose">
+            <ul class="panel-som-partes">
+              <li class="panel-som-parte panel-som-parte--si">
+                <span class="panel-som-punto" aria-hidden="true"></span>
+                Sí {{ intencionUso.si.porcentaje }}%
+              </li>
+              <li class="panel-som-parte panel-som-parte--talvez">
+                <span class="panel-som-punto" aria-hidden="true"></span>
+                Tal vez {{ intencionUso.talVez.porcentaje }}%
+              </li>
+              <li class="panel-som-parte panel-som-parte--no">
+                <span class="panel-som-punto" aria-hidden="true"></span>
+                No {{ intencionUso.no.porcentaje }}%
+              </li>
+            </ul>
+            <span class="panel-som-base">desglose de {{ intencionUso.total }} respuestas</span>
+          </div>
+
+          <!-- Card desprendida de los dos círculos: el 6.5% cierra el 100% con el otro paradigma -->
+          <div class="panel-rechazo-desprendido">
+            <span class="panel-rechazo-tallo" aria-hidden="true"></span>
+            <article class="panel-rechazo-card">
+              <div class="panel-rechazo-cabecera">
+                <span class="panel-rechazo-icono" aria-hidden="true">🔍</span>
+                <strong class="panel-rechazo-cifra">{{ intencionUso.no.porcentaje }}%</strong>
+                <span class="panel-rechazo-sub">paradigma tradicional</span>
+              </div>
+              <p class="panel-rechazo-desc">
+                Los dos círculos describen el paradigma que validamos:
+                <strong class="panel-rechazo-positivo">{{ intencionUso.positivoPorcentaje }}%</strong>
+                <span class="panel-rechazo-split">
+                  ({{ intencionUso.si.porcentaje }}% sí + {{ intencionUso.talVez.porcentaje }}% tal vez)
+                </span>
+                sumaría la app. Este
+                <strong class="panel-rechazo-negativo">{{ intencionUso.no.porcentaje }}%</strong>
+                es su reverso exacto: prefiere otros métodos de lectura o entretenimiento. Los dos
+                segmentos son complementarios y cierran el 100% de la muestra.
+              </p>
+              <p class="panel-rechazo-nota">
+                P{{ numeroIntencion }} · «{{ intencionUso.no.valor }}» ·
+                {{ intencionUso.no.cantidad }} de {{ intencionUso.total }} encuestas completas.
+              </p>
+            </article>
+          </div>
+
         </div>
 
         <div class="panel-intencion-texto">
           <h2 class="panel-seccion-titulo">Intención de uso</h2>
           <p class="panel-intencion-frase">
-            <strong>{{ intencionUso.cantidad }} de {{ intencionUso.total }}</strong> respondieron
-            “Sí, totalmente” a sumar la app a sus aplicaciones.
+            <strong>{{ intencionUso.positivoTotal }} de {{ intencionUso.total }}</strong>
+            muestran intención positiva o condicional de sumar la app.
           </p>
+
+          <!-- Desglose de los 3 segmentos -->
+          <ul class="panel-intencion-segmentos">
+            <li class="panel-intencion-segmento panel-intencion-segmento--si">
+              <span class="panel-intencion-seg-pct">{{ intencionUso.si.porcentaje }}%</span>
+              <span class="panel-intencion-seg-n">({{ intencionUso.si.cantidad }})</span>
+              <span class="panel-intencion-seg-label">Sí, totalmente</span>
+              <div class="panel-barra panel-barra--mini">
+                <span class="panel-barra-relleno panel-barra-relleno--si" [style.width.%]="intencionUso.si.porcentaje"></span>
+              </div>
+            </li>
+            <li class="panel-intencion-segmento panel-intencion-segmento--talvez">
+              <span class="panel-intencion-seg-pct">{{ intencionUso.talVez.porcentaje }}%</span>
+              <span class="panel-intencion-seg-n">({{ intencionUso.talVez.cantidad }})</span>
+              <span class="panel-intencion-seg-label">Tal vez <em>— depende de los temas</em></span>
+              <div class="panel-barra panel-barra--mini">
+                <span class="panel-barra-relleno panel-barra-relleno--talvez" [style.width.%]="intencionUso.talVez.porcentaje"></span>
+              </div>
+            </li>
+            <li class="panel-intencion-segmento panel-intencion-segmento--no">
+              <span class="panel-intencion-seg-pct">{{ intencionUso.no.porcentaje }}%</span>
+              <span class="panel-intencion-seg-n">({{ intencionUso.no.cantidad }})</span>
+              <span class="panel-intencion-seg-label">No</span>
+              <div class="panel-barra panel-barra--mini">
+                <span class="panel-barra-relleno panel-barra-relleno--no" [style.width.%]="intencionUso.no.porcentaje"></span>
+              </div>
+            </li>
+          </ul>
+
           <p class="panel-nota">
-            Es el porcentaje que después alimenta el SOM. Acá no se calcula: el SOM necesita
-            el TAM y el SAM reales, que todavía no están medidos.
+            El "Tal vez" no es indecisión: es una condición de producto accionable
+            ("sumaría la app si los temas me sirven"). Combinado con el "Sí", representa
+            el mercado real disponible para el SOM.
           </p>
+
         </div>
       </section>
     }
-
     <!-- Los 4 bloques de preguntas -->
     <section class="panel-bloques">
       @for (bloque of bloques(); track bloque.id; let indice = $index) {
@@ -313,6 +453,7 @@
         <table class="panel-tabla">
           <thead>
             <tr>
+              <th class="panel-th-id">#</th>
               <th>Fecha</th>
               <th>Estado</th>
               @for (pregunta of preguntas; track pregunta.id; let i = $index) {
@@ -327,7 +468,15 @@
 
           <tbody>
             @for (fila of filasDeLaPagina(); track fila.id) {
-              <tr [class.panel-tabla-fila--abierta]="filaAbierta() === fila.id">
+              <tr
+                [id]="'fila-' + fila.id"
+                [class.panel-tabla-fila--abierta]="filaAbierta() === fila.id"
+              >
+                <td class="panel-celda-id">
+                  <span class="panel-id-chip" [title]="'Registro ' + numeroRegistro(fila.id)">
+                    {{ numeroRegistro(fila.id) }}
+                  </span>
+                </td>
                 <td class="panel-celda-fecha">{{ formatearFecha(fila.fecha) }}</td>
                 <td>
                   <span class="panel-chip" [class]="'panel-chip--' + fila.estado" [title]="fila.duplicadoDe ? 'Ya había respondido: se conserva la respuesta ' + fila.duplicadoDe : ''">{{ etiquetaEstado(fila.estado) }}</span>
@@ -387,7 +536,7 @@
 
               @if (filaAbierta() === fila.id) {
                 <tr class="panel-tabla-detalle">
-                  <td [attr.colspan]="preguntas.length + 6">
+                  <td [attr.colspan]="preguntas.length + 7">
                     @if (fila.comentario) {
                       <p class="panel-comentario-completo">“{{ fila.comentario }}”</p>
                     }
@@ -414,7 +563,7 @@
 
             @if (!filasDeLaPagina().length) {
               <tr>
-                <td [attr.colspan]="preguntas.length + 6" class="panel-vacio">
+                <td [attr.colspan]="preguntas.length + 7" class="panel-vacio">
                   No hay respuestas que coincidan con los filtros.
                 </td>
               </tr>
@@ -475,7 +624,13 @@
       @if (comentarios().length) {
         <ul class="panel-lista-comentarios">
           @for (fila of comentarios(); track fila.id) {
-            <li class="panel-comentario">
+            <li [id]="'comentario-' + fila.id" class="panel-comentario">
+              <div class="panel-comentario-cabecera">
+                <div class="panel-comentario-etiquetas">
+                  <span class="panel-comentario-badge">{{ numeroComentario(fila.id) }}</span>
+                  <span class="panel-comentario-ref">Registro {{ numeroRegistro(fila.id) }}</span>
+                </div>
+              </div>
               <p class="panel-comentario-texto">“{{ fila.comentario }}”</p>
               <p class="panel-comentario-meta">
                 {{ fila.respuestas[preguntaNivel?.id || 'nivelEducativo'] || 'Sin nivel declarado' }}

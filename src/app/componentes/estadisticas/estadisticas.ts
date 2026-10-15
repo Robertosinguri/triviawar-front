@@ -56,6 +56,9 @@ export class EstadisticasComponent {
   /** El catálogo de preguntas: define el orden de las columnas de la sábana. */
   protected readonly preguntas = PREGUNTAS;
 
+  /** Número visible (1-based) de la pregunta de intención, para citarla como "P4". */
+  protected readonly numeroIntencion = PREGUNTAS.findIndex((pregunta) => pregunta.id === PREGUNTA_INTENCION) + 1;
+
   /** Pregunta 1: se usa para armar el filtro por nivel educativo. */
   protected readonly preguntaNivel = PREGUNTAS.find((pregunta) => pregunta.id === 'nivelEducativo') ?? null;
 
@@ -200,15 +203,54 @@ export class EstadisticasComponent {
     }));
   });
 
-  /** Intención de uso: el dato que después alimenta el SOM. */
-  protected readonly intencion = computed(() => {
+  /**
+   * Intención de uso: los tres segmentos completos de la pregunta `sumariaLaApp`.
+   *
+   * Exponer solo el "Sí, totalmente" oculta que el "Tal vez" (usuarios condicionales)
+   * es mercado real accionable. Se muestran los tres segmentos más el total positivo
+   * combinado (Sí + Tal vez) para que el SOM no quede subestimado.
+   */
+  protected readonly intencionDeUso = computed(() => {
     const bloque = this.bloques().find((item) => item.id === PREGUNTA_INTENCION);
     if (!bloque || !bloque.total) return null;
 
-    const primera = bloque.opciones[0];
-    if (!primera) return null;
+    // Las opciones vienen ordenadas igual que en encuesta-preguntas.ts:
+    // [0] Sí totalmente  [1] Tal vez  [2] No
+    const si      = bloque.opciones[0] ?? { cantidad: 0, porcentaje: 0, valor: '' };
+    const talVez  = bloque.opciones[1] ?? { cantidad: 0, porcentaje: 0, valor: '' };
+    const no      = bloque.opciones[2] ?? { cantidad: 0, porcentaje: 0, valor: '' };
 
-    return { porcentaje: primera.porcentaje, cantidad: primera.cantidad, total: bloque.total };
+    const positivoTotal = si.cantidad + talVez.cantidad;
+    const positivoPorcentaje = bloque.total
+      ? Math.round((positivoTotal / bloque.total) * 1000) / 10
+      : 0;
+
+    // Circunferencia para radio r=42: 2 * PI * 42 = 263.89
+    const c = 263.89;
+    const lenSi = Math.round((si.porcentaje / 100) * c * 10) / 10;
+    const lenTalVez = Math.round((talVez.porcentaje / 100) * c * 10) / 10;
+    const lenNo = Math.round((no.porcentaje / 100) * c * 10) / 10;
+
+    const offsetSi = 0;
+    const offsetTalVez = -lenSi;
+    const offsetNo = -(lenSi + lenTalVez);
+
+    return {
+      total: bloque.total,
+      si,
+      talVez,
+      no,
+      positivoTotal,
+      positivoPorcentaje,
+      // Geometría SVG
+      c,
+      lenSi,
+      lenTalVez,
+      lenNo,
+      offsetSi,
+      offsetTalVez,
+      offsetNo
+    };
   });
 
   /** Comentarios escritos, para la lectura cualitativa. */
@@ -333,6 +375,39 @@ export class EstadisticasComponent {
   protected alternarComentario(id: string): void {
     this.filaAbierta.set(this.filaAbierta() === id ? null : id);
   }
+
+  // --- Trazabilidad y enlace Sábana ↔ Comentarios -----------------------------
+
+  /** Mapa id de fila -> número correlativo absoluto (1-based) en listado original */
+  protected readonly indiceRegistroPorId = computed(() => {
+    const listado = this.panel.datos()?.listado ?? [];
+    const mapa = new Map<string, number>();
+    listado.forEach((fila, idx) => mapa.set(fila.id, idx + 1));
+    return mapa;
+  });
+
+  protected numeroRegistro(id: string): string {
+    const num = this.indiceRegistroPorId().get(id);
+    if (!num) return '—';
+    const total = this.panel.datos()?.listado?.length ?? 100;
+    return '#' + String(num).padStart(total >= 100 ? 3 : 2, '0');
+  }
+
+  /** Índice correlativo del comentario dentro de la lista de comentarios (C-01, C-02...) */
+  protected readonly indiceComentarioPorId = computed(() => {
+    const listado = this.comentarios();
+    const mapa = new Map<string, number>();
+    listado.forEach((fila, idx) => mapa.set(fila.id, idx + 1));
+    return mapa;
+  });
+
+  protected numeroComentario(id: string): string {
+    const num = this.indiceComentarioPorId().get(id);
+    if (!num) return '';
+    return 'C-' + String(num).padStart(2, '0');
+  }
+
+
 
   // --- Presentación ---------------------------------------------------------
 

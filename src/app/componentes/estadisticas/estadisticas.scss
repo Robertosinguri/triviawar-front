@@ -565,11 +565,112 @@ $panel-superficie: rgba(255, 255, 255, 0.04);
   border-radius: 16px;
 }
 
+// Contenedor de los dos gráficos circulares conectados
+.panel-intencion-graficos {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 12px;
+  background: rgba(0, 0, 0, 0.22);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 14px;
+}
+
+.panel-grafico-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+.panel-grafico-etiqueta {
+  font-size: 0.67rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: rgba($panel-cian, 0.9);
+}
+
+.panel-grafico-pie {
+  font-size: 0.64rem;
+  color: rgba($dark-text, 0.45);
+}
+
+// Franja a todo el ancho, debajo de los círculos. Al quedar fuera de los ítems,
+// no altera su altura y los dos círculos siguen alineados.
+.panel-som-desglose {
+  flex: 0 0 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  width: 100%;
+}
+
+// Desglose visible bajo el SOM: el agregado no viaja sin sus partes (Sí + Tal vez + No = 100%)
+.panel-som-partes {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 4px 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.panel-som-parte {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.62rem;
+  font-weight: 600;
+  color: rgba($dark-text, 0.72);
+}
+
+.panel-som-punto {
+  flex: 0 0 auto;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+}
+
+.panel-som-parte--si .panel-som-punto {
+  background: $panel-aqua;
+}
+
+.panel-som-parte--talvez .panel-som-punto {
+  background: $panel-amarillo;
+}
+
+.panel-som-parte--no .panel-som-punto {
+  background: $panel-cian;
+}
+
+.panel-som-base {
+  font-size: 0.58rem;
+  color: rgba($dark-text, 0.4);
+}
+
+.panel-grafico-conector {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 4px;
+}
+
+.panel-grafico-signo {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: rgba($panel-aqua, 0.65);
+}
+
 .panel-donut {
   position: relative;
   flex: 0 0 auto;
-  width: 124px;
-  height: 124px;
+  width: 112px;
+  height: 112px;
 
   svg {
     width: 100%;
@@ -584,24 +685,53 @@ $panel-superficie: rgba(255, 255, 255, 0.04);
   stroke-width: 10;
 }
 
-.panel-donut-valor {
+.panel-donut-arco {
   fill: none;
-  stroke: $panel-aqua;
   stroke-width: 10;
-  stroke-linecap: round;
-  filter: drop-shadow(0 0 6px rgba($panel-aqua, 0.7));
-  transition: stroke-dasharray 0.6s ease;
+  transition: stroke-dasharray 0.6s ease, stroke-dashoffset 0.6s ease;
+
+  &--si {
+    stroke: $panel-aqua;
+  }
+
+  &--talvez {
+    stroke: $panel-amarillo;
+  }
+
+  &--no {
+    stroke: $panel-cian;
+  }
 }
 
-.panel-donut-texto {
+.panel-donut-centro {
   position: absolute;
   inset: 0;
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
-  font-size: 1.35rem;
+  line-height: 1.15;
+  pointer-events: none;
+}
+
+.panel-donut-cifra {
+  font-size: 1.18rem;
   font-weight: 700;
-  color: #6ee7c8;
+  color: $dark-text;
+
+  &--destacada {
+    font-size: 1.3rem;
+    color: #6ee7c8;
+    filter: drop-shadow(0 0 6px rgba($panel-aqua, 0.4));
+  }
+}
+
+.panel-donut-subcifra {
+  font-size: 0.62rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: rgba($dark-text, 0.5);
 }
 
 .panel-intencion-texto {
@@ -610,7 +740,7 @@ $panel-superficie: rgba(255, 255, 255, 0.04);
 }
 
 .panel-intencion-frase {
-  margin: 0 0 8px;
+  margin: 0 0 12px;
   font-size: 0.84rem;
   line-height: 1.5;
   color: rgba($dark-text, 0.88);
@@ -618,6 +748,167 @@ $panel-superficie: rgba(255, 255, 255, 0.04);
   strong {
     color: $panel-cian;
   }
+}
+
+// Lista de los 3 segmentos de intención
+.panel-intencion-segmentos {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 0 0 12px;
+  padding: 0;
+  list-style: none;
+}
+
+.panel-intencion-segmento {
+  display: grid;
+  grid-template-columns: 3.5rem 2.2rem 1fr;
+  grid-template-rows: auto auto;
+  column-gap: 8px;
+  align-items: center;
+
+  .panel-barra--mini {
+    grid-column: 1 / -1;
+    margin-top: 3px;
+    height: 4px;
+  }
+}
+
+.panel-intencion-seg-pct {
+  font-size: 0.9rem;
+  font-weight: 700;
+  text-align: right;
+}
+
+.panel-intencion-seg-n {
+  font-size: 0.68rem;
+  color: rgba($dark-text, 0.45);
+}
+
+.panel-intencion-seg-label {
+  font-size: 0.76rem;
+  line-height: 1.35;
+  color: rgba($dark-text, 0.8);
+
+  em {
+    font-style: normal;
+    color: rgba($dark-text, 0.5);
+    font-size: 0.68rem;
+  }
+}
+
+// Colores por segmento
+.panel-intencion-segmento--si .panel-intencion-seg-pct {
+  color: $panel-aqua;
+}
+
+.panel-intencion-segmento--talvez .panel-intencion-seg-pct {
+  color: $panel-amarillo;
+}
+
+.panel-intencion-segmento--no .panel-intencion-seg-pct {
+  color: $panel-cian;
+}
+
+// Barras mini con color por segmento
+.panel-barra-relleno--si {
+  background: linear-gradient(90deg, $panel-aqua, $panel-cian);
+}
+
+.panel-barra-relleno--talvez {
+  background: rgba($panel-amarillo, 0.75);
+}
+
+.panel-barra-relleno--no {
+  background: $panel-cian;
+}
+
+// Card desprendida de los dos círculos: cierra el 100% con el paradigma tradicional
+.panel-rechazo-desprendido {
+  flex: 0 0 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  margin-top: 2px;
+}
+
+// Tallo punteado: une la card con los dos círculos de arriba
+.panel-rechazo-tallo {
+  width: 0;
+  height: 16px;
+  border-left: 1px dashed rgba($panel-cian, 0.5);
+}
+
+.panel-rechazo-card {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  width: 100%;
+  padding: 12px 14px;
+  text-align: left;
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba($panel-cian, 0.32);
+  border-radius: 12px;
+  transition: border-color 0.15s ease, background 0.15s ease;
+
+  &:hover {
+    background: rgba(0, 0, 0, 0.38);
+    border-color: rgba($panel-cian, 0.5);
+  }
+}
+
+.panel-rechazo-cabecera {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.panel-rechazo-icono {
+  font-size: 1.05rem;
+  line-height: 1;
+}
+
+.panel-rechazo-cifra {
+  font-size: 1.25rem;
+  font-weight: 700;
+  line-height: 1;
+  color: $panel-cian;
+}
+
+.panel-rechazo-sub {
+  font-size: 0.69rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: rgba($dark-text, 0.75);
+}
+
+.panel-rechazo-desc {
+  margin: 2px 0 0;
+  font-size: 0.68rem;
+  line-height: 1.45;
+  color: rgba($dark-text, 0.62);
+}
+
+.panel-rechazo-positivo {
+  color: #6ee7c8;
+}
+
+.panel-rechazo-negativo {
+  color: $panel-cian;
+}
+
+.panel-rechazo-split {
+  font-size: 0.64rem;
+  color: rgba($dark-text, 0.5);
+}
+
+.panel-rechazo-nota {
+  margin: 2px 0 0;
+  font-size: 0.64rem;
+  line-height: 1.4;
+  color: rgba($dark-text, 0.45);
 }
 
 // --- Bloques de preguntas ----------------------------------------------------
@@ -1082,8 +1373,40 @@ $panel-superficie: rgba(255, 255, 255, 0.04);
   padding: 14px 16px;
   background: $panel-superficie;
   border: 1px solid $panel-borde;
-  border-left: 2px solid rgba($panel-cian, 0.6);
+  border-left: 3px solid rgba($panel-cian, 0.6);
   border-radius: 12px;
+}
+
+.panel-comentario-cabecera {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+  padding-bottom: 6px;
+  border-bottom: 1px dashed rgba(255, 255, 255, 0.08);
+}
+
+.panel-comentario-etiquetas {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.panel-comentario-badge {
+  display: inline-block;
+  padding: 2px 6px;
+  font-size: 0.64rem;
+  font-weight: 700;
+  color: #6ee7c8;
+  background: rgba($panel-aqua, 0.15);
+  border: 1px solid rgba($panel-aqua, 0.3);
+  border-radius: 6px;
+}
+
+.panel-comentario-ref {
+  font-size: 0.66rem;
+  font-weight: 600;
+  color: rgba($dark-text, 0.6);
 }
 
 .panel-comentario-texto {
@@ -1098,6 +1421,28 @@ $panel-superficie: rgba(255, 255, 255, 0.04);
   margin: 0;
   font-size: 0.66rem;
   color: rgba($dark-text, 0.45);
+}
+
+// Estilos de trazabilidad en la tabla de la sábana
+.panel-th-id {
+  width: 44px;
+  text-align: center;
+}
+
+.panel-celda-id {
+  text-align: center;
+  white-space: nowrap;
+}
+
+.panel-id-chip {
+  display: inline-block;
+  padding: 2px 5px;
+  font-size: 0.64rem;
+  font-weight: 700;
+  color: rgba($dark-text, 0.75);
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 6px;
 }
 
 .panel-footer {
