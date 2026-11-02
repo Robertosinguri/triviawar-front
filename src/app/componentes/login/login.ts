@@ -4,12 +4,10 @@ import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { FirebaseAuthService } from '../../servicios/auth/firebase-auth.service';
 import { PwaInstallService } from '../../servicios/pwa/pwa-install.service';
-import { EncuestaService } from '../../servicios/encuesta/encuesta.service';
-import { Encuesta } from '../encuesta/encuesta';
 
 @Component({
   selector: 'app-login',
-  imports: [CommonModule, FormsModule, Encuesta],
+  imports: [CommonModule, FormsModule],
   templateUrl: './login.html',
   styleUrl: './login.scss',
   changeDetection: ChangeDetectionStrategy.OnPush
@@ -18,7 +16,6 @@ export class Login {
   private readonly authService = inject(FirebaseAuthService);
   private readonly router = inject(Router);
   private readonly pwaInstallService = inject(PwaInstallService);
-  private readonly encuestaService = inject(EncuestaService);
 
   protected readonly mensajePwa = signal('');
 
@@ -95,8 +92,6 @@ export class Login {
     });
 
     if (success) {
-      // Si respondió la encuesta antes de loguearse, se vincula con su cuenta.
-      void this.encuestaService.vincularConLaCuenta();
       this.router.navigate(['/dashboard']);
     }
   }
@@ -104,8 +99,6 @@ export class Login {
   protected async loginConGoogle(): Promise<void> {
     const res = await this.authService.loginWithGoogle();
     if (res.success) {
-      // Se vincula la encuesta anónima (si existe) con la cuenta de Google.
-      void this.encuestaService.vincularConLaCuenta();
       if (res.isNewUser) {
         this.isGoogleNewUser.set(true);
         // Pre-cargar el nombre que trajo Google
