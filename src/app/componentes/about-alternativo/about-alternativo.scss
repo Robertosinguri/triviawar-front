@@ -1,0 +1,472 @@
+@use '../../theme/variables.scss' as *;
+
+// ══════════════════════════════════════════════════════════════
+// PÁGINA "QUÉ ES TRIVIAWAR"
+// Encabezado institucional + problema / solución + cliente
+// ══════════════════════════════════════════════════════════════
+
+$about-cian: $primary-sky;
+$about-amarillo: $primary-yellow;
+$about-magenta: $primary-pink;
+$about-aqua: $primary-aqua;
+$about-borde: rgba(255, 255, 255, 0.1);
+$about-superficie: rgba(255, 255, 255, 0.06);
+
+.about-container {
+    @extend %page-container;
+    position: relative;
+    z-index: 1;
+}
+
+.about-main {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 2rem 2rem 0;
+    flex: 1;
+    animation: fadeIn 0.6s ease-out;
+
+    > *:not(:last-child) {
+        margin-bottom: 5rem;
+    }
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+// ── Título de sección compartido ──
+.section-title {
+    font-family: $font-victor-mono;
+    font-weight: 700;
+    font-size: 1.8rem;
+    text-align: center;
+    color: $about-cian;
+    text-shadow: 0 0 20px rgba($about-cian, 0.4);
+    margin-bottom: 2.5rem;
+    letter-spacing: 0.05em;
+
+    &::after {
+        content: '';
+        display: block;
+        width: 80px;
+        height: 3px;
+        margin: 1rem auto 0;
+        background: linear-gradient(90deg, transparent, $about-cian, transparent);
+        border-radius: 2px;
+    }
+}
+
+// ══════════════════════════════════════════════════════════════
+// ENCABEZADO INSTITUCIONAL
+// ══════════════════════════════════════════════════════════════
+.ficha {
+    background: $about-superficie;
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid $about-borde;
+    border-radius: 18px;
+    padding: 2rem 2.25rem;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+
+    &::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 3px;
+        background: linear-gradient(90deg, $about-magenta, $about-cian, $about-amarillo);
+    }
+}
+
+.ficha-universidad {
+    font-family: $font-victor-mono;
+    font-size: 0.82rem;
+    font-weight: 700;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: $about-cian;
+    margin-bottom: 0.9rem;
+}
+
+.ficha-materia {
+    font-family: $font-red-hat;
+    font-size: 1.85rem;
+    font-weight: 700;
+    color: $dark-text;
+    line-height: 1.25;
+    margin-bottom: 0.4rem;
+}
+
+.ficha-proyecto {
+    font-family: $font-red-hat;
+    font-size: 1.05rem;
+    color: rgba($dark-text, 0.72);
+    font-style: italic;
+    margin-bottom: 1.75rem;
+}
+
+.ficha-datos {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.25rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    margin: 0;
+    text-align: left;
+}
+
+.ficha-dato {
+    min-width: 0;
+
+    dt {
+        font-family: $font-victor-mono;
+        font-size: 0.66rem;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        color: rgba($about-amarillo, 0.85);
+        margin-bottom: 0.35rem;
+    }
+
+    dd {
+        margin: 0;
+        font-family: $font-red-hat;
+        font-size: 0.92rem;
+        line-height: 1.5;
+        color: rgba($dark-text, 0.9);
+        overflow-wrap: anywhere;
+    }
+}
+
+// ══════════════════════════════════════════════════════════════
+// ¿QUÉ ES TRIVIAWAR?
+// ══════════════════════════════════════════════════════════════
+.hero-section {
+    text-align: center;
+}
+
+.hero-title {
+    font-family: $font-monoton;
+    font-size: 2.8rem;
+    color: $about-amarillo;
+    text-shadow:
+        0 0 20px rgba($about-amarillo, 0.5),
+        0 0 60px rgba($about-amarillo, 0.2);
+    margin-bottom: 1.75rem;
+    letter-spacing: 0.06em;
+    line-height: 1.2;
+}
+
+.hero-resumen {
+    font-family: $font-red-hat;
+    font-size: 1.2rem;
+    line-height: 1.8;
+    color: rgba(white, 0.9);
+    max-width: 820px;
+    margin: 0 auto;
+    background: rgba(255, 255, 255, 0.06);
+    backdrop-filter: blur(16px);
+    border: 1px solid $about-borde;
+    border-radius: 16px;
+    padding: 1.75rem 2rem;
+}
+
+// ══════════════════════════════════════════════════════════════
+// EL PROBLEMA → LA SOLUCIÓN
+// ══════════════════════════════════════════════════════════════
+.duelo-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.bloque {
+    width: 100%;
+    background: $about-superficie;
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid $about-borde;
+    border-left: 3px solid $about-magenta;
+    border-radius: 16px;
+    padding: 1.75rem 2rem;
+
+    &--solucion {
+        border-left-color: $about-aqua;
+        box-shadow: 0 0 40px rgba($about-aqua, 0.08);
+    }
+}
+
+.bloque-etiqueta {
+    display: inline-block;
+    font-family: $font-victor-mono;
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: $about-magenta;
+    margin-bottom: 0.9rem;
+
+    .bloque--solucion & {
+        color: $about-aqua;
+    }
+}
+
+.bloque-texto {
+    font-family: $font-red-hat;
+    font-size: 1.08rem;
+    line-height: 1.85;
+    color: rgba($dark-text, 0.88);
+    margin: 0;
+}
+
+// ── Conector vertical entre los dos bloques ──
+.bloque-conector {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.65rem 0;
+}
+
+.conector-linea {
+    width: 2px;
+    height: 22px;
+    background: linear-gradient(180deg, rgba($about-magenta, 0.5), rgba($about-aqua, 0.5));
+}
+
+.conector-flecha {
+    font-size: 0.8rem;
+    color: rgba($about-aqua, 0.9);
+    line-height: 1;
+}
+
+// ══════════════════════════════════════════════════════════════
+// EL CLIENTE
+// ══════════════════════════════════════════════════════════════
+.cliente-card {
+    background: rgba($about-aqua, 0.08);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba($about-aqua, 0.28);
+    border-radius: 18px;
+    padding: 2rem 2.25rem;
+    box-shadow: 0 0 45px rgba($about-aqua, 0.08);
+}
+
+.cliente-etiqueta {
+    display: inline-block;
+    font-family: $font-victor-mono;
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: $about-aqua;
+    margin-bottom: 1rem;
+}
+
+.cliente-texto {
+    font-family: $font-red-hat;
+    font-size: 1.08rem;
+    line-height: 1.85;
+    color: rgba($dark-text, 0.9);
+    margin: 0 0 1.5rem;
+}
+
+.cliente-motivacion {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.9rem;
+    padding: 1.25rem 1.35rem;
+    background: rgba(0, 0, 0, 0.22);
+    border-radius: 14px;
+
+    p {
+        margin: 0;
+        font-family: $font-red-hat;
+        font-size: 1rem;
+        line-height: 1.75;
+        color: rgba($dark-text, 0.85);
+    }
+}
+
+.motivacion-icono {
+    font-size: 1.35rem;
+    line-height: 1.4;
+    flex-shrink: 0;
+}
+
+// ══════════════════════════════════════════════════════════════
+// QUÉ ENCONTRÁS ADENTRO
+// ══════════════════════════════════════════════════════════════
+.pilares-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1.5rem;
+}
+
+.pilar-card {
+    background: $about-superficie;
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid $about-borde;
+    border-radius: 18px;
+    padding: 1.75rem 1.4rem;
+    text-align: center;
+    transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+
+    &:hover {
+        transform: translateY(-4px);
+        border-color: rgba($about-cian, 0.35);
+        box-shadow: 0 12px 35px rgba(0, 0, 0, 0.28);
+    }
+}
+
+.pilar-icono {
+    display: block;
+    font-size: 1.9rem;
+    line-height: 1;
+    margin-bottom: 1rem;
+}
+
+.pilar-titulo {
+    font-family: $font-victor-mono;
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: $about-cian;
+    margin-bottom: 0.7rem;
+    line-height: 1.4;
+}
+
+.pilar-texto {
+    font-family: $font-red-hat;
+    font-size: 0.9rem;
+    line-height: 1.7;
+    color: rgba($dark-text, 0.78);
+    margin: 0;
+}
+
+// ══════════════════════════════════════════════════════════════
+// PIE DE PÁGINA
+// ══════════════════════════════════════════════════════════════
+.about-footer {
+    text-align: center;
+    padding: 2.5rem 1rem 3rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.footer-text {
+    font-family: $font-victor-mono;
+    font-size: 0.8rem;
+    line-height: 1.7;
+    color: rgba($dark-text, 0.6);
+    margin: 0 0 0.5rem;
+}
+
+.footer-nota {
+    font-family: $font-red-hat;
+    font-size: 0.85rem;
+    color: rgba($dark-text, 0.42);
+    margin: 0;
+}
+
+// ══════════════════════════════════════════════════════════════
+// RESPONSIVE
+// ══════════════════════════════════════════════════════════════
+@media (max-width: $tablet-large) {
+    .pilares-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .hero-title {
+        font-size: 2.3rem;
+    }
+
+    .ficha-datos {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+        text-align: center;
+    }
+}
+
+@include mobile-only {
+    .about-main {
+        padding: 1.25rem 1rem 0;
+
+        > *:not(:last-child) {
+            margin-bottom: 3.25rem;
+        }
+    }
+
+    .ficha {
+        padding: 1.5rem 1.25rem;
+    }
+
+    .ficha-materia {
+        font-size: 1.4rem;
+    }
+
+    .ficha-proyecto {
+        font-size: 0.95rem;
+    }
+
+    .hero-title {
+        font-size: 1.75rem;
+        letter-spacing: 0.04em;
+    }
+
+    .hero-resumen {
+        font-size: 1.02rem;
+        line-height: 1.75;
+        padding: 1.35rem 1.25rem;
+    }
+
+    .section-title {
+        font-size: 1.4rem;
+        margin-bottom: 2rem;
+    }
+
+    .bloque {
+        padding: 1.4rem 1.25rem;
+    }
+
+    .bloque-texto,
+    .cliente-texto {
+        font-size: 1rem;
+    }
+
+    .cliente-card {
+        padding: 1.5rem 1.25rem;
+    }
+
+    .pilares-grid {
+        grid-template-columns: 1fr;
+        gap: 1.15rem;
+    }
+
+    .about-footer {
+        padding: 2rem 0.5rem 2.5rem;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .about-main {
+        animation: none;
+    }
+
+    .pilar-card {
+        transition: none;
+
+        &:hover {
+            transform: none;
+        }
+    }
+}

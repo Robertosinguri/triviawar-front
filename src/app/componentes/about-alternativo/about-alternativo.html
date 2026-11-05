@@ -1,0 +1,105 @@
+<div class="about-container">
+    <app-navbar>
+        <main class="about-main">
+
+            <!-- ═══════════════════════════════════════════
+                 ENCABEZADO INSTITUCIONAL
+                 ═══════════════════════════════════════════ -->
+            <header class="ficha">
+                <p class="ficha-universidad">{{ institucion.universidad }}</p>
+                <h1 class="ficha-materia">{{ institucion.materia }}</h1>
+                <p class="ficha-proyecto">{{ institucion.proyecto }}</p>
+
+                <dl class="ficha-datos">
+                    <div class="ficha-dato">
+                        <dt>Año lectivo / cuatrimestre</dt>
+                        <dd>{{ institucion.cuatrimestre }}</dd>
+                    </div>
+                    <div class="ficha-dato">
+                        <dt>Equipo</dt>
+                        <dd>{{ institucion.equipo.join(' / ') }}</dd>
+                    </div>
+                    <div class="ficha-dato">
+                        <dt>Grupo</dt>
+                        <dd>{{ institucion.grupo }} – {{ institucion.comision }}</dd>
+                    </div>
+                </dl>
+            </header>
+
+            <!-- ═══════════════════════════════════════════
+                 QUÉ ES TRIVIAWAR
+                 ═══════════════════════════════════════════ -->
+            <section class="hero-section">
+                <h2 class="hero-title">Sobre la Aplicación</h2>
+                <p class="hero-resumen">{{ resumen }}</p>
+            </section>
+
+            <!-- ═══════════════════════════════════════════
+                 EL PROBLEMA → LA SOLUCIÓN
+                 ═══════════════════════════════════════════ -->
+            <section class="duelo-section">
+                <article class="bloque bloque--problema">
+                    <span class="bloque-etiqueta">{{ problema.titulo }}</span>
+                    <p class="bloque-texto">{{ problema.texto }}</p>
+                </article>
+
+                <div class="bloque-conector" aria-hidden="true">
+                    <span class="conector-linea"></span>
+                    <span class="conector-flecha">▼</span>
+                    <span class="conector-linea"></span>
+                </div>
+
+                <article class="bloque bloque--solucion">
+                    <span class="bloque-etiqueta">{{ solucion.titulo }}</span>
+                    <p class="bloque-texto">{{ solucion.texto }}</p>
+                </article>
+            </section>
+
+            <!-- ═══════════════════════════════════════════
+                 EL CLIENTE
+                 ═══════════════════════════════════════════ -->
+            <section class="cliente-section">
+                <h2 class="section-title">¿PARA QUIÉN ES?</h2>
+
+                <div class="cliente-card">
+                    <span class="cliente-etiqueta">{{ cliente.titulo }}</span>
+                    <p class="cliente-texto">{{ cliente.texto }}</p>
+
+                    <div class="cliente-motivacion">
+                        <span class="motivacion-icono">🤝</span>
+                        <p>{{ motivacion }}</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ═══════════════════════════════════════════
+                 QUÉ ENCONTRÁS ADENTRO
+                 ═══════════════════════════════════════════ -->
+            <section class="pilares-section">
+                <h2 class="section-title">QUÉ ENCONTRÁS ADENTRO</h2>
+
+                <div class="pilares-grid">
+                    @for (pilar of pilares; track pilar.titulo) {
+                    <article class="pilar-card">
+                        <span class="pilar-icono">{{ pilar.icono }}</span>
+                        <h3 class="pilar-titulo">{{ pilar.titulo }}</h3>
+                        <p class="pilar-texto">{{ pilar.texto }}</p>
+                    </article>
+                    }
+                </div>
+            </section>
+
+            <!-- ═══════════════════════════════════════════
+                 PIE DE PÁGINA
+                 ═══════════════════════════════════════════ -->
+            <footer class="about-footer">
+                <p class="footer-text">
+                    {{ institucion.materia }} · {{ institucion.universidad }} ·
+                    {{ institucion.grupo }} – {{ institucion.comision }}
+                </p>
+                <p class="footer-nota">Proyecto académico en desarrollo.</p>
+            </footer>
+
+        </main>
+    </app-navbar>
+</div>

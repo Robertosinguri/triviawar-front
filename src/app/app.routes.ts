@@ -5,7 +5,7 @@ import { ConfigurarSalaComponent } from './componentes/configurar-sala/configura
 import { LobbyComponent } from './componentes/lobby/lobby';
 import { EntrenamientoComponent } from './componentes/entrenamiento/entrenamiento';
 import { AboutComponent } from './componentes/about/about';
-import { AboutClasicoComponent } from './componentes/about-clasico/about-clasico';
+import { AboutAlternativoComponent } from './componentes/about-alternativo/about-alternativo';
 import { Routes } from '@angular/router';
 import { RankingComponent } from './componentes/ranking/ranking';
 import { ResultadosComponent } from './componentes/resultados/resultados';
@@ -68,20 +68,19 @@ export const routes: Routes = [
     pathMatch: 'full'
   },
 
-  // RUTA 9: About — "Qué es TriviaWar"
-  // El enlace del menú sigue siendo /about, pero ahora abre la presentación
-  // del proyecto (problema, solución y cliente).
+  // RUTA 9: About — página clásica (historia, features y equipo MVPP)
+  // El enlace del menú (/about) abre esta versión.
   {
     path: 'about',
     component: AboutComponent,
     canActivate: [authGuard]
   },
 
-  // RUTA 9b: About original, conservado para no perder el contenido.
+  // RUTA 9b: About alternativo — presentación institucional del proyecto.
   // No está enlazado desde el menú: se entra sólo por URL.
   {
-    path: 'about-clasico',
-    component: AboutClasicoComponent,
+    path: 'about-alternativo',
+    component: AboutAlternativoComponent,
     canActivate: [authGuard]
   },
 

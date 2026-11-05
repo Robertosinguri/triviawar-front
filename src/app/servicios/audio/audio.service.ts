@@ -309,7 +309,7 @@ reanudarMusicaContexto() {
     rutaActual === '/dashboard' ||
     rutaActual === '/ranking' ||
     rutaActual === '/about' ||
-    rutaActual === '/about-clasico'
+    rutaActual === '/about-alternativo'
   ) {
     
     this.musicaDashboardActiva = true;
